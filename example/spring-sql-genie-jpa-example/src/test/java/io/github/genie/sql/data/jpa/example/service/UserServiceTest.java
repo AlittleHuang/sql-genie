@@ -36,6 +36,6 @@ class UserServiceTest {
     void updateRandomNumber() {
         User first = userAccess.getFirst();
         User updated = userService.updateRandomNumber(first.getId());
-        Assertions.assertNotEquals(first.getOptLock(), updated);
+        Assertions.assertNotEquals(first.getOptLock(), updated.getOptLock());
     }
 }
