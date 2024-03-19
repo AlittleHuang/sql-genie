@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    url: jdbc:mysql:///genie-example?rewriteBatchedStatements=true
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+logging:
+  level:
+    io.github.genie.sql: debug

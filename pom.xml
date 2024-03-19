@@ -20,6 +20,7 @@
     <module>spring-boot-starters/spring-boot-starter-sql-genie-common</module>
     <module>spring-boot-starters/spring-boot-starter-sql-genie-jdbc</module>
     <module>spring-boot-starters/spring-boot-starter-sql-genie-jpa</module>
+    <module>example/spring-sql-genie-jdbc-example</module>
   </modules>
 
   <properties>
@@ -137,6 +138,11 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
           <version>3.2.3</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-deploy-plugin</artifactId>
+          <version>3.1.1</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
