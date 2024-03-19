@@ -16,6 +16,7 @@ import lombok.Setter;
 public class UserQuery implements PageRequest<User> {
 
     private String username;
+    private String parentUsername;
     private Gender gender;
     private Integer page;
     private Integer size;
@@ -24,7 +25,8 @@ public class UserQuery implements PageRequest<User> {
     public ExpressionHolder<User, Boolean> apply(Root<User> root) {
         return root
                 .whereIf(username != null, r -> r.get(User::getUsername).eq(username))
-                .andIf(gender != null, r -> r.get(User::getGender).eq(gender));
+                .andIf(gender != null, r -> r.get(User::getGender).eq(gender))
+                .andIf(parentUsername != null, r -> r.get(User::getParentUser).get(User::getUsername).eq(parentUsername));
     }
 
 
