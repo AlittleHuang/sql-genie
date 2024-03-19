@@ -6,16 +6,11 @@
   <parent>
     <groupId>io.github.genie-cloud</groupId>
     <artifactId>sql-genie</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.1-SNAPSHOT</version><!-- project version -->
+    <relativePath>../../pom.xml</relativePath>
   </parent>
 
-  <artifactId>sql-genie-jpa-metamodel</artifactId>
-
-  <properties>
-    <maven.compiler.source>17</maven.compiler.source>
-    <maven.compiler.target>17</maven.compiler.target>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
+  <artifactId>sql-genie-jpa</artifactId>
 
   <dependencies>
     <dependency>
@@ -25,8 +20,8 @@
     </dependency>
 
     <dependency>
-      <groupId>jakarta.persistence</groupId>
-      <artifactId>jakarta.persistence-api</artifactId>
+      <groupId>org.jetbrains</groupId>
+      <artifactId>annotations</artifactId>
       <scope>provided</scope>
     </dependency>
 
@@ -36,6 +31,16 @@
       <scope>provided</scope>
       <optional>true</optional>
     </dependency>
-  </dependencies>
+    <dependency>
+      <groupId>jakarta.persistence</groupId>
+      <artifactId>jakarta.persistence-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.github.genie-cloud</groupId>
+      <artifactId>sql-genie-jdbc</artifactId>
+      <version>${project.version}</version>
+      <scope>compile</scope>
+    </dependency>
 
+  </dependencies>
 </project>

@@ -22,8 +22,25 @@
     <module>spring-boot-starters/spring-boot-starter-sql-genie-jpa</module>
   </modules>
 
+  <properties>
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
+    <maven.compiler.release>17</maven.compiler.release>
+    <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <lombok.version>1.18.30</lombok.version>
+    <spring.boot.version>3.2.3</spring.boot.version>
+  </properties>
+
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-dependencies</artifactId>
+        <version>${spring.boot.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
 
       <dependency>
         <groupId>org.junit</groupId>
@@ -76,15 +93,6 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
-
-  <properties>
-    <maven.compiler.source>17</maven.compiler.source>
-    <maven.compiler.target>17</maven.compiler.target>
-    <maven.compiler.release>17</maven.compiler.release>
-    <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <lombok.version>1.18.30</lombok.version>
-  </properties>
 
   <licenses>
     <license>

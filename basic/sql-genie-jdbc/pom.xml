@@ -6,21 +6,16 @@
   <parent>
     <groupId>io.github.genie-cloud</groupId>
     <artifactId>sql-genie</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.1-SNAPSHOT</version><!-- project version -->
+    <relativePath>../../pom.xml</relativePath>
   </parent>
 
-  <artifactId>sql-genie-builder</artifactId>
-
-  <properties>
-    <maven.compiler.source>17</maven.compiler.source>
-    <maven.compiler.target>17</maven.compiler.target>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
+  <artifactId>sql-genie-jdbc</artifactId>
 
   <dependencies>
     <dependency>
       <groupId>io.github.genie-cloud</groupId>
-      <artifactId>sql-genie-api</artifactId>
+      <artifactId>sql-genie-builder</artifactId>
       <version>${project.version}</version>
     </dependency>
 
@@ -36,10 +31,6 @@
       <scope>provided</scope>
       <optional>true</optional>
     </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-    </dependency>
-  </dependencies>
 
+  </dependencies>
 </project>
