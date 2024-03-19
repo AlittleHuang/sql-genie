@@ -23,4 +23,12 @@ public class UserController {
         return userAccess.where(query).slice(query);
     }
 
+    @GetMapping("/user/list/join-example")
+    public Page<User> joinExample(UserQuery query) {
+        return userAccess
+                .fetch(User::getParentUser, User::getRandomUser)
+                .where(query)
+                .slice(query);
+    }
+
 }
