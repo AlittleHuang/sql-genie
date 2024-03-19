@@ -403,6 +403,10 @@ class TypedExpressionImpl<T, U> implements TypedExpression<T, U> {
             super(operation, operand);
         }
 
+        public static <T> BooleanExpression<T> of(Expression expression) {
+            return new BooleanExpressionImpl<>((Operation) null, expression);
+        }
+
         @Override
         public BooleanExpression<T> not() {
             return new BooleanExpressionImpl<>(this, Expressions.operate(operand, Operator.NOT));

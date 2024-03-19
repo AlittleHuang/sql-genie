@@ -20,6 +20,8 @@ import io.github.genie.sql.builder.TypedExpressionImpl.NumberExpressionImpl;
 import io.github.genie.sql.builder.TypedExpressionImpl.PathExpressionImpl;
 import io.github.genie.sql.builder.TypedExpressionImpl.StringExpressionImpl;
 
+import java.util.function.Function;
+
 public class RootImpl<T> implements Root<T> {
 
     private static final RootImpl<?> INSTANCE = new RootImpl<>();
@@ -29,6 +31,12 @@ public class RootImpl<T> implements Root<T> {
     }
 
     protected RootImpl() {
+    }
+
+    @Override
+    public BooleanExpression<T> whereIf(boolean predicate, Function<Root<T>, ExpressionHolder<T, Boolean>> predicateBuilder) {
+        Expression holder = predicate ? predicateBuilder.apply(this).expression() : Expressions.TRUE;
+        return BooleanExpressionImpl.of(holder);
     }
 
     @Override

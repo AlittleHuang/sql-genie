@@ -10,7 +10,11 @@ import io.github.genie.sql.api.TypedExpression.NumberExpression;
 import io.github.genie.sql.api.TypedExpression.PathExpression;
 import io.github.genie.sql.api.TypedExpression.StringExpression;
 
+import java.util.function.Function;
+
 public interface Root<T> {
+
+    BooleanExpression<T> whereIf(boolean predicate, Function<Root<T>, ExpressionHolder<T, Boolean>> predicateBuilder);
 
     <U> ExpressionHolder<T, U> of(U value);
 
