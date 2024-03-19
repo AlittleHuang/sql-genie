@@ -1,7 +1,7 @@
-package io.github.genie.data.jpa;
+package io.github.genie.sql.data.jpa;
 
-import io.github.genie.data.access.BaseDbAccessConfiguration;
-import io.github.genie.data.access.TransactionalUpdate;
+import io.github.genie.sql.data.access.BaseDbAccessConfiguration;
+import io.github.genie.sql.data.access.TransactionalUpdate;
 import io.github.genie.sql.api.Query;
 import io.github.genie.sql.api.Update;
 import io.github.genie.sql.builder.AbstractQueryExecutor;

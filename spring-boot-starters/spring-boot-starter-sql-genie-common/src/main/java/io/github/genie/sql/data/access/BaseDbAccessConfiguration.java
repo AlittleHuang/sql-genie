@@ -1,4 +1,4 @@
-package io.github.genie.data.access;
+package io.github.genie.sql.data.access;
 
 import io.github.genie.sql.builder.meta.Metamodel;
 import lombok.extern.slf4j.Slf4j;

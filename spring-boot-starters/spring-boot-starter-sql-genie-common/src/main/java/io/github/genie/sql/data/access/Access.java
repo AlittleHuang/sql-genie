@@ -1,4 +1,4 @@
-package io.github.genie.data.access;
+package io.github.genie.sql.data.access;
 
 import java.util.List;
 import java.util.Map;
