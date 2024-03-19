@@ -21,6 +21,7 @@
     <module>spring-boot-starters/spring-boot-starter-sql-genie-jdbc</module>
     <module>spring-boot-starters/spring-boot-starter-sql-genie-jpa</module>
     <module>example/spring-sql-genie-jdbc-example</module>
+    <module>example/spring-sql-genie-jpa-example</module>
   </modules>
 
   <properties>
