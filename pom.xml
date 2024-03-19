@@ -6,17 +6,20 @@
 
   <groupId>io.github.genie-cloud</groupId>
   <artifactId>sql-genie</artifactId>
-  <version>1.1.0</version>
+  <version>1.1.1-SNAPSHOT</version><!-- project version -->
 
   <packaging>pom</packaging>
 
   <modules>
-    <module>sql-genie-test</module>
-    <module>sql-genie-api</module>
-    <module>sql-genie-builder</module>
-    <module>sql-genie-jdbc</module>
-    <module>sql-genie-jpa</module>
-    <module>sql-genie-jpa-metamodel</module>
+    <module>basic/sql-genie-test</module>
+    <module>basic/sql-genie-api</module>
+    <module>basic/sql-genie-builder</module>
+    <module>basic/sql-genie-jdbc</module>
+    <module>basic/sql-genie-jpa</module>
+    <module>basic/sql-genie-jpa-metamodel</module>
+    <module>spring-boot-starters/spring-boot-starter-sql-genie-common</module>
+    <module>spring-boot-starters/spring-boot-starter-sql-genie-jdbc</module>
+    <module>spring-boot-starters/spring-boot-starter-sql-genie-jpa</module>
   </modules>
 
   <dependencyManagement>
