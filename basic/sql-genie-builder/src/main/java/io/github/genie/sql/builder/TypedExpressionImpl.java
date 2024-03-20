@@ -2,7 +2,10 @@ package io.github.genie.sql.builder;
 
 import io.github.genie.sql.api.Column;
 import io.github.genie.sql.api.Expression;
-import io.github.genie.sql.api.ExpressionHolder;
+import io.github.genie.sql.api.ExpressionOperator;
+import io.github.genie.sql.api.ExpressionOperator.AndOperator;
+import io.github.genie.sql.api.ExpressionOperator.OrOperator;
+import io.github.genie.sql.api.TypedExpression;
 import io.github.genie.sql.api.ExpressionOperator.ComparableOperator;
 import io.github.genie.sql.api.ExpressionOperator.NumberOperator;
 import io.github.genie.sql.api.ExpressionOperator.PathOperator;
@@ -18,7 +21,7 @@ import io.github.genie.sql.api.Path.ComparablePath;
 import io.github.genie.sql.api.Path.NumberPath;
 import io.github.genie.sql.api.Path.StringPath;
 import io.github.genie.sql.api.Root;
-import io.github.genie.sql.api.TypedExpression;
+import io.github.genie.sql.api.TypedExpression.BasicExpression;
 import io.github.genie.sql.builder.DefaultExpressionOperator.ComparableOperatorImpl;
 import io.github.genie.sql.builder.DefaultExpressionOperator.NumberOperatorImpl;
 import io.github.genie.sql.builder.DefaultExpressionOperator.PathOperatorImpl;
@@ -32,7 +35,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-class TypedExpressionImpl<T, U> implements TypedExpression<T, U> {
+class TypedExpressionImpl<T, U> implements BasicExpression<T, U> {
     protected final Operation operation;
     protected final Expression operand;
 
@@ -49,13 +52,13 @@ class TypedExpressionImpl<T, U> implements TypedExpression<T, U> {
         return operate(operator, ExpressionHolders.of(value));
     }
 
-    protected Expression operate(Operator operator, ExpressionHolder<T, ?> expression) {
+    protected Expression operate(Operator operator, TypedExpression<T, ?> expression) {
         return operate(operator, Lists.of(expression));
     }
 
-    protected Expression operate(Operator operator, Iterable<? extends ExpressionHolder<T, ?>> expressions) {
+    protected Expression operate(Operator operator, Iterable<? extends TypedExpression<T, ?>> expressions) {
         List<Expression> args = StreamSupport.stream(expressions.spliterator(), false)
-                .map(ExpressionHolder::expression)
+                .map(TypedExpression::expression)
                 .collect(Collectors.toList());
         return Expressions.operate(this.operand, operator, args);
     }
@@ -66,7 +69,7 @@ class TypedExpressionImpl<T, U> implements TypedExpression<T, U> {
     }
 
     @Override
-    public BooleanExpression<T> eq(ExpressionHolder<T, U> value) {
+    public BooleanExpression<T> eq(TypedExpression<T, U> value) {
         Expression operate = operate(Operator.EQ, value);
         return new BooleanExpressionImpl<>(this, operate);
     }
@@ -77,7 +80,7 @@ class TypedExpressionImpl<T, U> implements TypedExpression<T, U> {
     }
 
     @Override
-    public BooleanExpression<T> ne(ExpressionHolder<T, U> value) {
+    public BooleanExpression<T> ne(TypedExpression<T, U> value) {
         Expression operate = operate(Operator.NE, value);
         return new BooleanExpressionImpl<>(this, operate);
     }
@@ -89,7 +92,7 @@ class TypedExpressionImpl<T, U> implements TypedExpression<T, U> {
     }
 
     @Override
-    public BooleanExpression<T> in(@NotNull List<? extends ExpressionHolder<T, U>> values) {
+    public BooleanExpression<T> in(@NotNull List<? extends TypedExpression<T, U>> values) {
         Expression operate = operate(Operator.IN, values);
         return new BooleanExpressionImpl<>(this, operate);
     }
@@ -106,9 +109,9 @@ class TypedExpressionImpl<T, U> implements TypedExpression<T, U> {
     }
 
     @Override
-    public BooleanExpression<T> notIn(@NotNull List<? extends ExpressionHolder<T, U>> values) {
+    public BooleanExpression<T> notIn(@NotNull List<? extends TypedExpression<T, U>> values) {
         List<Expression> expressions = values.stream()
-                .map(ExpressionHolder::expression)
+                .map(TypedExpression::expression)
                 .collect(Collectors.toList());
         Expression operate = Expressions.operate(operand, Operator.IN, expressions);
         operate = Expressions.operate(operate, Operator.NOT);
@@ -233,32 +236,32 @@ class TypedExpressionImpl<T, U> implements TypedExpression<T, U> {
         }
 
         @Override
-        public BooleanExpression<T> ge(ExpressionHolder<T, U> expression) {
+        public BooleanExpression<T> ge(TypedExpression<T, U> expression) {
             return new BooleanExpressionImpl<>(this, operate(Operator.GE, expression));
         }
 
         @Override
-        public BooleanExpression<T> gt(ExpressionHolder<T, U> expression) {
+        public BooleanExpression<T> gt(TypedExpression<T, U> expression) {
             return new BooleanExpressionImpl<>(this, operate(Operator.GT, expression));
         }
 
         @Override
-        public BooleanExpression<T> le(ExpressionHolder<T, U> expression) {
+        public BooleanExpression<T> le(TypedExpression<T, U> expression) {
             return new BooleanExpressionImpl<>(this, operate(Operator.LE, expression));
         }
 
         @Override
-        public BooleanExpression<T> lt(ExpressionHolder<T, U> expression) {
+        public BooleanExpression<T> lt(TypedExpression<T, U> expression) {
             return new BooleanExpressionImpl<>(this, operate(Operator.LT, expression));
         }
 
         @Override
-        public BooleanExpression<T> between(ExpressionHolder<T, U> l, ExpressionHolder<T, U> r) {
+        public BooleanExpression<T> between(TypedExpression<T, U> l, TypedExpression<T, U> r) {
             return new BooleanExpressionImpl<>(this, operate(Operator.BETWEEN, Lists.of(l, r)));
         }
 
         @Override
-        public BooleanExpression<T> notBetween(ExpressionHolder<T, U> l, ExpressionHolder<T, U> r) {
+        public BooleanExpression<T> notBetween(TypedExpression<T, U> l, TypedExpression<T, U> r) {
             Expression operate = operate(Operator.BETWEEN, Lists.of(l, r));
             operate = Expressions.operate(operate, Operator.NOT);
             return new BooleanExpressionImpl<>(this, operate);
@@ -289,27 +292,27 @@ class TypedExpressionImpl<T, U> implements TypedExpression<T, U> {
         }
 
         @Override
-        public NumberExpression<T, U> add(ExpressionHolder<T, U> expression) {
+        public NumberExpression<T, U> add(TypedExpression<T, U> expression) {
             return new NumberExpressionImpl<>(this, operate(Operator.ADD, expression));
         }
 
         @Override
-        public NumberExpression<T, U> subtract(ExpressionHolder<T, U> expression) {
+        public NumberExpression<T, U> subtract(TypedExpression<T, U> expression) {
             return new NumberExpressionImpl<>(this, operate(Operator.SUBTRACT, expression));
         }
 
         @Override
-        public NumberExpression<T, U> multiply(ExpressionHolder<T, U> expression) {
+        public NumberExpression<T, U> multiply(TypedExpression<T, U> expression) {
             return new NumberExpressionImpl<>(this, operate(Operator.MULTIPLY, expression));
         }
 
         @Override
-        public NumberExpression<T, U> divide(ExpressionHolder<T, U> expression) {
+        public NumberExpression<T, U> divide(TypedExpression<T, U> expression) {
             return new NumberExpressionImpl<>(this, operate(Operator.DIVIDE, expression));
         }
 
         @Override
-        public NumberExpression<T, U> mod(ExpressionHolder<T, U> expression) {
+        public NumberExpression<T, U> mod(TypedExpression<T, U> expression) {
             return new NumberExpressionImpl<>(this, operate(Operator.MOD, expression));
         }
 
@@ -370,7 +373,7 @@ class TypedExpressionImpl<T, U> implements TypedExpression<T, U> {
 
         @Override
         public StringExpression<T> substring(int a, int b) {
-            List<ExpressionHolder<T, ?>> expressions =
+            List<TypedExpression<T, ?>> expressions =
                     Lists.of(ExpressionHolders.of(a), ExpressionHolders.of(b));
             return new StringExpressionImpl<>(this, operate(Operator.SUBSTRING, expressions));
         }
@@ -419,7 +422,7 @@ class TypedExpressionImpl<T, U> implements TypedExpression<T, U> {
         }
 
         @NotNull
-        OrOperator<T> newOrOperator(TypedExpression<?, ?> expression) {
+        OrOperator<T> newOrOperator(BasicExpression<?, ?> expression) {
             if (expression instanceof OrOperator) {
                 return TypeCastUtil.unsafeCast(expression);
             }
@@ -428,8 +431,8 @@ class TypedExpressionImpl<T, U> implements TypedExpression<T, U> {
         }
 
         @NotNull
-        AndOperator<T> newAndOperator(TypedExpression<?, ?> expression) {
-            if (expression instanceof AndOperator) {
+        ExpressionOperator.AndOperator<T> newAndOperator(BasicExpression<?, ?> expression) {
+            if (expression instanceof ExpressionOperator.AndOperator) {
                 return TypeCastUtil.unsafeCast(expression);
             }
             TypedExpressionImpl<?, ?> expr = (TypedExpressionImpl<?, ?>) expression;
@@ -460,18 +463,18 @@ class TypedExpressionImpl<T, U> implements TypedExpression<T, U> {
         }
 
         @Override
-        public OrOperator<T> or(ExpressionHolder<T, Boolean> expression) {
+        public OrOperator<T> or(TypedExpression<T, Boolean> expression) {
             return new BooleanExpressionImpl<>(or(), expression.expression());
         }
 
         @Override
-        public OrOperator<T> or(List<? extends ExpressionHolder<T, Boolean>> expressions) {
+        public OrOperator<T> or(List<? extends TypedExpression<T, Boolean>> expressions) {
             if (expressions.isEmpty()) {
                 return this;
             }
             List<Expression> sub = expressions
                     .subList(0, expressions.size() - 1)
-                    .stream().map(ExpressionHolder::expression)
+                    .stream().map(TypedExpression::expression)
                     .collect(Collectors.toList());
             Operation operation = (Operation) Expressions.operate(or(), Operator.OR, sub);
             Expression last = expressions.get(expressions.size() - 1).expression();
@@ -509,17 +512,17 @@ class TypedExpressionImpl<T, U> implements TypedExpression<T, U> {
         }
 
         @Override
-        public AndOperator<T> and(ExpressionHolder<T, Boolean> expression) {
+        public AndOperator<T> and(TypedExpression<T, Boolean> expression) {
             return new BooleanExpressionImpl<>(and(), expression.expression());
         }
 
         @Override
-        public AndOperator<T> and(List<? extends ExpressionHolder<T, Boolean>> expressions) {
+        public AndOperator<T> and(List<? extends TypedExpression<T, Boolean>> expressions) {
             BooleanExpression<T> expr = this;
             if (!expressions.isEmpty()) {
                 List<Expression> sub = expressions
                         .subList(0, expressions.size() - 1)
-                        .stream().map(ExpressionHolder::expression)
+                        .stream().map(TypedExpression::expression)
                         .collect(Collectors.toList());
                 Operation operation = (Operation) Expressions.operate(and(), Operator.AND, sub);
                 Expression last = expressions.get(expressions.size() - 1).expression();

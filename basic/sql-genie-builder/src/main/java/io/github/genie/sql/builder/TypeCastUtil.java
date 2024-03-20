@@ -1,7 +1,7 @@
 package io.github.genie.sql.builder;
 
 import io.github.genie.sql.api.Expression;
-import io.github.genie.sql.api.ExpressionHolder;
+import io.github.genie.sql.api.TypedExpression;
 
 import java.util.List;
 
@@ -11,7 +11,7 @@ public class TypeCastUtil {
         return unsafeCast(expression);
     }
 
-    public static <T, U> ExpressionHolder<T, U> cast(Expression expression) {
+    public static <T, U> TypedExpression<T, U> cast(Expression expression) {
         return unsafeCast(expression);
     }
 

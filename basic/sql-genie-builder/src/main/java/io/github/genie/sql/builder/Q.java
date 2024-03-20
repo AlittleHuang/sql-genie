@@ -1,7 +1,7 @@
 package io.github.genie.sql.builder;
 
 import io.github.genie.sql.api.Expression;
-import io.github.genie.sql.api.ExpressionHolder;
+import io.github.genie.sql.api.TypedExpression;
 import io.github.genie.sql.api.Order;
 import io.github.genie.sql.api.Order.SortOrder;
 import io.github.genie.sql.api.Path;
@@ -77,20 +77,20 @@ public final class Q {
     }
 
     @SafeVarargs
-    public static <T> BooleanExpression<T> and(ExpressionHolder<T, Boolean> predicate,
-                                               ExpressionHolder<T, Boolean>... predicates) {
+    public static <T> BooleanExpression<T> and(TypedExpression<T, Boolean> predicate,
+                                               TypedExpression<T, Boolean>... predicates) {
         List<Expression> metas = Arrays.stream(predicates)
-                .map(ExpressionHolder::expression)
+                .map(TypedExpression::expression)
                 .collect(Collectors.toList());
         Expression expression = Expressions.operate(predicate.expression(), AND, metas);
         return ofBooleanExpression(expression);
     }
 
     @SafeVarargs
-    public static <T> BooleanExpression<T> or(ExpressionHolder<T, Boolean> predicate,
-                                              ExpressionHolder<T, Boolean>... predicates) {
+    public static <T> BooleanExpression<T> or(TypedExpression<T, Boolean> predicate,
+                                              TypedExpression<T, Boolean>... predicates) {
         List<Expression> metas = Arrays.stream(predicates)
-                .map(ExpressionHolder::expression)
+                .map(TypedExpression::expression)
                 .collect(Collectors.toList());
         Expression expression = Expressions.operate(predicate.expression(), OR, metas);
         return ofBooleanExpression(expression);
@@ -116,7 +116,7 @@ public final class Q {
                 .collect(Collectors.toList());
     }
 
-    public static <T> BooleanExpression<T> not(ExpressionHolder<T, Boolean> lt) {
+    public static <T> BooleanExpression<T> not(TypedExpression<T, Boolean> lt) {
         Expression expression = Expressions.operate(lt.expression(), NOT);
         return ofBooleanExpression(expression);
     }

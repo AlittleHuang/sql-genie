@@ -1,8 +1,8 @@
 package io.github.genie.sql.data.access;
 
 import io.github.genie.sql.api.ExpressionBuilder;
-import io.github.genie.sql.api.ExpressionHolder;
-import io.github.genie.sql.api.ExpressionHolder.ColumnHolder;
+import io.github.genie.sql.api.TypedExpression;
+import io.github.genie.sql.api.TypedExpression.ColumnHolder;
 import io.github.genie.sql.api.ExpressionOperator.ComparableOperator;
 import io.github.genie.sql.api.ExpressionOperator.NumberOperator;
 import io.github.genie.sql.api.ExpressionOperator.PathOperator;
@@ -51,7 +51,7 @@ public abstract class AccessFacade<T> implements BaseAccess<T> {
     }
 
     @Override
-    public Where0<T, Tuple> select(List<? extends ExpressionHolder<T, ?>> paths) {
+    public Where0<T, Tuple> select(List<? extends TypedExpression<T, ?>> paths) {
         return select().select(paths);
     }
 
@@ -61,7 +61,7 @@ public abstract class AccessFacade<T> implements BaseAccess<T> {
     }
 
     @Override
-    public <R> Where0<T, R> select(ExpressionHolder<T, R> expression) {
+    public <R> Where0<T, R> select(TypedExpression<T, R> expression) {
         return select().select(expression);
     }
 
@@ -126,7 +126,7 @@ public abstract class AccessFacade<T> implements BaseAccess<T> {
     }
 
     @Override
-    public Where0<T, Tuple> selectDistinct(List<? extends ExpressionHolder<T, ?>> paths) {
+    public Where0<T, Tuple> selectDistinct(List<? extends TypedExpression<T, ?>> paths) {
         return select().selectDistinct(paths);
     }
 
@@ -136,7 +136,7 @@ public abstract class AccessFacade<T> implements BaseAccess<T> {
     }
 
     @Override
-    public <R> Where0<T, R> selectDistinct(ExpressionHolder<T, R> expression) {
+    public <R> Where0<T, R> selectDistinct(TypedExpression<T, R> expression) {
         return select().selectDistinct(expression);
     }
 
@@ -236,17 +236,17 @@ public abstract class AccessFacade<T> implements BaseAccess<T> {
     }
 
     @Override
-    public Where<T, T> where(ExpressionHolder<T, Boolean> predicate) {
+    public Where<T, T> where(TypedExpression<T, Boolean> predicate) {
         return select().where(predicate);
     }
 
     @Override
-    public Where<T, T> where(Function<Root<T>, ExpressionHolder<T, Boolean>> predicateBuilder) {
+    public Where<T, T> where(Function<Root<T>, TypedExpression<T, Boolean>> predicateBuilder) {
         return select().where(predicateBuilder);
     }
 
     @Override
-    public Where<T, T> whereIf(boolean predicate, Function<Root<T>, ExpressionHolder<T, Boolean>> predicateBuilder) {
+    public Where<T, T> whereIf(boolean predicate, Function<Root<T>, TypedExpression<T, Boolean>> predicateBuilder) {
         return select().whereIf(predicate, predicateBuilder);
     }
 

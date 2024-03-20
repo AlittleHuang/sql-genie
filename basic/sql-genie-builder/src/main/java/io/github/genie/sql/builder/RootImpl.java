@@ -1,7 +1,7 @@
 package io.github.genie.sql.builder;
 
 import io.github.genie.sql.api.Expression;
-import io.github.genie.sql.api.ExpressionHolder;
+import io.github.genie.sql.api.TypedExpression;
 import io.github.genie.sql.api.Operation;
 import io.github.genie.sql.api.Path;
 import io.github.genie.sql.api.Path.BooleanPath;
@@ -34,13 +34,13 @@ public class RootImpl<T> implements Root<T> {
     }
 
     @Override
-    public BooleanExpression<T> whereIf(boolean predicate, Function<Root<T>, ExpressionHolder<T, Boolean>> predicateBuilder) {
+    public BooleanExpression<T> whereIf(boolean predicate, Function<Root<T>, TypedExpression<T, Boolean>> predicateBuilder) {
         Expression holder = predicate ? predicateBuilder.apply(this).expression() : Expressions.TRUE;
         return BooleanExpressionImpl.of(holder);
     }
 
     @Override
-    public <U> ExpressionHolder<T, U> of(U value) {
+    public <U> TypedExpression<T, U> of(U value) {
         return ExpressionHolders.of(value);
     }
 

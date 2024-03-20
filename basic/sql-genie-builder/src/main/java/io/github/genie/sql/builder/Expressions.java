@@ -3,8 +3,8 @@ package io.github.genie.sql.builder;
 import io.github.genie.sql.api.Column;
 import io.github.genie.sql.api.Constant;
 import io.github.genie.sql.api.Expression;
-import io.github.genie.sql.api.ExpressionHolder;
-import io.github.genie.sql.api.ExpressionHolder.ColumnHolder;
+import io.github.genie.sql.api.TypedExpression;
+import io.github.genie.sql.api.TypedExpression.ColumnHolder;
 import io.github.genie.sql.api.Lists;
 import io.github.genie.sql.api.Operation;
 import io.github.genie.sql.api.Operator;
@@ -31,8 +31,8 @@ public interface Expressions {
     }
 
     static Expression of(Object value) {
-        if (value instanceof ExpressionHolder<?, ?>) {
-            return ((ExpressionHolder<?, ?>) value).expression();
+        if (value instanceof TypedExpression<?, ?>) {
+            return ((TypedExpression<?, ?>) value).expression();
         } else if (value instanceof Path<?, ?>) {
             return of((Path<?, ?>) value);
         }

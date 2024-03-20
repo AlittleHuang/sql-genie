@@ -1,7 +1,7 @@
 package io.github.genie.sql.test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import io.github.genie.sql.api.ExpressionHolder;
+import io.github.genie.sql.api.TypedExpression;
 import io.github.genie.sql.api.Lists;
 import io.github.genie.sql.api.LockModeType;
 import io.github.genie.sql.api.Operator;
@@ -93,7 +93,7 @@ public class GenericApiTest {
                         new MysqlUpdateSqlBuilder(),
                         connectionProvider,
                         metamodel);
-                // resetData(connection, jdbcUpdate, query);
+                resetData(connection, jdbcUpdate, query);
                 allUsers = queryAllUsers(query);
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -431,7 +431,7 @@ public class GenericApiTest {
     @ArgumentsSource(UserQueryProvider.class)
     public void testAggregateFunction(Select<User> userQuery) {
 
-        List<ExpressionHolder<User, ?>> selected = Arrays.asList(
+        List<TypedExpression<User, ?>> selected = Arrays.asList(
                 min(User::getRandomNumber),
                 max(User::getRandomNumber),
                 count(User::getRandomNumber),
@@ -1009,7 +1009,7 @@ public class GenericApiTest {
 
         Date time = allUsers.get(20).getTime();
 
-        ExpressionHolder<User, Boolean> or = get(User::isValid).eq(true)
+        TypedExpression<User, Boolean> or = get(User::isValid).eq(true)
                 .or(
                         get(User::getParentUser)
                                 .get(User::getUsername)

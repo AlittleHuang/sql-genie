@@ -14,9 +14,9 @@ import java.util.function.Function;
 
 public interface Root<T> {
 
-    BooleanExpression<T> whereIf(boolean predicate, Function<Root<T>, ExpressionHolder<T, Boolean>> predicateBuilder);
+    BooleanExpression<T> whereIf(boolean predicate, Function<Root<T>, TypedExpression<T, Boolean>> predicateBuilder);
 
-    <U> ExpressionHolder<T, U> of(U value);
+    <U> TypedExpression<T, U> of(U value);
 
     <U> PathExpression<T, U> get(Path<T, U> path);
 

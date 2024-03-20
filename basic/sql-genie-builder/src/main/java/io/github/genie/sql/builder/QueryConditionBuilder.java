@@ -3,7 +3,7 @@ package io.github.genie.sql.builder;
 import io.github.genie.sql.api.Column;
 import io.github.genie.sql.api.Expression;
 import io.github.genie.sql.api.ExpressionBuilder;
-import io.github.genie.sql.api.ExpressionHolder;
+import io.github.genie.sql.api.TypedExpression;
 import io.github.genie.sql.api.ExpressionOperator.ComparableOperator;
 import io.github.genie.sql.api.ExpressionOperator.NumberOperator;
 import io.github.genie.sql.api.ExpressionOperator.PathOperator;
@@ -29,7 +29,7 @@ import io.github.genie.sql.api.QueryStructure;
 import io.github.genie.sql.api.Root;
 import io.github.genie.sql.api.Selection;
 import io.github.genie.sql.api.Selection.MultiSelected;
-import io.github.genie.sql.api.TypedExpression;
+import io.github.genie.sql.api.TypedExpression.BasicExpression;
 import io.github.genie.sql.builder.DefaultExpressionOperator.ComparableOperatorImpl;
 import io.github.genie.sql.builder.DefaultExpressionOperator.NumberOperatorImpl;
 import io.github.genie.sql.builder.DefaultExpressionOperator.PathOperatorImpl;
@@ -73,14 +73,14 @@ public class QueryConditionBuilder<T, U> implements Where0<T, U>, Having<T, U>, 
     }
 
     @Override
-    public Where0<T, U> where(ExpressionHolder<T, Boolean> predicate) {
+    public Where0<T, U> where(TypedExpression<T, Boolean> predicate) {
         QueryStructureImpl structure = queryStructure.copy();
         whereAnd(structure, predicate.expression());
         return update(structure);
     }
 
     @Override
-    public Where0<T, U> where(Function<Root<T>, ExpressionHolder<T, Boolean>> predicateBuilder) {
+    public Where0<T, U> where(Function<Root<T>, TypedExpression<T, Boolean>> predicateBuilder) {
         return where(predicateBuilder.apply(RootImpl.of()));
     }
 
@@ -256,10 +256,10 @@ public class QueryConditionBuilder<T, U> implements Where0<T, U>, Having<T, U>, 
     }
 
     @Override
-    public Having<T, U> groupBy(List<? extends ExpressionHolder<T, ?>> expressions) {
+    public Having<T, U> groupBy(List<? extends TypedExpression<T, ?>> expressions) {
         QueryStructureImpl structure = queryStructure.copy();
         structure.groupBy = expressions.stream()
-                .map(ExpressionHolder::expression)
+                .map(TypedExpression::expression)
                 .collect(Collectors.toList());
         return update(structure);
     }
@@ -282,14 +282,14 @@ public class QueryConditionBuilder<T, U> implements Where0<T, U>, Having<T, U>, 
     }
 
     @Override
-    public OrderBy<T, U> having(ExpressionHolder<T, Boolean> predicate) {
+    public OrderBy<T, U> having(TypedExpression<T, Boolean> predicate) {
         QueryStructureImpl structure = queryStructure.copy();
         structure.having = predicate.expression();
         return update(structure);
     }
 
     @Override
-    public OrderBy<T, U> having(Function<Root<T>, ExpressionHolder<T, Boolean>> predicateBuilder) {
+    public OrderBy<T, U> having(Function<Root<T>, TypedExpression<T, Boolean>> predicateBuilder) {
         return having(predicateBuilder.apply(RootImpl.of()));
     }
 
@@ -304,7 +304,7 @@ public class QueryConditionBuilder<T, U> implements Where0<T, U>, Having<T, U>, 
     }
 
     @NotNull
-    private Where0<T, U> whereAnd(TypedExpression<?, ?> expression) {
+    private Where0<T, U> whereAnd(BasicExpression<?, ?> expression) {
         QueryStructureImpl structure = queryStructure.copy();
         whereAnd(structure, expression.expression());
         return update(structure);

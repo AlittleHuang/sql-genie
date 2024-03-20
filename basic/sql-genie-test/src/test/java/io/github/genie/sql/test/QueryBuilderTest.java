@@ -1,7 +1,7 @@
 package io.github.genie.sql.test;
 
 import io.github.genie.sql.api.ExpressionBuilder;
-import io.github.genie.sql.api.ExpressionHolder;
+import io.github.genie.sql.api.TypedExpression;
 import io.github.genie.sql.api.Lists;
 import io.github.genie.sql.api.LockModeType;
 import io.github.genie.sql.api.Path;
@@ -936,8 +936,8 @@ class QueryBuilderTest {
             collector = check.collector.where(Q.get(User::getRandomNumber).in(values));
             result.add(new Checker<>(users, collector));
 
-            List<ExpressionHolder<User, Integer>> collect = values.stream()
-                    .<ExpressionHolder<User, Integer>>map(ExpressionHolders::of)
+            List<TypedExpression<User, Integer>> collect = values.stream()
+                    .<TypedExpression<User, Integer>>map(ExpressionHolders::of)
                     .collect(Collectors.toList());
             collector = check.collector.where(User::getRandomNumber).in(collect);
             result.add(new Checker<>(users, collector));

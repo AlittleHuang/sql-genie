@@ -1,6 +1,6 @@
 package io.github.genie.sql.api;
 
-import io.github.genie.sql.api.ExpressionHolder.ColumnHolder;
+import io.github.genie.sql.api.TypedExpression.ColumnHolder;
 import io.github.genie.sql.api.ExpressionOperator.ComparableOperator;
 import io.github.genie.sql.api.ExpressionOperator.NumberOperator;
 import io.github.genie.sql.api.ExpressionOperator.PathOperator;
@@ -39,11 +39,11 @@ public interface Query {
 
         <R> Where<T, R> select(Class<R> projectionType);
 
-        Where0<T, Tuple> select(List<? extends ExpressionHolder<T, ?>> paths);
+        Where0<T, Tuple> select(List<? extends TypedExpression<T, ?>> paths);
 
         Where0<T, Tuple> select(ExpressionBuilder<T> selectBuilder);
 
-        <R> Where0<T, R> select(ExpressionHolder<T, R> expression);
+        <R> Where0<T, R> select(TypedExpression<T, R> expression);
 
         <R> Where0<T, R> select(Path<T, ? extends R> path);
 
@@ -75,11 +75,11 @@ public interface Query {
 
         <R> Where<T, R> selectDistinct(Class<R> projectionType);
 
-        Where0<T, Tuple> selectDistinct(List<? extends ExpressionHolder<T, ?>> paths);
+        Where0<T, Tuple> selectDistinct(List<? extends TypedExpression<T, ?>> paths);
 
         Where0<T, Tuple> selectDistinct(ExpressionBuilder<T> selectBuilder);
 
-        <R> Where0<T, R> selectDistinct(ExpressionHolder<T, R> expression);
+        <R> Where0<T, R> selectDistinct(TypedExpression<T, R> expression);
 
         <R> Where0<T, R> selectDistinct(Path<T, ? extends R> path);
 
@@ -152,11 +152,11 @@ public interface Query {
 
     interface Where<T, U> extends OrderBy<T, U> {
 
-        Where<T, U> where(ExpressionHolder<T, Boolean> predicate);
+        Where<T, U> where(TypedExpression<T, Boolean> predicate);
 
-        Where<T, U> where(Function<Root<T>, ExpressionHolder<T, Boolean>> predicateBuilder);
+        Where<T, U> where(Function<Root<T>, TypedExpression<T, Boolean>> predicateBuilder);
 
-        Where<T, U> whereIf(boolean predicate, Function<Root<T>, ExpressionHolder<T, Boolean>> predicateBuilder);
+        Where<T, U> whereIf(boolean predicate, Function<Root<T>, TypedExpression<T, Boolean>> predicateBuilder);
 
         <N> PathOperator<T, N, ? extends Where<T, U>> where(Path<T, N> path);
 
@@ -170,11 +170,11 @@ public interface Query {
 
     interface Where0<T, U> extends GroupBy<T, U>, Where<T, U> {
 
-        Where0<T, U> where(ExpressionHolder<T, Boolean> predicate);
+        Where0<T, U> where(TypedExpression<T, Boolean> predicate);
 
-        Where0<T, U> where(Function<Root<T>, ExpressionHolder<T, Boolean>> predicateBuilder);
+        Where0<T, U> where(Function<Root<T>, TypedExpression<T, Boolean>> predicateBuilder);
 
-        default Where0<T, U> whereIf(boolean predicate, Function<Root<T>, ExpressionHolder<T, Boolean>> predicateBuilder) {
+        default Where0<T, U> whereIf(boolean predicate, Function<Root<T>, TypedExpression<T, Boolean>> predicateBuilder) {
             if (predicate) {
                 return where(predicateBuilder.apply(root()));
             }
@@ -192,7 +192,7 @@ public interface Query {
     }
 
     interface GroupBy<T, U> extends OrderBy<T, U> {
-        Having<T, U> groupBy(List<? extends ExpressionHolder<T, ?>> expressions);
+        Having<T, U> groupBy(List<? extends TypedExpression<T, ?>> expressions);
 
         Having<T, U> groupBy(ExpressionBuilder<T> expressionBuilder);
 
@@ -223,9 +223,9 @@ public interface Query {
 
     interface Having<T, U> extends OrderBy<T, U> {
 
-        OrderBy<T, U> having(ExpressionHolder<T, Boolean> predicate);
+        OrderBy<T, U> having(TypedExpression<T, Boolean> predicate);
 
-        OrderBy<T, U> having(Function<Root<T>, ExpressionHolder<T, Boolean>> predicateBuilder);
+        OrderBy<T, U> having(Function<Root<T>, TypedExpression<T, Boolean>> predicateBuilder);
 
     }
 

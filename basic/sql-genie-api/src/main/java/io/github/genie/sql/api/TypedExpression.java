@@ -1,9 +1,7 @@
 package io.github.genie.sql.api;
 
-import io.github.genie.sql.api.ExpressionOperator.ComparableOperator;
-import io.github.genie.sql.api.ExpressionOperator.NumberOperator;
-import io.github.genie.sql.api.ExpressionOperator.PathOperator;
-import io.github.genie.sql.api.ExpressionOperator.StringOperator;
+import io.github.genie.sql.api.ExpressionOperator.AndOperator;
+import io.github.genie.sql.api.ExpressionOperator.OrOperator;
 import io.github.genie.sql.api.Path.BooleanPath;
 import io.github.genie.sql.api.Path.ComparablePath;
 import io.github.genie.sql.api.Path.NumberPath;
@@ -12,109 +10,65 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
-public interface TypedExpression<T, U> extends ExpressionHolder<T, U> {
+@SuppressWarnings("unused")
+public interface TypedExpression<T, U> {
 
-    Root<T> root();
+    Expression expression();
 
-    NumberExpression<T, Long> count();
-
-    BooleanExpression<T> eq(U value);
-
-    BooleanExpression<T> eq(ExpressionHolder<T, U> value);
-
-    BooleanExpression<T> ne(U value);
-
-    BooleanExpression<T> ne(ExpressionHolder<T, U> value);
-
-    @SuppressWarnings("unchecked")
-    BooleanExpression<T> in(U... values);
-
-    BooleanExpression<T> in(@NotNull List<? extends ExpressionHolder<T, U>> values);
-
-    BooleanExpression<T> in(@NotNull Collection<? extends U> values);
-
-    @SuppressWarnings("unchecked")
-    BooleanExpression<T> notIn(U... values);
-
-    BooleanExpression<T> notIn(@NotNull List<? extends ExpressionHolder<T, U>> values);
-
-    BooleanExpression<T> notIn(@NotNull Collection<? extends U> values);
-
-    BooleanExpression<T> isNull();
-
-    BooleanExpression<T> isNotNull();
-
-    interface AndOperator<T> extends ComparableExpression<T, Boolean> {
-
-        <R> PathOperator<T, R, AndOperator<T>> and(Path<T, R> path);
-
-        <R extends Comparable<R>> ComparableOperator<T, R, AndOperator<T>> and(ComparablePath<T, R> path);
-
-        <R extends Number & Comparable<R>> NumberOperator<T, R, AndOperator<T>> and(NumberPath<T, R> path);
-
-        AndOperator<T> and(BooleanPath<T> path);
-
-        StringOperator<T, AndOperator<T>> and(StringPath<T> path);
-
-        AndOperator<T> and(ExpressionHolder<T, Boolean> expression);
-
-        default AndOperator<T> andIf(boolean predicate, Function<Root<T>, ExpressionHolder<T, Boolean>> predicateBuilder) {
-            if (predicate) {
-                return and(predicateBuilder.apply(root()));
-            }
-            return this;
-        }
-
-        AndOperator<T> and(List<? extends ExpressionHolder<T, Boolean>> expressions);
-
-        Predicate<T> then();
+    interface ColumnHolder<T, U> extends TypedExpression<T, U> {
 
     }
 
-    interface OrOperator<T> extends ComparableExpression<T, Boolean> {
+    interface BasicExpression<T, U> extends TypedExpression<T, U> {
 
-        <N> PathOperator<T, N, OrOperator<T>> or(Path<T, N> path);
+        Root<T> root();
 
-        <N extends Number & Comparable<N>> NumberOperator<T, N, OrOperator<T>> or(NumberPath<T, N> path);
+        TypedExpression.NumberExpression<T, Long> count();
 
-        <N extends Comparable<N>> ComparableOperator<T, N, OrOperator<T>> or(ComparablePath<T, N> path);
+        TypedExpression.BooleanExpression<T> eq(U value);
 
-        StringOperator<T, ? extends OrOperator<T>> or(StringPath<T> path);
+        TypedExpression.BooleanExpression<T> eq(TypedExpression<T, U> value);
 
-        OrOperator<T> or(BooleanPath<T> path);
+        TypedExpression.BooleanExpression<T> ne(U value);
 
-        OrOperator<T> or(ExpressionHolder<T, Boolean> predicate);
+        TypedExpression.BooleanExpression<T> ne(TypedExpression<T, U> value);
 
-        default OrOperator<T> orIf(boolean predicate, Function<Root<T>, ExpressionHolder<T, Boolean>> predicateBuilder) {
-            if (predicate) {
-                return or(predicateBuilder.apply(root()));
-            }
-            return this;
-        }
+        @SuppressWarnings("unchecked")
+        TypedExpression.BooleanExpression<T> in(U... values);
 
-        OrOperator<T> or(List<? extends ExpressionHolder<T, Boolean>> expressions);
+        TypedExpression.BooleanExpression<T> in(@NotNull List<? extends TypedExpression<T, U>> values);
 
-        Predicate<T> then();
+        TypedExpression.BooleanExpression<T> in(@NotNull Collection<? extends U> values);
+
+        @SuppressWarnings("unchecked")
+        TypedExpression.BooleanExpression<T> notIn(U... values);
+
+        TypedExpression.BooleanExpression<T> notIn(@NotNull List<? extends TypedExpression<T, U>> values);
+
+        TypedExpression.BooleanExpression<T> notIn(@NotNull Collection<? extends U> values);
+
+        TypedExpression.BooleanExpression<T> isNull();
+
+        TypedExpression.BooleanExpression<T> isNotNull();
 
     }
 
     interface BooleanExpression<T> extends AndOperator<T>, OrOperator<T>, Predicate<T> {
     }
 
-    interface ComparableExpression<T, U extends Comparable<U>> extends TypedExpression<T, U> {
-        BooleanExpression<T> ge(ExpressionHolder<T, U> expression);
+    interface ComparableExpression<T, U extends Comparable<U>> extends BasicExpression<T, U> {
+        BooleanExpression<T> ge(TypedExpression<T, U> expression);
 
-        BooleanExpression<T> gt(ExpressionHolder<T, U> expression);
+        BooleanExpression<T> gt(TypedExpression<T, U> expression);
 
-        BooleanExpression<T> le(ExpressionHolder<T, U> expression);
+        BooleanExpression<T> le(TypedExpression<T, U> expression);
 
-        BooleanExpression<T> lt(ExpressionHolder<T, U> expression);
+        BooleanExpression<T> lt(TypedExpression<T, U> expression);
 
-        BooleanExpression<T> between(ExpressionHolder<T, U> l, ExpressionHolder<T, U> r);
+        BooleanExpression<T> between(TypedExpression<T, U> l, TypedExpression<T, U> r);
 
-        BooleanExpression<T> notBetween(ExpressionHolder<T, U> l, ExpressionHolder<T, U> r);
+        BooleanExpression<T> notBetween(TypedExpression<T, U> l, TypedExpression<T, U> r);
 
         Order<T> asc();
 
@@ -146,75 +100,80 @@ public interface TypedExpression<T, U> extends ExpressionHolder<T, U> {
             return notBetween(eb.of(l), eb.of(r));
         }
 
-        default BooleanExpression<T> between(ExpressionHolder<T, U> l, U r) {
+        default BooleanExpression<T> between(TypedExpression<T, U> l, U r) {
             return between(l, root().of(r));
         }
 
-        default BooleanExpression<T> between(U l, ExpressionHolder<T, U> r) {
+        default BooleanExpression<T> between(U l, TypedExpression<T, U> r) {
             return between(root().of(l), r);
         }
 
-        default BooleanExpression<T> notBetween(ExpressionHolder<T, U> l, U r) {
+        default BooleanExpression<T> notBetween(TypedExpression<T, U> l, U r) {
             return notBetween(l, root().of(r));
         }
 
-        default BooleanExpression<T> notBetween(U l, ExpressionHolder<T, U> r) {
+        default BooleanExpression<T> notBetween(U l, TypedExpression<T, U> r) {
             return notBetween(root().of(l), r);
         }
 
     }
 
     interface NumberExpression<T, U extends Number & Comparable<U>> extends ComparableExpression<T, U> {
-        NumberExpression<T, U> add(ExpressionHolder<T, U> expression);
+        TypedExpression.NumberExpression<T, U> add(TypedExpression<T, U> expression);
 
-        NumberExpression<T, U> subtract(ExpressionHolder<T, U> expression);
+        TypedExpression.NumberExpression<T, U> subtract(TypedExpression<T, U> expression);
 
-        NumberExpression<T, U> multiply(ExpressionHolder<T, U> expression);
+        TypedExpression.NumberExpression<T, U> multiply(TypedExpression<T, U> expression);
 
-        NumberExpression<T, U> divide(ExpressionHolder<T, U> expression);
+        TypedExpression.NumberExpression<T, U> divide(TypedExpression<T, U> expression);
 
-        NumberExpression<T, U> mod(ExpressionHolder<T, U> expression);
+        TypedExpression.NumberExpression<T, U> mod(TypedExpression<T, U> expression);
 
-        NumberExpression<T, U> sum();
+        TypedExpression.NumberExpression<T, U> sum();
 
-        <R extends Number & Comparable<R>> NumberExpression<T, R> avg();
+        <R extends Number & Comparable<R>> TypedExpression.NumberExpression<T, R> avg();
 
-        NumberExpression<T, U> max();
+        TypedExpression.NumberExpression<T, U> max();
 
-        NumberExpression<T, U> min();
+        TypedExpression.NumberExpression<T, U> min();
 
-        default NumberExpression<T, U> add(U value) {
+        default TypedExpression.NumberExpression<T, U> add(U value) {
             return add(root().of(value));
         }
 
-        default NumberExpression<T, U> subtract(U value) {
+        default TypedExpression.NumberExpression<T, U> subtract(U value) {
             return subtract(root().of(value));
         }
 
-        default NumberExpression<T, U> multiply(U value) {
+        default TypedExpression.NumberExpression<T, U> multiply(U value) {
             return multiply(root().of(value));
         }
 
-        default NumberExpression<T, U> divide(U value) {
+        default TypedExpression.NumberExpression<T, U> divide(U value) {
             return divide(root().of(value));
         }
 
-        default NumberExpression<T, U> mod(U value) {
+        default TypedExpression.NumberExpression<T, U> mod(U value) {
             return mod(root().of(value));
         }
 
     }
 
-    interface PathExpression<T, U> extends TypedExpression<T, U>, ColumnHolder<T, U> {
-        <R> PathExpression<T, R> get(Path<U, R> path);
+    interface PathExpression<T, U> extends BasicExpression<T, U>, ColumnHolder<T, U> {
+        <R> TypedExpression.PathExpression<T, R> get(Path<U, R> path);
 
-        StringExpression<T> get(StringPath<U> path);
+        TypedExpression.StringExpression<T> get(StringPath<U> path);
 
         <R extends Number & Comparable<R>> NumberExpression<T, R> get(NumberPath<U, R> path);
 
         <R extends Comparable<R>> ComparableExpression<T, R> get(ComparablePath<U, R> path);
 
         BooleanExpression<T> get(BooleanPath<U> path);
+
+    }
+
+    interface Predicate<T> extends TypedExpression<T, Boolean> {
+        Predicate<T> not();
 
     }
 
@@ -247,21 +206,16 @@ public interface TypedExpression<T, U> extends ExpressionHolder<T, U> {
             return notLike('%' + value + '%');
         }
 
-        StringExpression<T> lower();
+        TypedExpression.StringExpression<T> lower();
 
-        StringExpression<T> upper();
+        TypedExpression.StringExpression<T> upper();
 
-        StringExpression<T> substring(int a, int b);
+        TypedExpression.StringExpression<T> substring(int a, int b);
 
-        StringExpression<T> substring(int a);
+        TypedExpression.StringExpression<T> substring(int a);
 
-        StringExpression<T> trim();
+        TypedExpression.StringExpression<T> trim();
 
         NumberExpression<T, Integer> length();
-    }
-
-    interface Predicate<T> extends ExpressionHolder<T, Boolean> {
-        Predicate<T> not();
-
     }
 }

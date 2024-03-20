@@ -3,8 +3,8 @@ package io.github.genie.sql.builder;
 import io.github.genie.sql.api.Column;
 import io.github.genie.sql.api.Expression;
 import io.github.genie.sql.api.ExpressionBuilder;
-import io.github.genie.sql.api.ExpressionHolder;
-import io.github.genie.sql.api.ExpressionHolder.ColumnHolder;
+import io.github.genie.sql.api.TypedExpression;
+import io.github.genie.sql.api.TypedExpression.ColumnHolder;
 import io.github.genie.sql.api.Lists;
 import io.github.genie.sql.api.Path;
 import io.github.genie.sql.api.Query.Fetch;
@@ -151,7 +151,7 @@ public class QueryBuilder<T> extends QueryConditionBuilder<T, T> implements Sele
         return selectTuple(false, Lists.of(a, b, c, d, e, f, g, h, i, j));
     }
 
-    public Where0<T, Tuple> selectDistinct(List<? extends ExpressionHolder<T, ?>> expressions) {
+    public Where0<T, Tuple> selectDistinct(List<? extends TypedExpression<T, ?>> expressions) {
         return select(true, expressions);
     }
 
@@ -210,14 +210,14 @@ public class QueryBuilder<T> extends QueryConditionBuilder<T, T> implements Sele
         return selectTuple(true, Lists.of(a, b, c, d, e, f, g, h, i, j));
     }
 
-    public Where0<T, Tuple> select(List<? extends ExpressionHolder<T, ?>> expressions) {
+    public Where0<T, Tuple> select(List<? extends TypedExpression<T, ?>> expressions) {
         return select(false, expressions);
     }
 
-    public Where0<T, Tuple> select(boolean distinct, List<? extends ExpressionHolder<T, ?>> expressions) {
+    public Where0<T, Tuple> select(boolean distinct, List<? extends TypedExpression<T, ?>> expressions) {
         QueryStructureImpl structure = queryStructure.copy();
         List<Expression> selectExpressions = expressions.stream()
-                .map(ExpressionHolder::expression)
+                .map(TypedExpression::expression)
                 .collect(Collectors.toList());
         structure.select = new MultiSelectedImpl(selectExpressions, distinct);
         return update(structure);
@@ -232,15 +232,15 @@ public class QueryBuilder<T> extends QueryConditionBuilder<T, T> implements Sele
         return update(structure);
     }
 
-    public <R> Where0<T, R> selectDistinct(ExpressionHolder<T, R> paths) {
+    public <R> Where0<T, R> selectDistinct(TypedExpression<T, R> paths) {
         return select(true, paths);
     }
 
-    public <R> Where0<T, R> select(ExpressionHolder<T, R> paths) {
+    public <R> Where0<T, R> select(TypedExpression<T, R> paths) {
         return select(false, paths);
     }
 
-    public <R> Where0<T, R> select(boolean distinct, ExpressionHolder<T, R> paths) {
+    public <R> Where0<T, R> select(boolean distinct, TypedExpression<T, R> paths) {
         QueryStructureImpl structure = queryStructure.copy();
         Expression expression = paths.expression();
         Class<?> type = Object.class;

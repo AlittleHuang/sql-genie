@@ -2,7 +2,7 @@ package io.github.genie.sql.data.access;
 
 import io.github.genie.sql.api.Column;
 import io.github.genie.sql.api.Expression;
-import io.github.genie.sql.api.ExpressionHolder;
+import io.github.genie.sql.api.TypedExpression;
 import io.github.genie.sql.api.Operator;
 import io.github.genie.sql.api.Query;
 import io.github.genie.sql.api.Query.Select;
@@ -63,7 +63,7 @@ class BaseAccessImpl<T, ID> extends AccessFacade<T> implements BaseAccess<T> {
 
     public T get(ID id) {
         Expression operate = Expressions.operate(idColumn, Operator.EQ, Expressions.of(id));
-        ExpressionHolder<T, Boolean> predicate = ExpressionHolders.of(operate);
+        TypedExpression<T, Boolean> predicate = ExpressionHolders.of(operate);
         return where(predicate).getSingle();
     }
 
@@ -74,7 +74,7 @@ class BaseAccessImpl<T, ID> extends AccessFacade<T> implements BaseAccess<T> {
             return Collections.emptyList();
         }
         Expression operate = Expressions.operate(idColumn, Operator.IN, idsExpression);
-        ExpressionHolder<T, Boolean> predicate = ExpressionHolders.of(operate);
+        TypedExpression<T, Boolean> predicate = ExpressionHolders.of(operate);
         return where(predicate).getList();
     }
 

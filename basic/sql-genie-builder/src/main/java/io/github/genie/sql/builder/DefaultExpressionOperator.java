@@ -1,12 +1,12 @@
 package io.github.genie.sql.builder;
 
-import io.github.genie.sql.api.ExpressionHolder;
+import io.github.genie.sql.api.TypedExpression;
 import io.github.genie.sql.api.ExpressionOperator;
 import io.github.genie.sql.api.Path;
 import io.github.genie.sql.api.Path.ComparablePath;
 import io.github.genie.sql.api.Path.NumberPath;
 import io.github.genie.sql.api.Path.StringPath;
-import io.github.genie.sql.api.TypedExpression;
+import io.github.genie.sql.api.TypedExpression.BasicExpression;
 import io.github.genie.sql.api.TypedExpression.ComparableExpression;
 import io.github.genie.sql.api.TypedExpression.NumberExpression;
 import io.github.genie.sql.api.TypedExpression.PathExpression;
@@ -19,10 +19,10 @@ import java.util.function.Function;
 
 class DefaultExpressionOperator<T, U, B> implements ExpressionOperator<T, U, B> {
 
-    protected final TypedExpression<T, U> base;
-    protected final Function<? super TypedExpression<?, ?>, B> resultBuilder;
+    protected final BasicExpression<T, U> base;
+    protected final Function<? super BasicExpression<?, ?>, B> resultBuilder;
 
-    DefaultExpressionOperator(TypedExpression<T, U> base, Function<? super TypedExpression<?, ?>, B> resultBuilder) {
+    DefaultExpressionOperator(BasicExpression<T, U> base, Function<? super BasicExpression<?, ?>, B> resultBuilder) {
         this.base = base;
         this.resultBuilder = resultBuilder;
     }
@@ -33,7 +33,7 @@ class DefaultExpressionOperator<T, U, B> implements ExpressionOperator<T, U, B> 
     }
 
     @Override
-    public B eq(ExpressionHolder<T, U> expression) {
+    public B eq(TypedExpression<T, U> expression) {
         return resultBuilder.apply(base.eq(expression));
     }
 
@@ -43,7 +43,7 @@ class DefaultExpressionOperator<T, U, B> implements ExpressionOperator<T, U, B> 
     }
 
     @Override
-    public B ne(ExpressionHolder<T, U> expression) {
+    public B ne(TypedExpression<T, U> expression) {
         return resultBuilder.apply(base.ne(expression));
     }
 
@@ -54,7 +54,7 @@ class DefaultExpressionOperator<T, U, B> implements ExpressionOperator<T, U, B> 
     }
 
     @Override
-    public B in(@NotNull List<? extends ExpressionHolder<T, U>> expressions) {
+    public B in(@NotNull List<? extends TypedExpression<T, U>> expressions) {
         return resultBuilder.apply(base.in(expressions));
     }
 
@@ -70,7 +70,7 @@ class DefaultExpressionOperator<T, U, B> implements ExpressionOperator<T, U, B> 
     }
 
     @Override
-    public B notIn(@NotNull List<? extends ExpressionHolder<T, U>> expressions) {
+    public B notIn(@NotNull List<? extends TypedExpression<T, U>> expressions) {
         return resultBuilder.apply(base.notIn(expressions));
     }
 
@@ -91,7 +91,7 @@ class DefaultExpressionOperator<T, U, B> implements ExpressionOperator<T, U, B> 
 
     static class ComparableOperatorImpl<T, U extends Comparable<U>, B> extends DefaultExpressionOperator<T, U, B> implements ComparableOperator<T, U, B> {
 
-        public ComparableOperatorImpl(ComparableExpression<T, U> expression, Function<? super TypedExpression<?, ?>, B> resultBuilder) {
+        public ComparableOperatorImpl(ComparableExpression<T, U> expression, Function<? super BasicExpression<?, ?>, B> resultBuilder) {
             super(expression, resultBuilder);
         }
 
@@ -130,59 +130,59 @@ class DefaultExpressionOperator<T, U, B> implements ExpressionOperator<T, U, B> 
         }
 
         @Override
-        public B ge(ExpressionHolder<T, U> expression) {
+        public B ge(TypedExpression<T, U> expression) {
             return resultBuilder.apply(base().ge(expression));
         }
 
         @Override
-        public B gt(ExpressionHolder<T, U> expression) {
+        public B gt(TypedExpression<T, U> expression) {
             return resultBuilder.apply(base().gt(expression));
         }
 
         @Override
-        public B le(ExpressionHolder<T, U> expression) {
+        public B le(TypedExpression<T, U> expression) {
             return resultBuilder.apply(base().le(expression));
         }
 
         @Override
-        public B lt(ExpressionHolder<T, U> expression) {
+        public B lt(TypedExpression<T, U> expression) {
             return resultBuilder.apply(base().lt(expression));
         }
 
         @Override
-        public B between(ExpressionHolder<T, U> l, ExpressionHolder<T, U> r) {
+        public B between(TypedExpression<T, U> l, TypedExpression<T, U> r) {
             return resultBuilder.apply(base().between(l, r));
         }
 
         @Override
-        public B between(ExpressionHolder<T, U> l, U r) {
+        public B between(TypedExpression<T, U> l, U r) {
             return resultBuilder.apply(base().between(l, r));
         }
 
         @Override
-        public B between(U l, ExpressionHolder<T, U> r) {
+        public B between(U l, TypedExpression<T, U> r) {
             return resultBuilder.apply(base().between(l, r));
         }
 
         @Override
-        public B notBetween(ExpressionHolder<T, U> l, ExpressionHolder<T, U> r) {
+        public B notBetween(TypedExpression<T, U> l, TypedExpression<T, U> r) {
             return resultBuilder.apply(base().notBetween(l, r));
         }
 
         @Override
-        public B notBetween(ExpressionHolder<T, U> l, U r) {
+        public B notBetween(TypedExpression<T, U> l, U r) {
             return resultBuilder.apply(base().notBetween(l, r));
         }
 
         @Override
-        public B notBetween(U l, ExpressionHolder<T, U> r) {
+        public B notBetween(U l, TypedExpression<T, U> r) {
             return resultBuilder.apply(base().notBetween(l, r));
         }
     }
 
     static class NumberOperatorImpl<T, U extends Number & Comparable<U>, B> extends ComparableOperatorImpl<T, U, B> implements NumberOperator<T, U, B> {
 
-        public NumberOperatorImpl(NumberExpression<T, U> expression, Function<? super TypedExpression<?, ?>, B> resultBuilder) {
+        public NumberOperatorImpl(NumberExpression<T, U> expression, Function<? super BasicExpression<?, ?>, B> resultBuilder) {
             super(expression, resultBuilder);
         }
 
@@ -217,27 +217,27 @@ class DefaultExpressionOperator<T, U, B> implements ExpressionOperator<T, U, B> 
         }
 
         @Override
-        public NumberOperator<T, U, B> add(ExpressionHolder<T, U> expression) {
+        public NumberOperator<T, U, B> add(TypedExpression<T, U> expression) {
             return new NumberOperatorImpl<>(base().add(expression), resultBuilder);
         }
 
         @Override
-        public NumberOperator<T, U, B> subtract(ExpressionHolder<T, U> expression) {
+        public NumberOperator<T, U, B> subtract(TypedExpression<T, U> expression) {
             return new NumberOperatorImpl<>(base().subtract(expression), resultBuilder);
         }
 
         @Override
-        public NumberOperator<T, U, B> multiply(ExpressionHolder<T, U> expression) {
+        public NumberOperator<T, U, B> multiply(TypedExpression<T, U> expression) {
             return new NumberOperatorImpl<>(base().multiply(expression), resultBuilder);
         }
 
         @Override
-        public NumberOperator<T, U, B> divide(ExpressionHolder<T, U> expression) {
+        public NumberOperator<T, U, B> divide(TypedExpression<T, U> expression) {
             return new NumberOperatorImpl<>(base().divide(expression), resultBuilder);
         }
 
         @Override
-        public NumberOperator<T, U, B> mod(ExpressionHolder<T, U> expression) {
+        public NumberOperator<T, U, B> mod(TypedExpression<T, U> expression) {
             return new NumberOperatorImpl<>(base().mod(expression), resultBuilder);
         }
 
@@ -245,7 +245,7 @@ class DefaultExpressionOperator<T, U, B> implements ExpressionOperator<T, U, B> 
 
     static class PathOperatorImpl<T, U, B> extends DefaultExpressionOperator<T, U, B> implements PathOperator<T, U, B> {
 
-        public PathOperatorImpl(TypedExpression<T, U> expression, Function<? super TypedExpression<?, ?>, B> resultBuilder) {
+        public PathOperatorImpl(BasicExpression<T, U> expression, Function<? super BasicExpression<?, ?>, B> resultBuilder) {
             super(expression, resultBuilder);
         }
 
@@ -278,7 +278,7 @@ class DefaultExpressionOperator<T, U, B> implements ExpressionOperator<T, U, B> 
 
     static class StringOperatorImpl<T, B> extends ComparableOperatorImpl<T, String, B> implements StringOperator<T, B> {
 
-        public StringOperatorImpl(StringExpression<T> expression, Function<? super TypedExpression<?, ?>, B> resultBuilder) {
+        public StringOperatorImpl(StringExpression<T> expression, Function<? super BasicExpression<?, ?>, B> resultBuilder) {
             super(expression, resultBuilder);
         }
 
