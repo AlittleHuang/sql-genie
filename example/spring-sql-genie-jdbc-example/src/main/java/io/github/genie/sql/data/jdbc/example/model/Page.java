@@ -18,10 +18,10 @@ public class Page<T> {
     private int size;
     private long total;
 
-    public Page(PageRequest<T> request, List<T> content, long total) {
+    public Page(Pageable<T> request, List<T> content, long total) {
         this.content = content;
         this.page = request.page();
-        this.size = request.limit();
+        this.size = request.size();
         this.total = total;
     }
 }

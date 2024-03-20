@@ -20,15 +20,15 @@ public class UserController {
 
     @GetMapping("/user/list")
     public Page<User> getUsers(UserQuery query) {
-        return userAccess.where(query).slice(query);
+        return userAccess.where(query.predicate()).slice(query.pageable());
     }
 
     @GetMapping("/user/list/join-example")
     public Page<User> joinExample(UserQuery query) {
         return userAccess
                 .fetch(User::getParentUser, User::getRandomUser)
-                .where(query)
-                .slice(query);
+                .where(query.predicate())
+                .slice(query.pageable());
     }
 
 }

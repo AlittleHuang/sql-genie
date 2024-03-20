@@ -1,6 +1,7 @@
 package io.github.genie.sql.builder.reflect;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
@@ -10,7 +11,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Map;
 
-@Data
+@Getter
+@RequiredArgsConstructor
 @Accessors(fluent = true)
 public final class InstanceInvocationHandler implements InvocationHandler {
     private static final Method EQUALS = getEqualsMethod();
