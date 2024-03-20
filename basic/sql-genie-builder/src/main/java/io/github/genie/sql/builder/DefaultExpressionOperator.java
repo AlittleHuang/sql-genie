@@ -1,11 +1,11 @@
 package io.github.genie.sql.builder;
 
-import io.github.genie.sql.api.TypedExpression;
 import io.github.genie.sql.api.ExpressionOperator;
 import io.github.genie.sql.api.Path;
 import io.github.genie.sql.api.Path.ComparablePath;
 import io.github.genie.sql.api.Path.NumberPath;
 import io.github.genie.sql.api.Path.StringPath;
+import io.github.genie.sql.api.TypedExpression;
 import io.github.genie.sql.api.TypedExpression.BasicExpression;
 import io.github.genie.sql.api.TypedExpression.ComparableExpression;
 import io.github.genie.sql.api.TypedExpression.NumberExpression;

@@ -4,10 +4,9 @@ import io.github.genie.sql.api.Column;
 import io.github.genie.sql.api.Expression;
 import io.github.genie.sql.api.ExpressionOperator;
 import io.github.genie.sql.api.ExpressionOperator.AndOperator;
-import io.github.genie.sql.api.ExpressionOperator.OrOperator;
-import io.github.genie.sql.api.TypedExpression;
 import io.github.genie.sql.api.ExpressionOperator.ComparableOperator;
 import io.github.genie.sql.api.ExpressionOperator.NumberOperator;
+import io.github.genie.sql.api.ExpressionOperator.OrOperator;
 import io.github.genie.sql.api.ExpressionOperator.PathOperator;
 import io.github.genie.sql.api.ExpressionOperator.StringOperator;
 import io.github.genie.sql.api.Lists;
@@ -21,6 +20,7 @@ import io.github.genie.sql.api.Path.ComparablePath;
 import io.github.genie.sql.api.Path.NumberPath;
 import io.github.genie.sql.api.Path.StringPath;
 import io.github.genie.sql.api.Root;
+import io.github.genie.sql.api.TypedExpression;
 import io.github.genie.sql.api.TypedExpression.BasicExpression;
 import io.github.genie.sql.builder.DefaultExpressionOperator.ComparableOperatorImpl;
 import io.github.genie.sql.builder.DefaultExpressionOperator.NumberOperatorImpl;
@@ -49,7 +49,7 @@ class TypedExpressionImpl<T, U> implements BasicExpression<T, U> {
     }
 
     protected Expression operate(Operator operator, Object value) {
-        return operate(operator, ExpressionHolders.of(value));
+        return operate(operator, TypedExpressions.of(value));
     }
 
     protected Expression operate(Operator operator, TypedExpression<T, ?> expression) {
@@ -65,7 +65,7 @@ class TypedExpressionImpl<T, U> implements BasicExpression<T, U> {
 
     @Override
     public BooleanExpression<T> eq(U value) {
-        return eq(ExpressionHolders.of(value));
+        return eq(TypedExpressions.of(value));
     }
 
     @Override
@@ -76,7 +76,7 @@ class TypedExpressionImpl<T, U> implements BasicExpression<T, U> {
 
     @Override
     public BooleanExpression<T> ne(U value) {
-        return ne(ExpressionHolders.of(value));
+        return ne(TypedExpressions.of(value));
     }
 
     @Override
@@ -88,7 +88,7 @@ class TypedExpressionImpl<T, U> implements BasicExpression<T, U> {
     @SafeVarargs
     @Override
     public final BooleanExpression<T> in(U... values) {
-        return in(ExpressionHolders.of(values));
+        return in(TypedExpressions.of(values));
     }
 
     @Override
@@ -99,13 +99,13 @@ class TypedExpressionImpl<T, U> implements BasicExpression<T, U> {
 
     @Override
     public BooleanExpression<T> in(@NotNull Collection<? extends U> values) {
-        return in(ExpressionHolders.of(values));
+        return in(TypedExpressions.of(values));
     }
 
     @SafeVarargs
     @Override
     public final BooleanExpression<T> notIn(U... values) {
-        return notIn(ExpressionHolders.of(values));
+        return notIn(TypedExpressions.of(values));
     }
 
     @Override
@@ -120,7 +120,7 @@ class TypedExpressionImpl<T, U> implements BasicExpression<T, U> {
 
     @Override
     public BooleanExpression<T> notIn(@NotNull Collection<? extends U> values) {
-        return notIn(ExpressionHolders.of(values));
+        return notIn(TypedExpressions.of(values));
     }
 
     @Override
@@ -374,7 +374,7 @@ class TypedExpressionImpl<T, U> implements BasicExpression<T, U> {
         @Override
         public StringExpression<T> substring(int a, int b) {
             List<TypedExpression<T, ?>> expressions =
-                    Lists.of(ExpressionHolders.of(a), ExpressionHolders.of(b));
+                    Lists.of(TypedExpressions.of(a), TypedExpressions.of(b));
             return new StringExpressionImpl<>(this, operate(Operator.SUBSTRING, expressions));
         }
 

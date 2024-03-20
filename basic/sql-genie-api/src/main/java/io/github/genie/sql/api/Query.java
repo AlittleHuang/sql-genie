@@ -1,6 +1,5 @@
 package io.github.genie.sql.api;
 
-import io.github.genie.sql.api.TypedExpression.ColumnHolder;
 import io.github.genie.sql.api.ExpressionOperator.ComparableOperator;
 import io.github.genie.sql.api.ExpressionOperator.NumberOperator;
 import io.github.genie.sql.api.ExpressionOperator.PathOperator;
@@ -8,6 +7,7 @@ import io.github.genie.sql.api.ExpressionOperator.StringOperator;
 import io.github.genie.sql.api.Path.ComparablePath;
 import io.github.genie.sql.api.Path.NumberPath;
 import io.github.genie.sql.api.Path.StringPath;
+import io.github.genie.sql.api.TypedExpression.PathExpression;
 import io.github.genie.sql.api.tuple.Tuple;
 import io.github.genie.sql.api.tuple.Tuple10;
 import io.github.genie.sql.api.tuple.Tuple2;
@@ -114,17 +114,17 @@ public interface Query {
 
     interface Fetch<T> extends Where<T, T> {
 
-        Where<T, T> fetch(List<ColumnHolder<T, ?>> expressions);
+        Where<T, T> fetch(List<PathExpression<T, ?>> expressions);
 
-        default Where<T, T> fetch(ColumnHolder<T, ?> path) {
+        default Where<T, T> fetch(PathExpression<T, ?> path) {
             return fetch(Lists.of(path));
         }
 
-        default Where<T, T> fetch(ColumnHolder<T, ?> p0, ColumnHolder<T, ?> p1) {
+        default Where<T, T> fetch(PathExpression<T, ?> p0, PathExpression<T, ?> p1) {
             return fetch(Lists.of(p0, p1));
         }
 
-        default Where<T, T> fetch(ColumnHolder<T, ?> p0, ColumnHolder<T, ?> p1, ColumnHolder<T, ?> p3) {
+        default Where<T, T> fetch(PathExpression<T, ?> p0, PathExpression<T, ?> p1, PathExpression<T, ?> p3) {
             return fetch(Lists.of(p0, p1, p3));
         }
 
@@ -154,9 +154,17 @@ public interface Query {
 
         Where<T, U> where(TypedExpression<T, Boolean> predicate);
 
-        Where<T, U> where(Function<Root<T>, TypedExpression<T, Boolean>> predicateBuilder);
+        default Where<T, U> where(PredicateBuilder<T> predicateBuilder) {
+            return where(predicateBuilder.build(root()));
+        }
 
-        Where<T, U> whereIf(boolean predicate, Function<Root<T>, TypedExpression<T, Boolean>> predicateBuilder);
+        default Where<T, U> whereIf(boolean predicate, PredicateBuilder<T> predicateBuilder) {
+            if (predicate) {
+                return where(predicateBuilder);
+            } else {
+                return this;
+            }
+        }
 
         <N> PathOperator<T, N, ? extends Where<T, U>> where(Path<T, N> path);
 
@@ -172,11 +180,13 @@ public interface Query {
 
         Where0<T, U> where(TypedExpression<T, Boolean> predicate);
 
-        Where0<T, U> where(Function<Root<T>, TypedExpression<T, Boolean>> predicateBuilder);
+        default Where0<T, U> where(PredicateBuilder<T> predicateBuilder) {
+            return where(predicateBuilder.build(root()));
+        }
 
-        default Where0<T, U> whereIf(boolean predicate, Function<Root<T>, TypedExpression<T, Boolean>> predicateBuilder) {
+        default Where0<T, U> whereIf(boolean predicate, PredicateBuilder<T> predicateBuilder) {
             if (predicate) {
-                return where(predicateBuilder.apply(root()));
+                return where(predicateBuilder.build(root()));
             }
             return this;
         }
@@ -225,7 +235,9 @@ public interface Query {
 
         OrderBy<T, U> having(TypedExpression<T, Boolean> predicate);
 
-        OrderBy<T, U> having(Function<Root<T>, TypedExpression<T, Boolean>> predicateBuilder);
+        default OrderBy<T, U> having(PredicateBuilder<T> predicateBuilder) {
+            return having(predicateBuilder.build(root()));
+        }
 
     }
 
@@ -414,6 +426,12 @@ public interface Query {
     final class SliceQueryStructure {
         private final QueryStructure count;
         private final QueryStructure list;
+    }
+
+    @FunctionalInterface
+    interface PredicateBuilder<T> {
+        TypedExpression<T, Boolean> build(Root<T> root);
+
     }
 
 }

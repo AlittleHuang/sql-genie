@@ -16,10 +16,6 @@ public interface TypedExpression<T, U> {
 
     Expression expression();
 
-    interface ColumnHolder<T, U> extends TypedExpression<T, U> {
-
-    }
-
     interface BasicExpression<T, U> extends TypedExpression<T, U> {
 
         Root<T> root();
@@ -159,7 +155,7 @@ public interface TypedExpression<T, U> {
 
     }
 
-    interface PathExpression<T, U> extends BasicExpression<T, U>, ColumnHolder<T, U> {
+    interface PathExpression<T, U> extends BasicExpression<T, U> {
         <R> TypedExpression.PathExpression<T, R> get(Path<U, R> path);
 
         TypedExpression.StringExpression<T> get(StringPath<U> path);

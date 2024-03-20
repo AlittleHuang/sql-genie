@@ -1,14 +1,15 @@
 package io.github.genie.sql.builder;
 
 import io.github.genie.sql.api.Expression;
-import io.github.genie.sql.api.TypedExpression;
 import io.github.genie.sql.api.Operation;
 import io.github.genie.sql.api.Path;
 import io.github.genie.sql.api.Path.BooleanPath;
 import io.github.genie.sql.api.Path.ComparablePath;
 import io.github.genie.sql.api.Path.NumberPath;
 import io.github.genie.sql.api.Path.StringPath;
+import io.github.genie.sql.api.Query.PredicateBuilder;
 import io.github.genie.sql.api.Root;
+import io.github.genie.sql.api.TypedExpression;
 import io.github.genie.sql.api.TypedExpression.BooleanExpression;
 import io.github.genie.sql.api.TypedExpression.ComparableExpression;
 import io.github.genie.sql.api.TypedExpression.NumberExpression;
@@ -19,8 +20,6 @@ import io.github.genie.sql.builder.TypedExpressionImpl.ComparableExpressionImpl;
 import io.github.genie.sql.builder.TypedExpressionImpl.NumberExpressionImpl;
 import io.github.genie.sql.builder.TypedExpressionImpl.PathExpressionImpl;
 import io.github.genie.sql.builder.TypedExpressionImpl.StringExpressionImpl;
-
-import java.util.function.Function;
 
 public class RootImpl<T> implements Root<T> {
 
@@ -34,14 +33,14 @@ public class RootImpl<T> implements Root<T> {
     }
 
     @Override
-    public BooleanExpression<T> whereIf(boolean predicate, Function<Root<T>, TypedExpression<T, Boolean>> predicateBuilder) {
-        Expression holder = predicate ? predicateBuilder.apply(this).expression() : Expressions.TRUE;
+    public BooleanExpression<T> whereIf(boolean predicate, PredicateBuilder<T> predicateBuilder) {
+        Expression holder = predicate ? predicateBuilder.build(this).expression() : Expressions.TRUE;
         return BooleanExpressionImpl.of(holder);
     }
 
     @Override
     public <U> TypedExpression<T, U> of(U value) {
-        return ExpressionHolders.of(value);
+        return TypedExpressions.of(value);
     }
 
     @Override

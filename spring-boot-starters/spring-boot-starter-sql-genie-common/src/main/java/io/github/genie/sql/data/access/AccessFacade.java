@@ -1,8 +1,6 @@
 package io.github.genie.sql.data.access;
 
 import io.github.genie.sql.api.ExpressionBuilder;
-import io.github.genie.sql.api.TypedExpression;
-import io.github.genie.sql.api.TypedExpression.ColumnHolder;
 import io.github.genie.sql.api.ExpressionOperator.ComparableOperator;
 import io.github.genie.sql.api.ExpressionOperator.NumberOperator;
 import io.github.genie.sql.api.ExpressionOperator.PathOperator;
@@ -22,6 +20,8 @@ import io.github.genie.sql.api.Query.Where0;
 import io.github.genie.sql.api.Root;
 import io.github.genie.sql.api.Slice;
 import io.github.genie.sql.api.Sliceable;
+import io.github.genie.sql.api.TypedExpression;
+import io.github.genie.sql.api.TypedExpression.PathExpression;
 import io.github.genie.sql.api.Updater;
 import io.github.genie.sql.api.tuple.Tuple;
 import io.github.genie.sql.api.tuple.Tuple10;
@@ -196,22 +196,22 @@ public abstract class AccessFacade<T> implements BaseAccess<T> {
     }
 
     @Override
-    public Where<T, T> fetch(List<ColumnHolder<T, ?>> expressions) {
+    public Where<T, T> fetch(List<PathExpression<T, ?>> expressions) {
         return select().fetch(expressions);
     }
 
     @Override
-    public Where<T, T> fetch(ColumnHolder<T, ?> path) {
+    public Where<T, T> fetch(PathExpression<T, ?> path) {
         return select().fetch(path);
     }
 
     @Override
-    public Where<T, T> fetch(ColumnHolder<T, ?> p0, ColumnHolder<T, ?> p1) {
+    public Where<T, T> fetch(PathExpression<T, ?> p0, PathExpression<T, ?> p1) {
         return select().fetch(p0, p1);
     }
 
     @Override
-    public Where<T, T> fetch(ColumnHolder<T, ?> p0, ColumnHolder<T, ?> p1, ColumnHolder<T, ?> p3) {
+    public Where<T, T> fetch(PathExpression<T, ?> p0, PathExpression<T, ?> p1, PathExpression<T, ?> p3) {
         return select().fetch(p0, p1, p3);
     }
 
@@ -238,16 +238,6 @@ public abstract class AccessFacade<T> implements BaseAccess<T> {
     @Override
     public Where<T, T> where(TypedExpression<T, Boolean> predicate) {
         return select().where(predicate);
-    }
-
-    @Override
-    public Where<T, T> where(Function<Root<T>, TypedExpression<T, Boolean>> predicateBuilder) {
-        return select().where(predicateBuilder);
-    }
-
-    @Override
-    public Where<T, T> whereIf(boolean predicate, Function<Root<T>, TypedExpression<T, Boolean>> predicateBuilder) {
-        return select().whereIf(predicate, predicateBuilder);
     }
 
     @Override

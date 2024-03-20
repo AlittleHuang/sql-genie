@@ -3,14 +3,14 @@ package io.github.genie.sql.builder;
 import io.github.genie.sql.api.Column;
 import io.github.genie.sql.api.Expression;
 import io.github.genie.sql.api.ExpressionBuilder;
-import io.github.genie.sql.api.TypedExpression;
-import io.github.genie.sql.api.TypedExpression.ColumnHolder;
 import io.github.genie.sql.api.Lists;
 import io.github.genie.sql.api.Path;
 import io.github.genie.sql.api.Query.Fetch;
 import io.github.genie.sql.api.Query.Select;
 import io.github.genie.sql.api.Query.Where0;
 import io.github.genie.sql.api.QueryExecutor;
+import io.github.genie.sql.api.TypedExpression;
+import io.github.genie.sql.api.TypedExpression.PathExpression;
 import io.github.genie.sql.api.tuple.Tuple;
 import io.github.genie.sql.api.tuple.Tuple10;
 import io.github.genie.sql.api.tuple.Tuple2;
@@ -39,10 +39,10 @@ public class QueryBuilder<T> extends QueryConditionBuilder<T, T> implements Sele
         super(queryExecutor, type, structurePostProcessor);
     }
 
-    public Where0<T, T> fetch(List<ColumnHolder<T, ?>> expressions) {
+    public Where0<T, T> fetch(List<PathExpression<T, ?>> expressions) {
         QueryStructureImpl structure = queryStructure.copy();
         List<Column> list = new ArrayList<>(expressions.size());
-        for (ColumnHolder<T, ?> expression : expressions) {
+        for (PathExpression<T, ?> expression : expressions) {
             Expression expr = expression.expression();
             if (expr instanceof Column) {
                 Column column = (Column) expr;

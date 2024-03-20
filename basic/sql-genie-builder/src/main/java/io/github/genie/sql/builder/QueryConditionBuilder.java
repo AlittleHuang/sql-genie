@@ -3,7 +3,6 @@ package io.github.genie.sql.builder;
 import io.github.genie.sql.api.Column;
 import io.github.genie.sql.api.Expression;
 import io.github.genie.sql.api.ExpressionBuilder;
-import io.github.genie.sql.api.TypedExpression;
 import io.github.genie.sql.api.ExpressionOperator.ComparableOperator;
 import io.github.genie.sql.api.ExpressionOperator.NumberOperator;
 import io.github.genie.sql.api.ExpressionOperator.PathOperator;
@@ -29,6 +28,7 @@ import io.github.genie.sql.api.QueryStructure;
 import io.github.genie.sql.api.Root;
 import io.github.genie.sql.api.Selection;
 import io.github.genie.sql.api.Selection.MultiSelected;
+import io.github.genie.sql.api.TypedExpression;
 import io.github.genie.sql.api.TypedExpression.BasicExpression;
 import io.github.genie.sql.builder.DefaultExpressionOperator.ComparableOperatorImpl;
 import io.github.genie.sql.builder.DefaultExpressionOperator.NumberOperatorImpl;
@@ -77,11 +77,6 @@ public class QueryConditionBuilder<T, U> implements Where0<T, U>, Having<T, U>, 
         QueryStructureImpl structure = queryStructure.copy();
         whereAnd(structure, predicate.expression());
         return update(structure);
-    }
-
-    @Override
-    public Where0<T, U> where(Function<Root<T>, TypedExpression<T, Boolean>> predicateBuilder) {
-        return where(predicateBuilder.apply(RootImpl.of()));
     }
 
     static void whereAnd(QueryStructureImpl structure, Expression expression) {
@@ -286,11 +281,6 @@ public class QueryConditionBuilder<T, U> implements Where0<T, U>, Having<T, U>, 
         QueryStructureImpl structure = queryStructure.copy();
         structure.having = predicate.expression();
         return update(structure);
-    }
-
-    @Override
-    public OrderBy<T, U> having(Function<Root<T>, TypedExpression<T, Boolean>> predicateBuilder) {
-        return having(predicateBuilder.apply(RootImpl.of()));
     }
 
     @Override

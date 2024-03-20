@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-public interface ExpressionHolders {
+public interface TypedExpressions {
 
     static <T, U> TypedExpression<T, U> of(Expression expression) {
         return TypeCastUtil.cast(expression);
@@ -20,13 +20,13 @@ public interface ExpressionHolders {
 
     static <T, U> List<TypedExpression<T, U>> of(U[] values) {
         return Arrays.stream(values)
-                .map(ExpressionHolders::<T, U>of)
+                .map(TypedExpressions::<T, U>of)
                 .collect(Collectors.toList());
     }
 
     static <T, U> List<TypedExpression<T, U>> of(Iterable<? extends U> value) {
         return StreamSupport.stream(value.spliterator(), false)
-                .map(ExpressionHolders::<T, U>of)
+                .map(TypedExpressions::<T, U>of)
                 .collect(Collectors.toList());
     }
 

@@ -1,10 +1,6 @@
 package io.github.genie.sql.data.jdbc.example.model;
 
-import io.github.genie.sql.api.TypedExpression;
-import io.github.genie.sql.api.Root;
-import io.github.genie.sql.data.jdbc.example.eneity.User;
-
-import java.util.function.Function;
+import io.github.genie.sql.api.Query.PredicateBuilder;
 
 /**
  * @author HuangChengwei
@@ -16,7 +12,7 @@ public interface PageablePredicate<T> {
 
     Integer getSize();
 
-    Function<Root<User>, TypedExpression<User, Boolean>> predicate();
+    PredicateBuilder<T> predicate();
 
     default Pageable<T> pageable() {
         return new DefaultPageable<>(getPage(), getSize());

@@ -6,8 +6,8 @@ import io.github.genie.sql.api.Operator;
 import io.github.genie.sql.api.Query;
 import io.github.genie.sql.api.Update;
 import io.github.genie.sql.api.Updater;
-import io.github.genie.sql.builder.ExpressionHolders;
 import io.github.genie.sql.builder.Expressions;
+import io.github.genie.sql.builder.TypedExpressions;
 import io.github.genie.sql.builder.UpdaterImpl;
 import io.github.genie.sql.builder.reflect.ReflectUtil;
 import jakarta.persistence.EntityManager;
@@ -59,7 +59,7 @@ public class JpaUpdate implements Update {
             Column idPath = Expressions.column(name);
             Expression operate = Expressions.operate(idPath, Operator.IN, ids);
             List<T> dbList = query.from(entityType)
-                    .where(ExpressionHolders.of(operate))
+                    .where(TypedExpressions.of(operate))
                     .getList();
             if (dbList.size() != entities.size()) {
                 throw new IllegalArgumentException("some id not found");

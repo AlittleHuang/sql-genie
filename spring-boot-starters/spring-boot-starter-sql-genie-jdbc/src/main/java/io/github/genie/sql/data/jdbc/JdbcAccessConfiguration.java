@@ -1,12 +1,12 @@
 package io.github.genie.sql.data.jdbc;
 
-import io.github.genie.sql.data.access.BaseDbAccessConfiguration;
-import io.github.genie.sql.data.access.TransactionalUpdate;
 import io.github.genie.sql.api.Query;
 import io.github.genie.sql.api.Update;
 import io.github.genie.sql.builder.AbstractQueryExecutor;
 import io.github.genie.sql.builder.QueryStructurePostProcessor;
 import io.github.genie.sql.builder.meta.Metamodel;
+import io.github.genie.sql.data.access.BaseDbAccessConfiguration;
+import io.github.genie.sql.data.access.TransactionalUpdate;
 import io.github.genie.sql.executor.jdbc.ConnectionProvider;
 import io.github.genie.sql.executor.jdbc.JdbcQueryExecutor;
 import io.github.genie.sql.executor.jdbc.JdbcQueryExecutor.QuerySqlBuilder;

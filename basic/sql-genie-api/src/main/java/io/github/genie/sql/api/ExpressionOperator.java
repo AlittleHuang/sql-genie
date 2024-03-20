@@ -4,12 +4,12 @@ import io.github.genie.sql.api.Path.BooleanPath;
 import io.github.genie.sql.api.Path.ComparablePath;
 import io.github.genie.sql.api.Path.NumberPath;
 import io.github.genie.sql.api.Path.StringPath;
+import io.github.genie.sql.api.Query.PredicateBuilder;
 import io.github.genie.sql.api.TypedExpression.ComparableExpression;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
 public interface ExpressionOperator<T, U, B> {
 
@@ -172,9 +172,9 @@ public interface ExpressionOperator<T, U, B> {
 
         ExpressionOperator.AndOperator<T> and(TypedExpression<T, Boolean> expression);
 
-        default ExpressionOperator.AndOperator<T> andIf(boolean predicate, Function<Root<T>, TypedExpression<T, Boolean>> predicateBuilder) {
+        default ExpressionOperator.AndOperator<T> andIf(boolean predicate, PredicateBuilder<T> predicateBuilder) {
             if (predicate) {
-                return and(predicateBuilder.apply(root()));
+                return and(predicateBuilder.build(root()));
             }
             return this;
         }
@@ -199,9 +199,9 @@ public interface ExpressionOperator<T, U, B> {
 
         ExpressionOperator.OrOperator<T> or(TypedExpression<T, Boolean> predicate);
 
-        default ExpressionOperator.OrOperator<T> orIf(boolean predicate, Function<Root<T>, TypedExpression<T, Boolean>> predicateBuilder) {
+        default ExpressionOperator.OrOperator<T> orIf(boolean predicate, PredicateBuilder<T> predicateBuilder) {
             if (predicate) {
-                return or(predicateBuilder.apply(root()));
+                return or(predicateBuilder.build(root()));
             }
             return this;
         }

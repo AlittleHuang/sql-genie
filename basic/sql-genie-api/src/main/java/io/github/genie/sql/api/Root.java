@@ -4,17 +4,16 @@ import io.github.genie.sql.api.Path.BooleanPath;
 import io.github.genie.sql.api.Path.ComparablePath;
 import io.github.genie.sql.api.Path.NumberPath;
 import io.github.genie.sql.api.Path.StringPath;
+import io.github.genie.sql.api.Query.PredicateBuilder;
 import io.github.genie.sql.api.TypedExpression.BooleanExpression;
 import io.github.genie.sql.api.TypedExpression.ComparableExpression;
 import io.github.genie.sql.api.TypedExpression.NumberExpression;
 import io.github.genie.sql.api.TypedExpression.PathExpression;
 import io.github.genie.sql.api.TypedExpression.StringExpression;
 
-import java.util.function.Function;
-
 public interface Root<T> {
 
-    BooleanExpression<T> whereIf(boolean predicate, Function<Root<T>, TypedExpression<T, Boolean>> predicateBuilder);
+    BooleanExpression<T> whereIf(boolean predicate, PredicateBuilder<T> predicateBuilder);
 
     <U> TypedExpression<T, U> of(U value);
 

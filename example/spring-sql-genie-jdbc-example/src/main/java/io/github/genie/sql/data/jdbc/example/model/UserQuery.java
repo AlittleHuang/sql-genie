@@ -1,12 +1,9 @@
 package io.github.genie.sql.data.jdbc.example.model;
 
-import io.github.genie.sql.api.TypedExpression;
-import io.github.genie.sql.api.Root;
+import io.github.genie.sql.api.Query.PredicateBuilder;
 import io.github.genie.sql.data.jdbc.example.eneity.Gender;
 import io.github.genie.sql.data.jdbc.example.eneity.User;
 import lombok.Data;
-
-import java.util.function.Function;
 
 /**
  * @author HuangChengwei
@@ -22,7 +19,7 @@ public class UserQuery implements PageablePredicate<User> {
     private Integer size;
 
     @Override
-    public Function<Root<User>, TypedExpression<User, Boolean>> predicate() {
+    public PredicateBuilder<User> predicate() {
         return root -> root
                 .whereIf(username != null, r -> r.get(User::getUsername).eq(username))
                 .andIf(gender != null, r -> r.get(User::getGender).eq(gender))

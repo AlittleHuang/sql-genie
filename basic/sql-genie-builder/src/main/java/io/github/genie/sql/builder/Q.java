@@ -1,7 +1,6 @@
 package io.github.genie.sql.builder;
 
 import io.github.genie.sql.api.Expression;
-import io.github.genie.sql.api.TypedExpression;
 import io.github.genie.sql.api.Order;
 import io.github.genie.sql.api.Order.SortOrder;
 import io.github.genie.sql.api.Path;
@@ -10,6 +9,7 @@ import io.github.genie.sql.api.Path.ComparablePath;
 import io.github.genie.sql.api.Path.NumberPath;
 import io.github.genie.sql.api.Path.StringPath;
 import io.github.genie.sql.api.Root;
+import io.github.genie.sql.api.TypedExpression;
 import io.github.genie.sql.api.TypedExpression.BooleanExpression;
 import io.github.genie.sql.api.TypedExpression.ComparableExpression;
 import io.github.genie.sql.api.TypedExpression.NumberExpression;

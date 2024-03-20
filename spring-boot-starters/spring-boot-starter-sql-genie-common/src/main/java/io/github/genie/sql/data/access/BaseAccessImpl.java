@@ -2,14 +2,14 @@ package io.github.genie.sql.data.access;
 
 import io.github.genie.sql.api.Column;
 import io.github.genie.sql.api.Expression;
-import io.github.genie.sql.api.TypedExpression;
 import io.github.genie.sql.api.Operator;
 import io.github.genie.sql.api.Query;
 import io.github.genie.sql.api.Query.Select;
+import io.github.genie.sql.api.TypedExpression;
 import io.github.genie.sql.api.Update;
 import io.github.genie.sql.api.Updater;
-import io.github.genie.sql.builder.ExpressionHolders;
 import io.github.genie.sql.builder.Expressions;
+import io.github.genie.sql.builder.TypedExpressions;
 import io.github.genie.sql.builder.meta.Metamodel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ResolvableType;
@@ -63,7 +63,7 @@ class BaseAccessImpl<T, ID> extends AccessFacade<T> implements BaseAccess<T> {
 
     public T get(ID id) {
         Expression operate = Expressions.operate(idColumn, Operator.EQ, Expressions.of(id));
-        TypedExpression<T, Boolean> predicate = ExpressionHolders.of(operate);
+        TypedExpression<T, Boolean> predicate = TypedExpressions.of(operate);
         return where(predicate).getSingle();
     }
 
@@ -74,7 +74,7 @@ class BaseAccessImpl<T, ID> extends AccessFacade<T> implements BaseAccess<T> {
             return Collections.emptyList();
         }
         Expression operate = Expressions.operate(idColumn, Operator.IN, idsExpression);
-        TypedExpression<T, Boolean> predicate = ExpressionHolders.of(operate);
+        TypedExpression<T, Boolean> predicate = TypedExpressions.of(operate);
         return where(predicate).getList();
     }
 

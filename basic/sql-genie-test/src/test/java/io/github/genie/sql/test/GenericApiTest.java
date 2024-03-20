@@ -1,7 +1,6 @@
 package io.github.genie.sql.test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import io.github.genie.sql.api.TypedExpression;
 import io.github.genie.sql.api.Lists;
 import io.github.genie.sql.api.LockModeType;
 import io.github.genie.sql.api.Operator;
@@ -12,6 +11,7 @@ import io.github.genie.sql.api.Query.SliceQueryStructure;
 import io.github.genie.sql.api.QueryStructure;
 import io.github.genie.sql.api.Root;
 import io.github.genie.sql.api.Slice;
+import io.github.genie.sql.api.TypedExpression;
 import io.github.genie.sql.api.TypedExpression.BooleanExpression;
 import io.github.genie.sql.api.tuple.Tuple;
 import io.github.genie.sql.api.tuple.Tuple2;

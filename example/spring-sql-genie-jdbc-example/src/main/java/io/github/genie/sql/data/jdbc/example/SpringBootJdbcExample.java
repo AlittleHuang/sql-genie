@@ -11,6 +11,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 @SpringBootApplication
 public class SpringBootJdbcExample {
     public static ConfigurableApplicationContext context;
+
     public static void main(String[] args) {
         context = SpringApplication.run(SpringBootJdbcExample.class, args);
     }
