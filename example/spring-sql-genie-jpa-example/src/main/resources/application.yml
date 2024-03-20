@@ -4,10 +4,6 @@ spring:
     username: root
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
-  jpa:
-    properties:
-      hibernate:
-        format_sql: true
 logging:
   level:
-    org.hibernate.SQL: debug
+    io.github.genie.sql: debug
