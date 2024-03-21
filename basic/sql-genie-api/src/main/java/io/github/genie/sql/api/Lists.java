@@ -1,10 +1,10 @@
 package io.github.genie.sql.api;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public interface Lists {
@@ -58,8 +58,10 @@ public interface Lists {
     }
 
     static <T> List<T> concat(Collection<? extends T> collection, Collection<? extends T> value) {
-        return Stream.concat(collection.stream(), value.stream())
-                .collect(Collectors.toList());
+        ArrayList<T> list = new ArrayList<>(collection.size() + 1);
+        list.addAll(collection);
+        list.addAll(value);
+        return list;
     }
 
 }

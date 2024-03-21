@@ -2,7 +2,6 @@ package io.github.genie.sql.builder;
 
 import io.github.genie.sql.api.Column;
 import io.github.genie.sql.api.Expression;
-import io.github.genie.sql.api.Query.ExpressionsBuilder;
 import io.github.genie.sql.api.ExpressionOperator.ComparableOperator;
 import io.github.genie.sql.api.ExpressionOperator.NumberOperator;
 import io.github.genie.sql.api.ExpressionOperator.PathOperator;
@@ -17,6 +16,7 @@ import io.github.genie.sql.api.Path.ComparablePath;
 import io.github.genie.sql.api.Path.NumberPath;
 import io.github.genie.sql.api.Path.StringPath;
 import io.github.genie.sql.api.Query.Collector;
+import io.github.genie.sql.api.Query.ExpressionsBuilder;
 import io.github.genie.sql.api.Query.Having;
 import io.github.genie.sql.api.Query.OrderBy;
 import io.github.genie.sql.api.Query.OrderOperator;
@@ -161,16 +161,15 @@ public class QueryConditionBuilder<T, U> implements Where0<T, U>, Having<T, U>, 
         return false;
     }
 
-    protected boolean requiredCountSubQuery(Expression column) {
-        if (column instanceof Column) {
+    protected boolean requiredCountSubQuery(Expression expr) {
+        if (expr instanceof Column) {
             return false;
-        } else if (column instanceof Operation) {
-            Operation operation = (Operation) column;
-            Expression expression = operation.operand();
-            if (requiredCountSubQuery(expression)) {
+        } else if (expr instanceof Operation) {
+            Operation operation = (Operation) expr;
+            if (operation.operator().isAgg()) {
                 return true;
             }
-            List<? extends Expression> args = operation.args();
+            List<? extends Expression> args = operation.operands();
             if (args != null) {
                 for (Expression arg : args) {
                     if (requiredCountSubQuery(arg)) {
@@ -178,7 +177,6 @@ public class QueryConditionBuilder<T, U> implements Where0<T, U>, Having<T, U>, 
                     }
                 }
             }
-            return operation.operator().isAgg();
         }
         return false;
     }

@@ -28,9 +28,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-@SuppressWarnings({"PatternVariableCanBeUsed"})
 final class QueryStructures {
 
     @EqualsAndHashCode
@@ -242,15 +240,8 @@ final class QueryStructures {
     @lombok.Data
     @Accessors(fluent = true)
     static final class OperationImpl implements Operation {
-        private final Expression operand;
+        private final List<? extends Expression> operands;
         private final Operator operator;
-        private final List<? extends Expression> args;
-
-        @Override
-        public String toString() {
-            return QueryStructures.toString(this);
-        }
-
     }
 
     @lombok.Data
@@ -329,42 +320,11 @@ final class QueryStructures {
         }
     }
 
-    public static String toString(Operation o) {
-        Expression l = o.operand();
-        List<? extends Expression> r;
-        if (o.args() != null) {
-            r = o.args();
-        } else {
-            r = Lists.of();
-        }
-        if (o.operator().isMultivalued()) {
-            return Stream.concat(Stream.of(l), r.stream())
-                    .map(it -> toString(o, it))
-                    .collect(Collectors.joining(" " + o.operator() + ' '));
-        } else if (r.isEmpty()) {
-            return o.operator().sign() + '(' + l + ')';
-        } else if (r.size() == 1) {
-            return toString(o, l) + ' ' + o.operator().sign() + ' ' + toString(o, r.get(0));
-        } else {
-            return toString(o, l) + " " + o.operator().sign() + '(' + toString(r) + ')';
-        }
-    }
-
     @NotNull
     private static String toString(List<?> list) {
         return list.stream()
                 .map(String::valueOf)
                 .collect(Collectors.joining(", "));
-    }
-
-    private static String toString(Operation parent, Expression subMeta) {
-        if (subMeta instanceof Operation) {
-            Operation o = (Operation) subMeta;
-            if (o.operator().priority() > parent.operator().priority()) {
-                return "(" + subMeta + ')';
-            }
-        }
-        return subMeta.toString();
     }
 
     private QueryStructures() {

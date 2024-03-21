@@ -13,6 +13,7 @@ import jakarta.persistence.criteria.From;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Path;
+import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import org.jetbrains.annotations.NotNull;
 
@@ -46,27 +47,20 @@ public class ExpressionBuilder {
         }
         if (expression instanceof Operation) {
             Operation ov = (Operation) expression;
-            List<? extends Expression> args = ov.args();
             Operator operator = ov.operator();
-            jakarta.persistence.criteria.Expression<?> e0 = toExpression(ov.operand());
-            Expression e1 = ov.firstArg();
-            Expression e2 = ov.secondArg();
+            jakarta.persistence.criteria.Expression<?> e0 = toExpression(ov.firstOperand());
+            Expression e1 = ov.secondOperand();
+            Expression e2 = ov.thirdOperand();
             switch (operator) {
                 case NOT:
                     return cb.not(cast(e0));
                 case AND: {
-                    jakarta.persistence.criteria.Expression<Boolean> res = cast(e0);
-                    for (Expression arg : args) {
-                        res = cb.and(res, cast(toExpression(arg)));
-                    }
-                    return res;
+                    Predicate[] predicates = getPredicates(ov.operands());
+                    return cb.and(predicates);
                 }
                 case OR: {
-                    jakarta.persistence.criteria.Expression<Boolean> res = cast(e0);
-                    for (Expression arg : args) {
-                        res = cb.or(res, cast(toExpression(arg)));
-                    }
-                    return res;
+                    Predicate[] predicates = getPredicates(ov.operands());
+                    return cb.or(predicates);
                 }
                 case GT: {
                     if (e1 instanceof Constant) {
@@ -144,11 +138,13 @@ public class ExpressionBuilder {
                 case IS_NOT_NULL:
                     return cb.isNotNull(e0);
                 case IN: {
-                    if (args.isEmpty()) {
+                    List<? extends Expression> operands = ov.operands();
+                    if (operands.size() <= 1) {
                         return cb.literal(false);
                     } else {
                         CriteriaBuilder.In<Object> in = cb.in(e0);
-                        for (Expression arg : args) {
+                        for (int i = 1; i < operands.size(); i++) {
+                            Expression arg = operands.get(i);
                             if (arg instanceof Constant) {
                                 Constant cv = (Constant) arg;
                                 in = in.value(cv.value());
@@ -181,14 +177,15 @@ public class ExpressionBuilder {
                 case UPPER:
                     return cb.upper(cast(e0));
                 case SUBSTRING: {
-                    if (args.size() == 1) {
+                    List<? extends Expression> operands = ov.operands();
+                    if (operands.size() == 2) {
                         if (e1 instanceof Constant
                             && ((Constant) e1).value() instanceof Number) {
                             Number number = (Number) ((Constant) e1).value();
                             return cb.substring(cast(e0), number.intValue());
                         }
                         return cb.substring(cast(e0), cast(toExpression(e1)));
-                    } else if (args.size() == 2) {
+                    } else if (operands.size() == 3) {
                         if (e1 instanceof Constant
                             && ((Constant) e1).value() instanceof Number
                             && e2 instanceof Constant
@@ -276,6 +273,20 @@ public class ExpressionBuilder {
         } else {
             throw new UnsupportedOperationException("unknown expression type " + expression.getClass());
         }
+    }
+
+    @NotNull
+    private Predicate[] getPredicates(List<? extends Expression> operands) {
+        return operands.stream()
+                .map(this::toExpression)
+                .map(expr -> {
+                    if (expr instanceof Predicate) {
+                        return (Predicate) expr;
+                    } else {
+                        return cb.equal(expr, true);
+                    }
+                })
+                .toArray(Predicate[]::new);
     }
 
     public static <T> jakarta.persistence.criteria.Expression<T> cast(jakarta.persistence.criteria.Expression<?> expression) {

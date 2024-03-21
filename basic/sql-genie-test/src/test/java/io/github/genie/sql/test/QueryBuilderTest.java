@@ -1,11 +1,11 @@
 package io.github.genie.sql.test;
 
-import io.github.genie.sql.api.Query.ExpressionsBuilder;
 import io.github.genie.sql.api.Lists;
 import io.github.genie.sql.api.LockModeType;
 import io.github.genie.sql.api.Path;
 import io.github.genie.sql.api.Path.ComparablePath;
 import io.github.genie.sql.api.Query;
+import io.github.genie.sql.api.Query.ExpressionsBuilder;
 import io.github.genie.sql.api.Query.OrderBy;
 import io.github.genie.sql.api.Query.Select;
 import io.github.genie.sql.api.Query.Where;
@@ -15,10 +15,10 @@ import io.github.genie.sql.api.TypedExpression;
 import io.github.genie.sql.api.TypedExpression.BooleanExpression;
 import io.github.genie.sql.api.tuple.Tuple;
 import io.github.genie.sql.api.tuple.Tuple2;
-import io.github.genie.sql.builder.util.Paths;
 import io.github.genie.sql.builder.RootImpl;
 import io.github.genie.sql.builder.Tuples;
 import io.github.genie.sql.builder.TypedExpressions;
+import io.github.genie.sql.builder.util.Paths;
 import io.github.genie.sql.test.entity.User;
 import io.github.genie.sql.test.example.Page;
 import io.github.genie.sql.test.example.Pageable;

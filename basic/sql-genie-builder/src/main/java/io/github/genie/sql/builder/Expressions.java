@@ -75,14 +75,16 @@ public interface Expressions {
             && l instanceof Operation
             && ((Operation) l).operator() == Operator.NOT) {
             Operation operation = (Operation) l;
-            return operation.operand();
+            return operation.firstOperand();
         }
         if (o.isMultivalued() && l instanceof Operation && ((Operation) l).operator() == o) {
             Operation lo = (Operation) l;
-            List<Expression> args = Lists.concat(lo.args(), r);
-            return new OperationImpl(lo.operand(), o, args);
+            List<Expression> operands = Lists.concat(lo.operands(), r);
+            return new OperationImpl(operands, o);
         }
-        return new OperationImpl(l, o, r);
+        List<Expression> operands = new ArrayList<>(r.size() + 1);
+        operands.addAll(r);
+        return new OperationImpl(operands, o);
     }
 
     static <T> List<PathExpression<T, ?>> toExpressionList(Collection<Path<T, ?>> paths) {

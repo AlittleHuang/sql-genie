@@ -332,9 +332,8 @@ public class MySqlQuerySqlBuilder implements QuerySqlBuilder {
 
         private void appendOperation(List<Object> args, Operation operation) {
             Operator operator = operation.operator();
-            Expression leftOperand = operation.operand();
+            Expression leftOperand = operation.firstOperand();
             Operator operator0 = getOperator(leftOperand);
-            List<? extends Expression> rightOperand = operation.args();
             switch (operator) {
                 case NOT: {
                     appendOperator(operator);
@@ -370,7 +369,9 @@ public class MySqlQuerySqlBuilder implements QuerySqlBuilder {
                     } else {
                         appendExpression(args, leftOperand);
                     }
-                    for (Expression value : rightOperand) {
+                    List<? extends Expression> operands = operation.operands();
+                    for (int i = 1; i < operands.size(); i++) {
+                        Expression value = operands.get(i);
                         appendOperator(operator);
                         Operator operator1 = getOperator(value);
                         if (operator1 != null && operator1.priority() >= operator.priority()) {
@@ -398,7 +399,9 @@ public class MySqlQuerySqlBuilder implements QuerySqlBuilder {
                     appendOperator(operator);
                     sql.append('(');
                     appendExpression(args, leftOperand);
-                    for (Expression expression : rightOperand) {
+                    List<? extends Expression> operands = operation.operands();
+                    for (int i = 1; i < operands.size(); i++) {
+                        Expression expression = operands.get(i);
                         sql.append(',');
                         appendExpression(args, expression);
                     }
@@ -406,14 +409,16 @@ public class MySqlQuerySqlBuilder implements QuerySqlBuilder {
                     break;
                 }
                 case IN: {
-                    if (rightOperand.isEmpty()) {
+                    if (operation.operands().size() <= 1) {
                         appendBlank().append(0);
                     } else {
                         appendBlank();
                         appendExpression(leftOperand);
                         appendOperator(operator);
                         char join = '(';
-                        for (Expression expression : rightOperand) {
+                        List<? extends Expression> operands = operation.operands();
+                        for (int i = 1; i < operands.size(); i++) {
+                            Expression expression = operands.get(i);
                             sql.append(join);
                             appendExpression(args, expression);
                             join = ',';
@@ -428,7 +433,7 @@ public class MySqlQuerySqlBuilder implements QuerySqlBuilder {
                     appendOperator(operator);
                     appendBlank();
                     Expression operate = Expressions
-                            .operate(rightOperand.get(0), Operator.AND, Lists.of(rightOperand.get(1)));
+                            .operate(operation.secondOperand(), Operator.AND, Lists.of(operation.thirdOperand()));
                     appendExpression(args, operate);
                     break;
                 }

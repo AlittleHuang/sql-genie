@@ -2,9 +2,9 @@ package io.github.genie.sql.builder;
 
 import io.github.genie.sql.api.Column;
 import io.github.genie.sql.api.Expression;
-import io.github.genie.sql.api.Query.ExpressionsBuilder;
 import io.github.genie.sql.api.Lists;
 import io.github.genie.sql.api.Path;
+import io.github.genie.sql.api.Query.ExpressionsBuilder;
 import io.github.genie.sql.api.Query.Fetch;
 import io.github.genie.sql.api.Query.Select;
 import io.github.genie.sql.api.Query.Where0;
