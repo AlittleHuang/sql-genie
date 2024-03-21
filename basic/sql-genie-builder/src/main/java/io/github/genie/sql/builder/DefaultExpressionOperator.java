@@ -8,7 +8,7 @@ import io.github.genie.sql.api.Path.StringPath;
 import io.github.genie.sql.api.TypedExpression;
 import io.github.genie.sql.api.TypedExpression.BasicExpression;
 import io.github.genie.sql.api.TypedExpression.ComparableExpression;
-import io.github.genie.sql.api.TypedExpression.JoinPathExpression;
+import io.github.genie.sql.api.TypedExpression.EntityPathExpression;
 import io.github.genie.sql.api.TypedExpression.NumberExpression;
 import io.github.genie.sql.api.TypedExpression.StringExpression;
 import org.jetbrains.annotations.NotNull;
@@ -304,8 +304,8 @@ class DefaultExpressionOperator<T, U, B> implements ExpressionOperator<T, U, B> 
             super(expression, resultBuilder);
         }
 
-        protected JoinPathExpression<T, U> base() {
-            return (JoinPathExpression<T, U>) base;
+        protected EntityPathExpression<T, U> base() {
+            return (EntityPathExpression<T, U>) base;
         }
 
         @Override

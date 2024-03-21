@@ -196,8 +196,8 @@ public interface TypedExpression<T, U> {
 
     }
 
-    interface JoinPathExpression<T, U> extends PathExpression<T, U> {
-        <R> JoinPathExpression<T, R> get(Path<U, R> path);
+    interface EntityPathExpression<T, U> extends PathExpression<T, U> {
+        <R> EntityPathExpression<T, R> get(Path<U, R> path);
 
         StringPathExpression<T> get(StringPath<U> path);
 
@@ -206,7 +206,6 @@ public interface TypedExpression<T, U> {
         <R extends Comparable<R>> ComparablePathExpression<T, R> get(ComparablePath<U, R> path);
 
         BooleanPathExpression<T> get(BooleanPath<U> path);
-
 
         <R> PathExpression<T, R> get(PathExpression<U, R> path);
 

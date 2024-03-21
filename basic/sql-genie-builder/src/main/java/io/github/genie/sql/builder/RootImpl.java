@@ -1,19 +1,16 @@
 package io.github.genie.sql.builder;
 
-import io.github.genie.sql.api.Expression;
 import io.github.genie.sql.api.Operation;
 import io.github.genie.sql.api.Path;
 import io.github.genie.sql.api.Path.BooleanPath;
 import io.github.genie.sql.api.Path.ComparablePath;
 import io.github.genie.sql.api.Path.NumberPath;
 import io.github.genie.sql.api.Path.StringPath;
-import io.github.genie.sql.api.Query.PredicateBuilder;
 import io.github.genie.sql.api.Root;
 import io.github.genie.sql.api.TypedExpression;
-import io.github.genie.sql.api.TypedExpression.BooleanExpression;
 import io.github.genie.sql.api.TypedExpression.BooleanPathExpression;
 import io.github.genie.sql.api.TypedExpression.ComparablePathExpression;
-import io.github.genie.sql.api.TypedExpression.JoinPathExpression;
+import io.github.genie.sql.api.TypedExpression.EntityPathExpression;
 import io.github.genie.sql.api.TypedExpression.NumberPathExpression;
 import io.github.genie.sql.api.TypedExpression.StringPathExpression;
 import io.github.genie.sql.builder.TypedExpressionImpl.BooleanExpressionImpl;
@@ -33,23 +30,17 @@ public class RootImpl<T> implements Root<T> {
     }
 
     @Override
-    public BooleanExpression<T> whereIf(boolean predicate, PredicateBuilder<T> predicateBuilder) {
-        Expression holder = predicate ? predicateBuilder.build(this).expression() : Expressions.TRUE;
-        return TypedExpressions.ofBoolean(holder);
-    }
-
-    @Override
     public <U> TypedExpression<T, U> of(U value) {
         return TypedExpressions.of(value);
     }
 
     @Override
-    public <U> JoinPathExpression<T, U> join(Path<T, U> path) {
+    public <U> EntityPathExpression<T, U> entity(Path<T, U> path) {
         return new TypedExpressionImpl<>((Operation) null, Expressions.of(path));
     }
 
     @Override
-    public <U> JoinPathExpression<T, U> get(Path<T, U> path) {
+    public <U> EntityPathExpression<T, U> get(Path<T, U> path) {
         return new TypedExpressionImpl<>((Operation) null, Expressions.of(path));
     }
 

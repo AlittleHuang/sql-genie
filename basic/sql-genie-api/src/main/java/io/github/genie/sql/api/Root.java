@@ -4,23 +4,17 @@ import io.github.genie.sql.api.Path.BooleanPath;
 import io.github.genie.sql.api.Path.ComparablePath;
 import io.github.genie.sql.api.Path.NumberPath;
 import io.github.genie.sql.api.Path.StringPath;
-import io.github.genie.sql.api.Query.PredicateBuilder;
-import io.github.genie.sql.api.TypedExpression.BooleanExpression;
 import io.github.genie.sql.api.TypedExpression.BooleanPathExpression;
 import io.github.genie.sql.api.TypedExpression.ComparablePathExpression;
-import io.github.genie.sql.api.TypedExpression.JoinPathExpression;
-import io.github.genie.sql.api.TypedExpression.NumberExpression;
+import io.github.genie.sql.api.TypedExpression.EntityPathExpression;
 import io.github.genie.sql.api.TypedExpression.NumberPathExpression;
-import io.github.genie.sql.api.TypedExpression.PathExpression;
 import io.github.genie.sql.api.TypedExpression.StringPathExpression;
 
 public interface Root<T> {
 
-    BooleanExpression<T> whereIf(boolean predicate, PredicateBuilder<T> predicateBuilder);
-
     <U> TypedExpression<T, U> of(U value);
 
-    <U> JoinPathExpression<T, U> get(Path<T, U> path);
+    <U> EntityPathExpression<T, U> get(Path<T, U> path);
 
     StringPathExpression<T> get(StringPath<T> path);
 
@@ -30,7 +24,7 @@ public interface Root<T> {
 
     BooleanPathExpression<T> get(BooleanPath<T> path);
 
-    <U> JoinPathExpression<T, U> join(Path<T, U> path);
+    <U> EntityPathExpression<T, U> entity(Path<T, U> path);
 
     StringPathExpression<T> string(Path<T, String> path);
 

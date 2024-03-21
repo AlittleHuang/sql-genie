@@ -1,6 +1,6 @@
 package io.github.genie.sql.data.example.model;
 
-import io.github.genie.sql.api.Query.PredicateBuilder;
+import io.github.genie.sql.api.TypedExpression;
 
 /**
  * @author HuangChengwei
@@ -12,7 +12,7 @@ public interface PageablePredicate<T> {
 
     Integer getSize();
 
-    PredicateBuilder<T> predicate();
+    TypedExpression<T, Boolean> predicate();
 
     default Pageable<T> pageable() {
         return new DefaultPageable<>(getPage(), getSize());

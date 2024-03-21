@@ -1,6 +1,6 @@
 package io.github.genie.sql.data.example.model;
 
-import io.github.genie.sql.api.Query.PredicateBuilder;
+import io.github.genie.sql.api.TypedExpression;
 import io.github.genie.sql.data.example.eneity.Gender;
 import io.github.genie.sql.data.example.eneity.User;
 import lombok.Data;
@@ -19,8 +19,8 @@ public class UserQuery2 implements PageablePredicate<User> {
     private Integer size;
 
     @Override
-    public PredicateBuilder<User> predicate() {
-        return unused -> User.Username.eqIfNotNull(username)
+    public TypedExpression<User, Boolean> predicate() {
+        return User.Username.eqIfNotNull(username)
                 .or(User.ParentUser.get(User.Username).eqIfNotNull(parentUsername))
                 .or(User.Gender.eqIfNotNull(gender));
     }

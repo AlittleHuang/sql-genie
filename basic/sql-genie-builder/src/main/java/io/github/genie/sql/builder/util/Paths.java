@@ -7,15 +7,15 @@ import io.github.genie.sql.api.Path.NumberPath;
 import io.github.genie.sql.api.Path.StringPath;
 import io.github.genie.sql.api.TypedExpression.BooleanPathExpression;
 import io.github.genie.sql.api.TypedExpression.ComparablePathExpression;
-import io.github.genie.sql.api.TypedExpression.JoinPathExpression;
+import io.github.genie.sql.api.TypedExpression.EntityPathExpression;
 import io.github.genie.sql.api.TypedExpression.NumberPathExpression;
 import io.github.genie.sql.api.TypedExpression.StringPathExpression;
 import io.github.genie.sql.builder.RootImpl;
 
 public interface Paths {
 
-    static <T, U> JoinPathExpression<T, U> get(Path<T, U> path) {
-        return RootImpl.<T>of().join(path);
+    static <T, U> EntityPathExpression<T, U> get(Path<T, U> path) {
+        return RootImpl.<T>of().entity(path);
     }
 
     static <T> StringPathExpression<T> get(StringPath<T> path) {
@@ -32,6 +32,10 @@ public interface Paths {
 
     static <T> BooleanPathExpression<T> get(BooleanPath<T> path) {
         return RootImpl.<T>of().get(path);
+    }
+
+    static <T, U> EntityPathExpression<T, U> entity(Path<T, U> path) {
+        return RootImpl.<T>of().entity(path);
     }
 
     static <T> StringPathExpression<T> string(Path<T, String> path) {

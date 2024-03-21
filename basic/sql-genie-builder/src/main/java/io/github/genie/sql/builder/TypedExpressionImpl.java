@@ -22,7 +22,7 @@ import io.github.genie.sql.api.Path.StringPath;
 import io.github.genie.sql.api.Root;
 import io.github.genie.sql.api.TypedExpression;
 import io.github.genie.sql.api.TypedExpression.BasicExpression;
-import io.github.genie.sql.api.TypedExpression.JoinPathExpression;
+import io.github.genie.sql.api.TypedExpression.EntityPathExpression;
 import io.github.genie.sql.builder.DefaultExpressionOperator.ComparableOperatorImpl;
 import io.github.genie.sql.builder.DefaultExpressionOperator.NumberOperatorImpl;
 import io.github.genie.sql.builder.DefaultExpressionOperator.PathOperatorImpl;
@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-class TypedExpressionImpl<T, U> implements BasicExpression<T, U>, JoinPathExpression<T, U> {
+class TypedExpressionImpl<T, U> implements BasicExpression<T, U>, EntityPathExpression<T, U> {
     protected final Operation operation;
     protected final Expression operand;
 
@@ -186,7 +186,7 @@ class TypedExpressionImpl<T, U> implements BasicExpression<T, U>, JoinPathExpres
     }
 
     @Override
-    public <R> JoinPathExpression<T, R> get(Path<U, R> path) {
+    public <R> EntityPathExpression<T, R> get(Path<U, R> path) {
         return new TypedExpressionImpl<>(this, getPath(path));
     }
 
