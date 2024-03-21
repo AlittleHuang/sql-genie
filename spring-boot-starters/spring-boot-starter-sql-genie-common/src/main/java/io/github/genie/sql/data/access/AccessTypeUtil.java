@@ -2,6 +2,7 @@ package io.github.genie.sql.data.access;
 
 import io.github.genie.sql.api.Query.Select;
 import io.github.genie.sql.api.Updater;
+import io.github.genie.sql.builder.TypeCastUtil;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.config.DependencyDescriptor;
 

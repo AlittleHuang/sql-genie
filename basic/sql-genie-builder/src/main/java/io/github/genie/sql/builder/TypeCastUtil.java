@@ -11,6 +11,10 @@ public class TypeCastUtil {
         return unsafeCast(expression);
     }
 
+    public static <T> Class<T> cast(Class<?> resolve) {
+        return unsafeCast(resolve);
+    }
+
     public static <T, U> TypedExpression<T, U> cast(Expression expression) {
         return unsafeCast(expression);
     }

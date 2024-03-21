@@ -9,6 +9,7 @@ import io.github.genie.sql.api.TypedExpression;
 import io.github.genie.sql.api.Update;
 import io.github.genie.sql.api.Updater;
 import io.github.genie.sql.builder.Expressions;
+import io.github.genie.sql.builder.TypeCastUtil;
 import io.github.genie.sql.builder.TypedExpressions;
 import io.github.genie.sql.builder.meta.Metamodel;
 import org.springframework.beans.factory.annotation.Autowired;
