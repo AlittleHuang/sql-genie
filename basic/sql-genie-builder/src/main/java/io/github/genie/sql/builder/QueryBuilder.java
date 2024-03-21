@@ -2,7 +2,7 @@ package io.github.genie.sql.builder;
 
 import io.github.genie.sql.api.Column;
 import io.github.genie.sql.api.Expression;
-import io.github.genie.sql.api.ExpressionBuilder;
+import io.github.genie.sql.api.Query.ExpressionsBuilder;
 import io.github.genie.sql.api.Lists;
 import io.github.genie.sql.api.Path;
 import io.github.genie.sql.api.Query.Fetch;
@@ -54,7 +54,7 @@ public class QueryBuilder<T> extends QueryConditionBuilder<T, T> implements Sele
     }
 
     @Override
-    public Where0<T, Tuple> select(ExpressionBuilder<T> selectBuilder) {
+    public Where0<T, Tuple> select(ExpressionsBuilder<T> selectBuilder) {
         return select(selectBuilder.apply(RootImpl.of()));
     }
 
@@ -156,7 +156,7 @@ public class QueryBuilder<T> extends QueryConditionBuilder<T, T> implements Sele
     }
 
     @Override
-    public Where0<T, Tuple> selectDistinct(ExpressionBuilder<T> selectBuilder) {
+    public Where0<T, Tuple> selectDistinct(ExpressionsBuilder<T> selectBuilder) {
         return selectDistinct(selectBuilder.apply(RootImpl.of()));
     }
 

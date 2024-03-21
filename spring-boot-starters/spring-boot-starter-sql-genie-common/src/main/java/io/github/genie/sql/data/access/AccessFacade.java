@@ -1,6 +1,6 @@
 package io.github.genie.sql.data.access;
 
-import io.github.genie.sql.api.ExpressionBuilder;
+import io.github.genie.sql.api.Query.ExpressionsBuilder;
 import io.github.genie.sql.api.ExpressionOperator.ComparableOperator;
 import io.github.genie.sql.api.ExpressionOperator.NumberOperator;
 import io.github.genie.sql.api.ExpressionOperator.PathOperator;
@@ -56,7 +56,7 @@ public abstract class AccessFacade<T> implements BaseAccess<T> {
     }
 
     @Override
-    public Where0<T, Tuple> select(ExpressionBuilder<T> selectBuilder) {
+    public Where0<T, Tuple> select(ExpressionsBuilder<T> selectBuilder) {
         return select().select(selectBuilder);
     }
 
@@ -131,7 +131,7 @@ public abstract class AccessFacade<T> implements BaseAccess<T> {
     }
 
     @Override
-    public Where0<T, Tuple> selectDistinct(ExpressionBuilder<T> selectBuilder) {
+    public Where0<T, Tuple> selectDistinct(ExpressionsBuilder<T> selectBuilder) {
         return select().selectDistinct(selectBuilder);
     }
 

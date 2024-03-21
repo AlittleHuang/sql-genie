@@ -2,7 +2,7 @@ package io.github.genie.sql.builder;
 
 import io.github.genie.sql.api.Column;
 import io.github.genie.sql.api.Expression;
-import io.github.genie.sql.api.ExpressionBuilder;
+import io.github.genie.sql.api.Query.ExpressionsBuilder;
 import io.github.genie.sql.api.ExpressionOperator.ComparableOperator;
 import io.github.genie.sql.api.ExpressionOperator.NumberOperator;
 import io.github.genie.sql.api.ExpressionOperator.PathOperator;
@@ -260,8 +260,8 @@ public class QueryConditionBuilder<T, U> implements Where0<T, U>, Having<T, U>, 
     }
 
     @Override
-    public Having<T, U> groupBy(ExpressionBuilder<T> expressionBuilder) {
-        return groupBy(expressionBuilder.apply(RootImpl.of()));
+    public Having<T, U> groupBy(ExpressionsBuilder<T> expressionsBuilder) {
+        return groupBy(expressionsBuilder.apply(RootImpl.of()));
     }
 
     @Override

@@ -41,7 +41,7 @@ public interface Query {
 
         Where0<T, Tuple> select(List<? extends TypedExpression<T, ?>> paths);
 
-        Where0<T, Tuple> select(ExpressionBuilder<T> selectBuilder);
+        Where0<T, Tuple> select(ExpressionsBuilder<T> selectBuilder);
 
         <R> Where0<T, R> select(TypedExpression<T, R> expression);
 
@@ -77,7 +77,7 @@ public interface Query {
 
         Where0<T, Tuple> selectDistinct(List<? extends TypedExpression<T, ?>> paths);
 
-        Where0<T, Tuple> selectDistinct(ExpressionBuilder<T> selectBuilder);
+        Where0<T, Tuple> selectDistinct(ExpressionsBuilder<T> selectBuilder);
 
         <R> Where0<T, R> selectDistinct(TypedExpression<T, R> expression);
 
@@ -204,7 +204,7 @@ public interface Query {
     interface GroupBy<T, U> extends OrderBy<T, U> {
         Having<T, U> groupBy(List<? extends TypedExpression<T, ?>> expressions);
 
-        Having<T, U> groupBy(ExpressionBuilder<T> expressionBuilder);
+        Having<T, U> groupBy(ExpressionsBuilder<T> expressionsBuilder);
 
         Having<T, U> groupBy(Path<T, ?> path);
 
@@ -433,4 +433,7 @@ public interface Query {
         TypedExpression<T, Boolean> build(Root<T> root);
     }
 
+    interface ExpressionsBuilder<T> {
+        List<? extends TypedExpression<T, ?>> apply(Root<T> root);
+    }
 }

@@ -1,6 +1,6 @@
 package io.github.genie.sql.test;
 
-import io.github.genie.sql.api.ExpressionBuilder;
+import io.github.genie.sql.api.Query.ExpressionsBuilder;
 import io.github.genie.sql.api.Lists;
 import io.github.genie.sql.api.LockModeType;
 import io.github.genie.sql.api.Path;
@@ -484,14 +484,14 @@ class QueryBuilderTest {
 
         assertEquals(tuples, collect2);
 
-        tuples = userQuery.selectDistinct((ExpressionBuilder<User>) user ->
+        tuples = userQuery.selectDistinct((ExpressionsBuilder<User>) user ->
                         Lists.of(user.get(User::getRandomNumber), user.get(User::getUsername)))
                 .getList();
 
         assertEquals(tuples, collect2);
 
 
-        tuples = userQuery.select((ExpressionBuilder<User>) user ->
+        tuples = userQuery.select((ExpressionsBuilder<User>) user ->
                         Lists.of(user.get(User::getRandomNumber), user.get(User::getUsername)))
                 .getList();
         collect2 = users().stream()
@@ -556,14 +556,14 @@ class QueryBuilderTest {
             assertEquals(value, objects.get(1));
         }
 
-        ExpressionBuilder<User> expressionBuilder =
+        ExpressionsBuilder<User> expressionsBuilder =
                 (Root<User> root) -> Lists.of(root.get(User::getRandomNumber));
         list = userQuery
                 .select(Lists.of(
                         get(User::getRandomNumber),
                         get(User::getId).count()
                 ))
-                .groupBy(expressionBuilder)
+                .groupBy(expressionsBuilder)
                 .getList();
 
         assertEquals(list.size(), count.size());
@@ -593,7 +593,7 @@ class QueryBuilderTest {
                 ))
                 .where(User::isValid).eq(true)
                 .where(User::getRandomNumber).eq(1)
-                .groupBy(expressionBuilder)
+                .groupBy(expressionsBuilder)
                 .getList();
         count = users().stream()
                 .filter(it -> it.isValid() && it.getRandomNumber() == 1)
