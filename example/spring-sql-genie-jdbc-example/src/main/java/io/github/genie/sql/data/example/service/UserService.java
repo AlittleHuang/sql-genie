@@ -2,6 +2,8 @@ package io.github.genie.sql.data.example.service;
 
 import io.github.genie.sql.data.access.Access;
 import io.github.genie.sql.data.example.eneity.User;
+import io.github.genie.sql.data.example.model.Page;
+import io.github.genie.sql.data.example.model.Pageable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +35,13 @@ public class UserService {
         }
         userAccess.update(user);
         return user;
+    }
+
+    public Page<User> page(String username, Pageable<User> pageable) {
+        return userAccess
+                .where(User::getUsername).eqIfNotNull(username)
+                .where(User::getUsername).eqIfNotNull(username)
+                .slice(pageable);
     }
 
 }

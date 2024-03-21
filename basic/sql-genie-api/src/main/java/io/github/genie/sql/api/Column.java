@@ -7,5 +7,7 @@ non-sealed public interface Column extends Expression, Iterable<String> {
 
     Column get(String path);
 
+    Column get(Column column);
+
     Column parent();
 }

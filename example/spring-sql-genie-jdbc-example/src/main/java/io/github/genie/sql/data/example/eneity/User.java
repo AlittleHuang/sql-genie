@@ -1,5 +1,10 @@
 package io.github.genie.sql.data.example.eneity;
 
+import io.github.genie.sql.api.TypedExpression.ComparablePathExpression;
+import io.github.genie.sql.api.TypedExpression.JoinPathExpression;
+import io.github.genie.sql.api.TypedExpression.NumberPathExpression;
+import io.github.genie.sql.api.TypedExpression.StringPathExpression;
+import io.github.genie.sql.builder.util.Paths;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
@@ -15,6 +20,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 
+import static io.github.genie.sql.builder.util.Paths.get;
 import static jakarta.persistence.ConstraintMode.NO_CONSTRAINT;
 
 @SuppressWarnings("JpaDataSourceORMInspection")
@@ -23,7 +29,10 @@ import static jakarta.persistence.ConstraintMode.NO_CONSTRAINT;
 @Getter
 @Setter
 public class User {
-
+    public static StringPathExpression<User> Username = get(User::getUsername);
+    public static JoinPathExpression<User, User> ParentUser = Paths.get(User::getParentUser);
+    public static ComparablePathExpression<User, Gender> Gender = get(User::getGender);
+    public static NumberPathExpression<User, Integer> Pid = get(User::getPid);
     @Id
     private Long id;
 

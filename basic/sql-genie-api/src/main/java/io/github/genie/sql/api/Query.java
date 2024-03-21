@@ -431,7 +431,6 @@ public interface Query {
     @FunctionalInterface
     interface PredicateBuilder<T> {
         TypedExpression<T, Boolean> build(Root<T> root);
-
     }
 
 }

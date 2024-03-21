@@ -10,6 +10,10 @@ import java.util.List;
  */
 public interface Pageable<T> extends Sliceable<T, Page<T>> {
 
+    static <T> Pageable<T> of(int page, int size) {
+        return new DefaultPageable<>(page, size);
+    }
+
     int page();
 
     int size();

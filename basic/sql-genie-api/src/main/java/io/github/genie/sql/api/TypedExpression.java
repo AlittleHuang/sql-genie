@@ -2,6 +2,7 @@ package io.github.genie.sql.api;
 
 import io.github.genie.sql.api.ExpressionOperator.AndOperator;
 import io.github.genie.sql.api.ExpressionOperator.OrOperator;
+import io.github.genie.sql.api.Order.SortOrder;
 import io.github.genie.sql.api.Path.BooleanPath;
 import io.github.genie.sql.api.Path.ComparablePath;
 import io.github.genie.sql.api.Path.NumberPath;
@@ -20,33 +21,37 @@ public interface TypedExpression<T, U> {
 
         Root<T> root();
 
-        TypedExpression.NumberExpression<T, Long> count();
+        NumberExpression<T, Long> count();
 
-        TypedExpression.BooleanExpression<T> eq(U value);
+        BooleanExpression<T> eq(U value);
 
-        TypedExpression.BooleanExpression<T> eq(TypedExpression<T, U> value);
+        BooleanExpression<T> eqIfNotNull(U value);
 
-        TypedExpression.BooleanExpression<T> ne(U value);
+        BooleanExpression<T> eq(TypedExpression<T, U> value);
 
-        TypedExpression.BooleanExpression<T> ne(TypedExpression<T, U> value);
+        BooleanExpression<T> ne(U value);
 
-        @SuppressWarnings("unchecked")
-        TypedExpression.BooleanExpression<T> in(U... values);
+        BooleanExpression<T> neIfNotNull(U value);
 
-        TypedExpression.BooleanExpression<T> in(@NotNull List<? extends TypedExpression<T, U>> values);
-
-        TypedExpression.BooleanExpression<T> in(@NotNull Collection<? extends U> values);
+        BooleanExpression<T> ne(TypedExpression<T, U> value);
 
         @SuppressWarnings("unchecked")
-        TypedExpression.BooleanExpression<T> notIn(U... values);
+        BooleanExpression<T> in(U... values);
 
-        TypedExpression.BooleanExpression<T> notIn(@NotNull List<? extends TypedExpression<T, U>> values);
+        BooleanExpression<T> in(@NotNull List<? extends TypedExpression<T, U>> values);
 
-        TypedExpression.BooleanExpression<T> notIn(@NotNull Collection<? extends U> values);
+        BooleanExpression<T> in(@NotNull Collection<? extends U> values);
 
-        TypedExpression.BooleanExpression<T> isNull();
+        @SuppressWarnings("unchecked")
+        BooleanExpression<T> notIn(U... values);
 
-        TypedExpression.BooleanExpression<T> isNotNull();
+        BooleanExpression<T> notIn(@NotNull List<? extends TypedExpression<T, U>> values);
+
+        BooleanExpression<T> notIn(@NotNull Collection<? extends U> values);
+
+        BooleanExpression<T> isNull();
+
+        BooleanExpression<T> isNotNull();
 
     }
 
@@ -66,9 +71,15 @@ public interface TypedExpression<T, U> {
 
         BooleanExpression<T> notBetween(TypedExpression<T, U> l, TypedExpression<T, U> r);
 
-        Order<T> asc();
+        default Order<T> asc() {
+            return sort(SortOrder.ASC);
+        }
 
-        Order<T> desc();
+        default Order<T> desc() {
+            return sort(SortOrder.DESC);
+        }
+
+        Order<T> sort(SortOrder order);
 
         default BooleanExpression<T> ge(U value) {
             return ge(root().of(value));
@@ -83,6 +94,22 @@ public interface TypedExpression<T, U> {
         }
 
         default BooleanExpression<T> lt(U value) {
+            return lt(root().of(value));
+        }
+
+        default BooleanExpression<T> geIfNotNull(U value) {
+            return ge(root().of(value));
+        }
+
+        default BooleanExpression<T> gtIfNotNull(U value) {
+            return gt(root().of(value));
+        }
+
+        default BooleanExpression<T> leIfNotNull(U value) {
+            return le(root().of(value));
+        }
+
+        default BooleanExpression<T> ltIfNotNull(U value) {
             return lt(root().of(value));
         }
 
@@ -115,56 +142,81 @@ public interface TypedExpression<T, U> {
     }
 
     interface NumberExpression<T, U extends Number & Comparable<U>> extends ComparableExpression<T, U> {
-        TypedExpression.NumberExpression<T, U> add(TypedExpression<T, U> expression);
+        NumberExpression<T, U> add(TypedExpression<T, U> expression);
 
-        TypedExpression.NumberExpression<T, U> subtract(TypedExpression<T, U> expression);
+        NumberExpression<T, U> subtract(TypedExpression<T, U> expression);
 
-        TypedExpression.NumberExpression<T, U> multiply(TypedExpression<T, U> expression);
+        NumberExpression<T, U> multiply(TypedExpression<T, U> expression);
 
-        TypedExpression.NumberExpression<T, U> divide(TypedExpression<T, U> expression);
+        NumberExpression<T, U> divide(TypedExpression<T, U> expression);
 
-        TypedExpression.NumberExpression<T, U> mod(TypedExpression<T, U> expression);
+        NumberExpression<T, U> mod(TypedExpression<T, U> expression);
 
-        TypedExpression.NumberExpression<T, U> sum();
+        NumberExpression<T, U> sum();
 
-        <R extends Number & Comparable<R>> TypedExpression.NumberExpression<T, R> avg();
+        <R extends Number & Comparable<R>> NumberExpression<T, R> avg();
 
-        TypedExpression.NumberExpression<T, U> max();
+        NumberExpression<T, U> max();
 
-        TypedExpression.NumberExpression<T, U> min();
+        NumberExpression<T, U> min();
 
-        default TypedExpression.NumberExpression<T, U> add(U value) {
+        default NumberExpression<T, U> add(U value) {
             return add(root().of(value));
         }
 
-        default TypedExpression.NumberExpression<T, U> subtract(U value) {
+        default NumberExpression<T, U> subtract(U value) {
             return subtract(root().of(value));
         }
 
-        default TypedExpression.NumberExpression<T, U> multiply(U value) {
+        default NumberExpression<T, U> multiply(U value) {
             return multiply(root().of(value));
         }
 
-        default TypedExpression.NumberExpression<T, U> divide(U value) {
+        default NumberExpression<T, U> divide(U value) {
             return divide(root().of(value));
         }
 
-        default TypedExpression.NumberExpression<T, U> mod(U value) {
+        default NumberExpression<T, U> mod(U value) {
             return mod(root().of(value));
         }
+
+        NumberExpression<T, U> addIfNotNull(U value);
+
+        NumberExpression<T, U> subtractIfNotNull(U value);
+
+        NumberExpression<T, U> multiplyIfNotNull(U value);
+
+        NumberExpression<T, U> divideIfNotNull(U value);
+
+        NumberExpression<T, U> modIfNotNull(U value);
 
     }
 
     interface PathExpression<T, U> extends BasicExpression<T, U> {
-        <R> TypedExpression.PathExpression<T, R> get(Path<U, R> path);
 
-        TypedExpression.StringExpression<T> get(StringPath<U> path);
+    }
 
-        <R extends Number & Comparable<R>> NumberExpression<T, R> get(NumberPath<U, R> path);
+    interface JoinPathExpression<T, U> extends PathExpression<T, U> {
+        <R> JoinPathExpression<T, R> get(Path<U, R> path);
 
-        <R extends Comparable<R>> ComparableExpression<T, R> get(ComparablePath<U, R> path);
+        StringPathExpression<T> get(StringPath<U> path);
 
-        BooleanExpression<T> get(BooleanPath<U> path);
+        <R extends Number & Comparable<R>> NumberPathExpression<T, R> get(NumberPath<U, R> path);
+
+        <R extends Comparable<R>> ComparablePathExpression<T, R> get(ComparablePath<U, R> path);
+
+        BooleanPathExpression<T> get(BooleanPath<U> path);
+
+
+        <R> PathExpression<T, R> get(PathExpression<U, R> path);
+
+        StringPathExpression<T> get(StringPathExpression<U> path);
+
+        <R extends Number & Comparable<R>> NumberPathExpression<T, R> get(NumberPathExpression<U, R> path);
+
+        <R extends Comparable<R>> ComparablePathExpression<T, R> get(ComparablePathExpression<U, R> path);
+
+        BooleanPathExpression<T> get(BooleanPathExpression<U> path);
 
     }
 
@@ -202,16 +254,56 @@ public interface TypedExpression<T, U> {
             return notLike('%' + value + '%');
         }
 
-        TypedExpression.StringExpression<T> lower();
+        BooleanExpression<T> likeIfNotNull(String value);
 
-        TypedExpression.StringExpression<T> upper();
+        default BooleanExpression<T> startWithIfNotNull(String value) {
+            return value == null ? likeIfNotNull(null) : likeIfNotNull(value + '%');
+        }
 
-        TypedExpression.StringExpression<T> substring(int a, int b);
+        default BooleanExpression<T> endsWithIfNotNull(String value) {
+            return value == null ? likeIfNotNull(null) : likeIfNotNull('%' + value);
+        }
 
-        TypedExpression.StringExpression<T> substring(int a);
+        default BooleanExpression<T> containsIfNotNull(String value) {
+            return value == null ? likeIfNotNull(null) : likeIfNotNull('%' + value + '%');
+        }
 
-        TypedExpression.StringExpression<T> trim();
+        BooleanExpression<T> notLikeIfNotNull(String value);
+
+        default BooleanExpression<T> notStartWithIfNotNull(String value) {
+            return value == null ? notLikeIfNotNull(null) : notLikeIfNotNull(value + '%');
+        }
+
+        default BooleanExpression<T> notEndsWithIfNotNull(String value) {
+            return value == null ? notLikeIfNotNull(null) : notLikeIfNotNull('%' + value);
+        }
+
+        default BooleanExpression<T> notContainsIfNotNull(String value) {
+            return value == null ? notLikeIfNotNull(null) : notLikeIfNotNull('%' + value + '%');
+        }
+
+        StringExpression<T> lower();
+
+        StringExpression<T> upper();
+
+        StringExpression<T> substring(int a, int b);
+
+        StringExpression<T> substring(int a);
+
+        StringExpression<T> trim();
 
         NumberExpression<T, Integer> length();
+    }
+
+    interface BooleanPathExpression<T> extends BooleanExpression<T>, PathExpression<T, Boolean> {
+    }
+
+    interface StringPathExpression<T> extends StringExpression<T>, PathExpression<T, String> {
+    }
+
+    interface ComparablePathExpression<T, U extends Comparable<U>> extends ComparableExpression<T, U>, PathExpression<T, U> {
+    }
+
+    interface NumberPathExpression<T, U extends Number & Comparable<U>> extends NumberExpression<T, U>, PathExpression<T, U> {
     }
 }

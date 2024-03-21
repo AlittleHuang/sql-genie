@@ -15,9 +15,13 @@ public interface ExpressionOperator<T, U, B> {
 
     B eq(U value);
 
+    B eqIfNotNull(U value);
+
     B eq(TypedExpression<T, U> expression);
 
     B ne(U value);
+
+    B neIfNotNull(U value);
 
     B ne(TypedExpression<T, U> expression);
 
@@ -48,6 +52,14 @@ public interface ExpressionOperator<T, U, B> {
         B le(U value);
 
         B lt(U value);
+
+        B geIfNotNull(U value);
+
+        B gtIfNotNull(U value);
+
+        B leIfNotNull(U value);
+
+        B ltIfNotNull(U value);
 
         B between(U l, U r);
 
@@ -85,6 +97,16 @@ public interface ExpressionOperator<T, U, B> {
         NumberOperator<T, U, B> divide(U value);
 
         NumberOperator<T, U, B> mod(U value);
+
+        NumberOperator<T, U, B> addIfNotNull(U value);
+
+        NumberOperator<T, U, B> subtractIfNotNull(U value);
+
+        NumberOperator<T, U, B> multiplyIfNotNull(U value);
+
+        NumberOperator<T, U, B> divideIfNotNull(U value);
+
+        NumberOperator<T, U, B> modIfNotNull(U value);
 
         NumberOperator<T, U, B> add(TypedExpression<T, U> expression);
 
@@ -143,6 +165,35 @@ public interface ExpressionOperator<T, U, B> {
         default B notContains(String value) {
             return notLike('%' + value + '%');
         }
+
+        B likeIfNotNull(String value);
+
+        default B startWithIfNotNull(String value) {
+            return likeIfNotNull(value + '%');
+        }
+
+        default B endsWithIfNotNull(String value) {
+            return likeIfNotNull('%' + value);
+        }
+
+        default B containsIfNotNull(String value) {
+            return likeIfNotNull('%' + value + '%');
+        }
+
+        B notLikeIfNotNull(String value);
+
+        default B notStartWithIfNotNull(String value) {
+            return notLikeIfNotNull(value + '%');
+        }
+
+        default B notEndsWithIfNotNull(String value) {
+            return notLikeIfNotNull('%' + value);
+        }
+
+        default B notContainsIfNotNull(String value) {
+            return notLikeIfNotNull('%' + value + '%');
+        }
+
 
         StringOperator<T, B> lower();
 

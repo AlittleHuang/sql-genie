@@ -6,10 +6,13 @@ import io.github.genie.sql.api.Path.NumberPath;
 import io.github.genie.sql.api.Path.StringPath;
 import io.github.genie.sql.api.Query.PredicateBuilder;
 import io.github.genie.sql.api.TypedExpression.BooleanExpression;
-import io.github.genie.sql.api.TypedExpression.ComparableExpression;
+import io.github.genie.sql.api.TypedExpression.BooleanPathExpression;
+import io.github.genie.sql.api.TypedExpression.ComparablePathExpression;
+import io.github.genie.sql.api.TypedExpression.JoinPathExpression;
 import io.github.genie.sql.api.TypedExpression.NumberExpression;
+import io.github.genie.sql.api.TypedExpression.NumberPathExpression;
 import io.github.genie.sql.api.TypedExpression.PathExpression;
-import io.github.genie.sql.api.TypedExpression.StringExpression;
+import io.github.genie.sql.api.TypedExpression.StringPathExpression;
 
 public interface Root<T> {
 
@@ -17,34 +20,24 @@ public interface Root<T> {
 
     <U> TypedExpression<T, U> of(U value);
 
-    <U> PathExpression<T, U> get(Path<T, U> path);
+    <U> JoinPathExpression<T, U> get(Path<T, U> path);
 
-    StringExpression<T> get(StringPath<T> path);
+    StringPathExpression<T> get(StringPath<T> path);
 
-    <U extends Number & Comparable<U>> NumberExpression<T, U> get(NumberPath<T, U> path);
+    <U extends Number & Comparable<U>> NumberPathExpression<T, U> get(NumberPath<T, U> path);
 
-    <U extends Comparable<U>> ComparableExpression<T, U> get(ComparablePath<T, U> path);
+    <U extends Comparable<U>> ComparablePathExpression<T, U> get(ComparablePath<T, U> path);
 
-    BooleanExpression<T> get(BooleanPath<T> path);
+    BooleanPathExpression<T> get(BooleanPath<T> path);
 
-    default <U extends Number & Comparable<U>> NumberExpression<T, U> min(NumberPath<T, U> path) {
-        return get(path).min();
-    }
+    <U> JoinPathExpression<T, U> join(Path<T, U> path);
 
-    default <U extends Number & Comparable<U>> NumberExpression<T, U> max(NumberPath<T, U> path) {
-        return get(path).max();
-    }
+    StringPathExpression<T> string(Path<T, String> path);
 
-    default <U extends Number & Comparable<U>> NumberExpression<T, U> sum(NumberPath<T, U> path) {
-        return get(path).sum();
-    }
+    <U extends Number & Comparable<U>> NumberPathExpression<T, U> number(Path<T, U> path);
 
-    default <U extends Number & Comparable<U>> NumberExpression<T, U> avg(NumberPath<T, U> path) {
-        return get(path).avg();
-    }
+    <U extends Comparable<U>> ComparablePathExpression<T, U> comparable(Path<T, U> path);
 
-    default NumberExpression<T, Long> count(Path<T, ?> path) {
-        return get(path).count();
-    }
+    BooleanPathExpression<T> bool(Path<T, Boolean> path);
 
 }

@@ -8,8 +8,8 @@ import io.github.genie.sql.api.Path.StringPath;
 import io.github.genie.sql.api.TypedExpression;
 import io.github.genie.sql.api.TypedExpression.BasicExpression;
 import io.github.genie.sql.api.TypedExpression.ComparableExpression;
+import io.github.genie.sql.api.TypedExpression.JoinPathExpression;
 import io.github.genie.sql.api.TypedExpression.NumberExpression;
-import io.github.genie.sql.api.TypedExpression.PathExpression;
 import io.github.genie.sql.api.TypedExpression.StringExpression;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,6 +33,11 @@ class DefaultExpressionOperator<T, U, B> implements ExpressionOperator<T, U, B> 
     }
 
     @Override
+    public B eqIfNotNull(U value) {
+        return resultBuilder.apply(value == null ? null : base.eq(value));
+    }
+
+    @Override
     public B eq(TypedExpression<T, U> expression) {
         return resultBuilder.apply(base.eq(expression));
     }
@@ -40,6 +45,11 @@ class DefaultExpressionOperator<T, U, B> implements ExpressionOperator<T, U, B> 
     @Override
     public B ne(U value) {
         return resultBuilder.apply(base.ne(value));
+    }
+
+    @Override
+    public B neIfNotNull(U value) {
+        return resultBuilder.apply(value == null ? null : base.ne(value));
     }
 
     @Override
@@ -117,6 +127,26 @@ class DefaultExpressionOperator<T, U, B> implements ExpressionOperator<T, U, B> 
         @Override
         public B lt(U value) {
             return resultBuilder.apply(base().lt(value));
+        }
+
+        @Override
+        public B geIfNotNull(U value) {
+            return resultBuilder.apply(value == null ? null : base().ge(value));
+        }
+
+        @Override
+        public B gtIfNotNull(U value) {
+            return resultBuilder.apply(value == null ? null : base().gt(value));
+        }
+
+        @Override
+        public B leIfNotNull(U value) {
+            return resultBuilder.apply(value == null ? null : base().le(value));
+        }
+
+        @Override
+        public B ltIfNotNull(U value) {
+            return resultBuilder.apply(value == null ? null : base().lt(value));
         }
 
         @Override
@@ -217,6 +247,31 @@ class DefaultExpressionOperator<T, U, B> implements ExpressionOperator<T, U, B> 
         }
 
         @Override
+        public NumberOperator<T, U, B> addIfNotNull(U value) {
+            return value == null ? this : add(value);
+        }
+
+        @Override
+        public NumberOperator<T, U, B> subtractIfNotNull(U value) {
+            return value == null ? this : subtract(value);
+        }
+
+        @Override
+        public NumberOperator<T, U, B> multiplyIfNotNull(U value) {
+            return value == null ? this : multiply(value);
+        }
+
+        @Override
+        public NumberOperator<T, U, B> divideIfNotNull(U value) {
+            return value == null ? this : divide(value);
+        }
+
+        @Override
+        public NumberOperator<T, U, B> modIfNotNull(U value) {
+            return value == null ? this : mod(value);
+        }
+
+        @Override
         public NumberOperator<T, U, B> add(TypedExpression<T, U> expression) {
             return new NumberOperatorImpl<>(base().add(expression), resultBuilder);
         }
@@ -249,8 +304,8 @@ class DefaultExpressionOperator<T, U, B> implements ExpressionOperator<T, U, B> 
             super(expression, resultBuilder);
         }
 
-        protected PathExpression<T, U> base() {
-            return (PathExpression<T, U>) base;
+        protected JoinPathExpression<T, U> base() {
+            return (JoinPathExpression<T, U>) base;
         }
 
         @Override
@@ -295,6 +350,16 @@ class DefaultExpressionOperator<T, U, B> implements ExpressionOperator<T, U, B> 
         @Override
         public B notLike(String value) {
             return resultBuilder.apply(base().notLike(value));
+        }
+
+        @Override
+        public B likeIfNotNull(String value) {
+            return resultBuilder.apply(value == null ? null : base().like(value));
+        }
+
+        @Override
+        public B notLikeIfNotNull(String value) {
+            return resultBuilder.apply(value == null ? null : base().notLike(value));
         }
 
         @Override

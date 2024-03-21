@@ -2,7 +2,7 @@ package io.github.genie.sql.test.example;
 
 import io.github.genie.sql.api.Query;
 import io.github.genie.sql.api.Query.Select;
-import io.github.genie.sql.builder.Q;
+import io.github.genie.sql.builder.util.Paths;
 import io.github.genie.sql.executor.jdbc.MySqlQuerySqlBuilder;
 import io.github.genie.sql.executor.jpa.JpaQueryExecutor;
 import io.github.genie.sql.meta.JpaMetamodel;
@@ -48,7 +48,7 @@ public class Example {
         // select * from employee where name = 'Luna' and age > 10 order by id desc limit 0,100
         query.where(Employee::getName).eq("Luna")
                 .where(Employee::getAge).gt(10)
-                .orderBy(Q.get(Employee::getId).desc())
+                .orderBy(Paths.get(Employee::getId).desc())
                 .getList(0, 100);
 
         // select employee.* from

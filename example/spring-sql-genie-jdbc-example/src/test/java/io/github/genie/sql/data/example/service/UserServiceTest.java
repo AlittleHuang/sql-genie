@@ -2,6 +2,8 @@ package io.github.genie.sql.data.example.service;
 
 import io.github.genie.sql.data.access.Access;
 import io.github.genie.sql.data.example.eneity.User;
+import io.github.genie.sql.data.example.model.Page;
+import io.github.genie.sql.data.example.model.Pageable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,5 +40,13 @@ class UserServiceTest {
         User first = userAccess.getFirst();
         User updated = userService.updateRandomNumber(first.getRandomNumber());
         Assertions.assertNotEquals(first.getOptLock(), updated.getOptLock());
+    }
+
+    @Test
+    void page() {
+        Page<User> page = userService.page(null, Pageable.of(1, 12));
+        System.out.println(page);
+        page = userService.page("Marjorie Minnie", Pageable.of(1, 12));
+        System.out.println(page);
     }
 }

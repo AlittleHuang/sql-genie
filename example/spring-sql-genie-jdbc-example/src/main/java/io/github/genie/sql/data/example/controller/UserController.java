@@ -4,6 +4,7 @@ import io.github.genie.sql.data.access.Access;
 import io.github.genie.sql.data.example.eneity.User;
 import io.github.genie.sql.data.example.model.Page;
 import io.github.genie.sql.data.example.model.UserQuery;
+import io.github.genie.sql.data.example.model.UserQuery2;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,7 +25,7 @@ public class UserController {
     }
 
     @GetMapping("/user/list/join-example")
-    public Page<User> joinExample(UserQuery query) {
+    public Page<User> joinExample(UserQuery2 query) {
         return userAccess
                 .fetch(User::getParentUser, User::getRandomUser)
                 .where(query.predicate())

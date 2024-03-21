@@ -11,11 +11,15 @@ import io.github.genie.sql.api.Path.StringPath;
 import io.github.genie.sql.api.Root;
 import io.github.genie.sql.api.TypedExpression;
 import io.github.genie.sql.api.TypedExpression.BooleanExpression;
-import io.github.genie.sql.api.TypedExpression.ComparableExpression;
+import io.github.genie.sql.api.TypedExpression.BooleanPathExpression;
+import io.github.genie.sql.api.TypedExpression.ComparablePathExpression;
 import io.github.genie.sql.api.TypedExpression.NumberExpression;
+import io.github.genie.sql.api.TypedExpression.NumberPathExpression;
 import io.github.genie.sql.api.TypedExpression.PathExpression;
-import io.github.genie.sql.api.TypedExpression.StringExpression;
+import io.github.genie.sql.api.TypedExpression.StringPathExpression;
 import io.github.genie.sql.builder.QueryStructures.OrderImpl;
+import io.github.genie.sql.builder.util.Paths;
+import io.github.genie.sql.builder.util.Predicates;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -27,53 +31,56 @@ import static io.github.genie.sql.api.Operator.NOT;
 import static io.github.genie.sql.api.Operator.OR;
 import static io.github.genie.sql.api.Order.SortOrder.ASC;
 import static io.github.genie.sql.api.Order.SortOrder.DESC;
-import static io.github.genie.sql.builder.RootImpl.ofBooleanExpression;
 
+/**
+ * @deprecated use {@link Paths} and {@link Predicates}
+ */
+@Deprecated
 public final class Q {
 
     public static <T> Root<T> of() {
         return RootImpl.of();
     }
 
-    public static <T, U> PathExpression<T, U> get(Path<T, U> path) {
+    public static <T, U> PathExpression<T, U> join(Path<T, U> path) {
         return Q.<T>of().get(path);
     }
 
-    public static <T> StringExpression<T> get(StringPath<T> path) {
+    public static <T> StringPathExpression<T> get(StringPath<T> path) {
         return Q.<T>of().get(path);
     }
 
     public static <T, U extends Number & Comparable<U>>
-    NumberExpression<T, U> get(NumberPath<T, U> path) {
+    NumberPathExpression<T, U> get(NumberPath<T, U> path) {
         return Q.<T>of().get(path);
     }
 
-    public static <T, V extends Comparable<V>> ComparableExpression<T, V> get(ComparablePath<T, V> path) {
+    public static <T, V extends Comparable<V>> ComparablePathExpression<T, V> get(ComparablePath<T, V> path) {
         return Q.<T>of().get(path);
     }
 
-    public static <T> BooleanExpression<T> get(BooleanPath<T> path) {
+    public static <T> BooleanPathExpression<T> get(BooleanPath<T> path) {
         return Q.<T>of().get(path);
     }
 
     public static <T, E extends Number & Comparable<E>> NumberExpression<T, E> min(NumberPath<T, E> path) {
-        return Q.<T>of().min(path);
+        return Q.<T>of().get(path).min();
     }
 
     public static <T, E extends Number & Comparable<E>> NumberExpression<T, E> max(NumberPath<T, E> path) {
-        return Q.<T>of().max(path);
+        return Q.<T>of().get(path).max();
     }
 
     public static <T, E extends Number & Comparable<E>> NumberExpression<T, E> sum(NumberPath<T, E> path) {
-        return Q.<T>of().sum(path);
+        return Q.<T>of().get(path).sum();
     }
 
     public static <T, E extends Number & Comparable<E>> NumberExpression<T, E> avg(NumberPath<T, E> path) {
-        return Q.<T>of().avg(path);
+        return Q.<T>of().get(path).avg();
     }
 
     public static <T> NumberExpression<T, Long> count(Path<T, ?> path) {
-        return Q.<T>of().count(path);
+        return Q.<T>of().get(path).count();
     }
 
     @SafeVarargs
@@ -83,7 +90,7 @@ public final class Q {
                 .map(TypedExpression::expression)
                 .collect(Collectors.toList());
         Expression expression = Expressions.operate(predicate.expression(), AND, metas);
-        return ofBooleanExpression(expression);
+        return TypedExpressions.ofBoolean(expression);
     }
 
     @SafeVarargs
@@ -93,7 +100,7 @@ public final class Q {
                 .map(TypedExpression::expression)
                 .collect(Collectors.toList());
         Expression expression = Expressions.operate(predicate.expression(), OR, metas);
-        return ofBooleanExpression(expression);
+        return TypedExpressions.ofBoolean(expression);
     }
 
     public static <T> Order<T> desc(Path<T, ? extends Comparable<?>> path) {
@@ -118,7 +125,7 @@ public final class Q {
 
     public static <T> BooleanExpression<T> not(TypedExpression<T, Boolean> lt) {
         Expression expression = Expressions.operate(lt.expression(), NOT);
-        return ofBooleanExpression(expression);
+        return TypedExpressions.ofBoolean(expression);
     }
 
     private Q() {

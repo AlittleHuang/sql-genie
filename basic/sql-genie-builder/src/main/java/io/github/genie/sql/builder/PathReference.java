@@ -35,7 +35,14 @@ public class PathReference {
     }
 
     public static <T, R> PathReference of(Path<T, R> path) {
-        return map.computeIfAbsent(path, PathReference::createPathReference);
+        Objects.requireNonNull(path);
+        PathReference v = map.get(path);
+        if (v == null) {
+            PathReference newValue = createPathReference(path);
+            map.put(path, newValue);
+            return newValue;
+        }
+        return v;
     }
 
     private static PathReference createPathReference(Path<?, ?> path) {

@@ -11,6 +11,8 @@ import io.github.genie.sql.api.Query.QueryStructureBuilder;
 import io.github.genie.sql.api.Root;
 import io.github.genie.sql.api.Slice;
 import io.github.genie.sql.api.Sliceable;
+import io.github.genie.sql.api.TypedExpression.ComparableExpression;
+import io.github.genie.sql.builder.util.Paths;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -31,7 +33,11 @@ public class OrderOperatorImpl<T, U> implements OrderOperator<T, U> {
     private List<Order<T>> asOrderList(Order.SortOrder sort) {
         return orderByPaths
                 .stream()
-                .map(path -> Q.orderBy(path, sort))
+                .map(path -> {
+                    ComparableExpression<T, ?> expression =
+                            Paths.comparable(TypeCastUtil.unsafeCast(path));
+                    return expression.sort(sort);
+                })
                 .collect(Collectors.toList());
     }
 

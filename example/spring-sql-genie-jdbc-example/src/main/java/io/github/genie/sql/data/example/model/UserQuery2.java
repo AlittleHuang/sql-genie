@@ -10,7 +10,7 @@ import lombok.Data;
  * @since 2024-03-19 16:52
  */
 @Data
-public class UserQuery implements PageablePredicate<User> {
+public class UserQuery2 implements PageablePredicate<User> {
 
     private String username;
     private String parentUsername;
@@ -20,9 +20,8 @@ public class UserQuery implements PageablePredicate<User> {
 
     @Override
     public PredicateBuilder<User> predicate() {
-        return root -> root
-                .whereIf(username != null, user -> User.Username.eq(username))
-                .andIf(gender != null, user -> User.Gender.eq(gender))
-                .andIf(parentUsername != null, user -> User.ParentUser.get(User.Username).eq(parentUsername));
+        return unused -> User.Username.eqIfNotNull(username)
+                .or(User.ParentUser.get(User.Username).eqIfNotNull(parentUsername))
+                .or(User.Gender.eqIfNotNull(gender));
     }
 }

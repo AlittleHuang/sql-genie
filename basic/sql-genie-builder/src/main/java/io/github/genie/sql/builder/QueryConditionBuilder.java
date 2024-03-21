@@ -295,6 +295,9 @@ public class QueryConditionBuilder<T, U> implements Where0<T, U>, Having<T, U>, 
 
     @NotNull
     private Where0<T, U> whereAnd(BasicExpression<?, ?> expression) {
+        if (expression == null) {
+            return this;
+        }
         QueryStructureImpl structure = queryStructure.copy();
         whereAnd(structure, expression.expression());
         return update(structure);

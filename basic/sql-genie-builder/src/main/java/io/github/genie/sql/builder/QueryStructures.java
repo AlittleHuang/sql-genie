@@ -311,6 +311,19 @@ final class QueryStructures {
         }
 
         @Override
+        public Column get(Column column) {
+            String[] paths = new String[size() + column.size()];
+            int i = 0;
+            for (String s : this) {
+                paths[i++] = s;
+            }
+            for (String s : column) {
+                paths[i++] = s;
+            }
+            return new ColumnImpl(paths);
+        }
+
+        @Override
         public int hashCode() {
             return Arrays.hashCode(paths);
         }

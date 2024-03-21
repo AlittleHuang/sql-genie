@@ -15,7 +15,7 @@ import io.github.genie.sql.api.TypedExpression;
 import io.github.genie.sql.api.TypedExpression.BooleanExpression;
 import io.github.genie.sql.api.tuple.Tuple;
 import io.github.genie.sql.api.tuple.Tuple2;
-import io.github.genie.sql.builder.Q;
+import io.github.genie.sql.builder.util.Paths;
 import io.github.genie.sql.builder.RootImpl;
 import io.github.genie.sql.builder.Tuples;
 import io.github.genie.sql.builder.TypedExpressions;
@@ -37,7 +37,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static io.github.genie.sql.builder.Q.get;
+import static io.github.genie.sql.builder.util.Paths.get;
 import static io.github.genie.sql.test.Transaction.doInTransaction;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -82,7 +82,7 @@ class QueryBuilderTest {
         ui = userQuery.selectDistinct(UserInterface.class).getFirst();
         assertEquals(model.asMap(), ui.asMap());
 
-        Long count = userQuery.select(Q.get(User::getId).count()).getSingle();
+        Long count = userQuery.select(get(User::getId).count()).getSingle();
         assertEquals(count, users().size());
 
         Tuple aggArray = userQuery.select(Lists.of(
@@ -470,7 +470,7 @@ class QueryBuilderTest {
         assertEquals(list, collect);
 
 
-        list = userQuery.selectDistinct(Q.get(User::getRandomNumber))
+        list = userQuery.selectDistinct(get(User::getRandomNumber))
                 .getList();
         assertEquals(list, collect);
 
@@ -517,7 +517,7 @@ class QueryBuilderTest {
             }
         }
 
-        users = userQuery.fetch(Q.get(User::getParentUser).get(User::getParentUser))
+        users = userQuery.fetch(Paths.get(User::getParentUser).get(User::getParentUser))
                 .getList();
 
         assertEquals(users, users());
@@ -541,8 +541,8 @@ class QueryBuilderTest {
     void groupBy(Select<User> userQuery) {
         List<Tuple> list = userQuery
                 .select(Lists.of(
-                        Q.get(User::getRandomNumber),
-                        Q.get(User::getId).count()
+                        get(User::getRandomNumber),
+                        get(User::getId).count()
                 ))
                 .groupBy(User::getRandomNumber)
                 .getList();
@@ -560,8 +560,8 @@ class QueryBuilderTest {
                 (Root<User> root) -> Lists.of(root.get(User::getRandomNumber));
         list = userQuery
                 .select(Lists.of(
-                        Q.get(User::getRandomNumber),
-                        Q.get(User::getId).count()
+                        get(User::getRandomNumber),
+                        get(User::getId).count()
                 ))
                 .groupBy(expressionBuilder)
                 .getList();
@@ -574,8 +574,8 @@ class QueryBuilderTest {
 
         list = userQuery
                 .select(Lists.of(
-                        Q.get(User::getRandomNumber),
-                        Q.get(User::getId).count()
+                        get(User::getRandomNumber),
+                        get(User::getId).count()
                 ))
                 .groupBy(Lists.<Path<User, ?>>of(User::getRandomNumber))
                 .getList();
@@ -588,8 +588,8 @@ class QueryBuilderTest {
 
         list = userQuery
                 .select(Lists.of(
-                        Q.get(User::getRandomNumber),
-                        Q.get(User::getId).count()
+                        get(User::getRandomNumber),
+                        get(User::getId).count()
                 ))
                 .where(User::isValid).eq(true)
                 .where(User::getRandomNumber).eq(1)
@@ -715,7 +715,7 @@ class QueryBuilderTest {
 
         Where<User, User> userQuery = check.collector;
         OrderBy<User, User> collector = userQuery
-                .where(get(User::getParentUser).get(User::getUsername).eq(username));
+                .where(Paths.get(User::getParentUser).get(User::getUsername).eq(username));
         Stream<User> stream = newStream(check)
                 .filter(user -> user.getParentUser() != null && username.equals(user.getParentUser().getUsername()));
         result.add(new Checker<>(stream, collector));
@@ -723,7 +723,7 @@ class QueryBuilderTest {
         stream = newStream(check)
                 .filter(user -> user.getParentUser() != null && !username.equals(user.getParentUser().getUsername()));
         collector = userQuery
-                .where(get(User::getParentUser).get(User::getUsername).ne(username));
+                .where(Paths.get(User::getParentUser).get(User::getUsername).ne(username));
         result.add(new Checker<>(stream, collector));
 
         collector = userQuery
@@ -843,20 +843,20 @@ class QueryBuilderTest {
         result.add(new Checker<>(users, collector));
         collector = check.collector.where((ComparablePath<User, Integer>) User::getRandomNumber).eq(1);
         result.add(new Checker<>(users, collector));
-        collector = check.collector.where(Q.get(User::getRandomNumber).eq(1));
+        collector = check.collector.where(get(User::getRandomNumber).eq(1));
         result.add(new Checker<>(users, collector));
         users = check.expected.stream()
                 .filter(it -> it.getRandomNumber() == 1 || it.getRandomNumber() == 2)
                 .collect(Collectors.toList());
-        collector = check.collector.where(Q.get(User::getRandomNumber).eq(1).or(User::getRandomNumber).eq(2));
+        collector = check.collector.where(get(User::getRandomNumber).eq(1).or(User::getRandomNumber).eq(2));
         result.add(new Checker<>(users, collector));
-        collector = check.collector.where(Q.get(User::getRandomNumber).eq(1)
+        collector = check.collector.where(get(User::getRandomNumber).eq(1)
                 .orIf(true, root -> root.get(User::getRandomNumber).eq(2))
                 .orIf(false, root -> root.get(User::getId).eq(2)));
         result.add(new Checker<>(users, collector));
-        collector = check.collector.where(Q.get(User::getRandomNumber).eq(1).or((ComparablePath<User, Integer>) User::getRandomNumber).eq(2));
+        collector = check.collector.where(get(User::getRandomNumber).eq(1).or((ComparablePath<User, Integer>) User::getRandomNumber).eq(2));
         result.add(new Checker<>(users, collector));
-        collector = check.collector.where(Q.get(User::getRandomNumber).eq(1).or(Lists.of(Q.get(User::getRandomNumber).eq(2))));
+        collector = check.collector.where(get(User::getRandomNumber).eq(1).or(Lists.of(get(User::getRandomNumber).eq(2))));
         result.add(new Checker<>(users, collector));
         users = check.expected.stream()
                 .filter(it -> it.getRandomNumber() == 1 && it.isValid())
@@ -866,12 +866,12 @@ class QueryBuilderTest {
         collector = check.collector.where(User::getRandomNumber).eq(1)
                 .where((Path<User, Boolean>) User::isValid).eq(TypedExpressions.ofTrue());
         result.add(new Checker<>(users, collector));
-        collector = check.collector.where(Q.get(User::getRandomNumber).eq(1).and(User::isValid));
+        collector = check.collector.where(get(User::getRandomNumber).eq(1).and(User::isValid));
         result.add(new Checker<>(users, collector));
-        collector = check.collector.where(Q.get(User::getRandomNumber).eq(1)
+        collector = check.collector.where(get(User::getRandomNumber).eq(1)
                 .andIf(true, root -> root.get(User::isValid)));
         result.add(new Checker<>(users, collector));
-        collector = check.collector.where(Q.get(User::getRandomNumber).eq(1).and(Lists.of(Q.get(User::isValid))));
+        collector = check.collector.where(get(User::getRandomNumber).eq(1).and(Lists.of(get(User::isValid))));
         result.add(new Checker<>(users, collector));
         collector = check.collector
                 .whereIf(true, root -> root.get(User::getRandomNumber).eq(1))
@@ -888,9 +888,9 @@ class QueryBuilderTest {
         //
         //    B eq(ExpressionHolder<T, U> expression);
         users = check.expected.stream().filter(it -> it.getRandomNumber() == it.getId()).collect(Collectors.toList());
-        collector = check.collector.where(User::getRandomNumber).eq(Q.get(User::getId));
+        collector = check.collector.where(User::getRandomNumber).eq(get(User::getId));
         result.add(new Checker<>(users, collector));
-        collector = check.collector.where(Q.get(User::getRandomNumber).eq(Q.get(User::getId)));
+        collector = check.collector.where(get(User::getRandomNumber).eq(get(User::getId)));
         result.add(new Checker<>(users, collector));
         collector = check.collector.where((Root<User> root) -> root.get(User::getRandomNumber).eq(root.get(User::getId)));
         result.add(new Checker<>(users, collector));
@@ -904,14 +904,14 @@ class QueryBuilderTest {
         users = check.expected.stream().filter(it -> it.getRandomNumber() != 1).collect(Collectors.toList());
         collector = check.collector.where(User::getRandomNumber).ne(1);
         result.add(new Checker<>(users, collector));
-        collector = check.collector.where(Q.get(User::getRandomNumber).ne(1));
+        collector = check.collector.where(get(User::getRandomNumber).ne(1));
         result.add(new Checker<>(users, collector));
         //
         //    B ne(ExpressionHolder<T, U> expression);
         users = check.expected.stream().filter(it -> it.getRandomNumber() != it.getId()).collect(Collectors.toList());
-        collector = check.collector.where(User::getRandomNumber).ne(Q.get(User::getId));
+        collector = check.collector.where(User::getRandomNumber).ne(get(User::getId));
         result.add(new Checker<>(users, collector));
-        collector = check.collector.where(Q.get(User::getRandomNumber).ne(Q.get(User::getId)));
+        collector = check.collector.where(get(User::getRandomNumber).ne(get(User::getId)));
         result.add(new Checker<>(users, collector));
         users = check.expected.stream().filter(User::isValid).collect(Collectors.toList());
         collector = check.collector.where(User::isValid).eq(true);
@@ -931,9 +931,9 @@ class QueryBuilderTest {
             result.add(new Checker<>(users, collector));
             collector = check.collector.where(User::getRandomNumber).in(values);
             result.add(new Checker<>(users, collector));
-            collector = check.collector.where(Q.get(User::getRandomNumber).in(nums));
+            collector = check.collector.where(get(User::getRandomNumber).in(nums));
             result.add(new Checker<>(users, collector));
-            collector = check.collector.where(Q.get(User::getRandomNumber).in(values));
+            collector = check.collector.where(get(User::getRandomNumber).in(values));
             result.add(new Checker<>(users, collector));
 
             List<TypedExpression<User, Integer>> collect = values.stream()
@@ -941,22 +941,22 @@ class QueryBuilderTest {
                     .collect(Collectors.toList());
             collector = check.collector.where(User::getRandomNumber).in(collect);
             result.add(new Checker<>(users, collector));
-            collector = check.collector.where(Q.get(User::getRandomNumber).in(collect));
+            collector = check.collector.where(get(User::getRandomNumber).in(collect));
             result.add(new Checker<>(users, collector));
 
             users = check.expected.stream().filter(it -> !values.contains(it.getRandomNumber()))
                     .collect(Collectors.toList());
             collector = check.collector.where(User::getRandomNumber).notIn(nums);
             result.add(new Checker<>(users, collector));
-            collector = check.collector.where(Q.get(User::getRandomNumber).notIn(nums));
+            collector = check.collector.where(get(User::getRandomNumber).notIn(nums));
             result.add(new Checker<>(users, collector));
             collector = check.collector.where(User::getRandomNumber).notIn(values);
             result.add(new Checker<>(users, collector));
-            collector = check.collector.where(Q.get(User::getRandomNumber).notIn(values));
+            collector = check.collector.where(get(User::getRandomNumber).notIn(values));
             result.add(new Checker<>(users, collector));
             collector = check.collector.where(User::getRandomNumber).notIn(collect);
             result.add(new Checker<>(users, collector));
-            collector = check.collector.where(Q.get(User::getRandomNumber).notIn(collect));
+            collector = check.collector.where(get(User::getRandomNumber).notIn(collect));
             result.add(new Checker<>(users, collector));
 
         }
@@ -966,14 +966,14 @@ class QueryBuilderTest {
         users = check.expected.stream().filter(it -> it.getPid() == null).collect(Collectors.toList());
         collector = check.collector.where(User::getPid).isNull();
         result.add(new Checker<>(users, collector));
-        collector = check.collector.where(Q.get(User::getPid).isNull());
+        collector = check.collector.where(get(User::getPid).isNull());
         result.add(new Checker<>(users, collector));
         //
         //    B isNotNull();
         users = check.expected.stream().filter(it -> it.getPid() != null).collect(Collectors.toList());
         collector = check.collector.where(User::getPid).isNotNull();
         result.add(new Checker<>(users, collector));
-        collector = check.collector.where(Q.get(User::getPid).isNotNull());
+        collector = check.collector.where(get(User::getPid).isNotNull());
         result.add(new Checker<>(users, collector));
 
 
@@ -981,11 +981,11 @@ class QueryBuilderTest {
         users = check.expected.stream().filter(it -> it.getRandomNumber() >= 50).collect(Collectors.toList());
         collector = check.collector.where(User::getRandomNumber).ge(50);
         result.add(new Checker<>(users, collector));
-        collector = check.collector.where(Q.get(User::getRandomNumber).ge(50));
+        collector = check.collector.where(get(User::getRandomNumber).ge(50));
         result.add(new Checker<>(users, collector));
         collector = check.collector.where(User::getRandomNumber).ge(TypedExpressions.of(50));
         result.add(new Checker<>(users, collector));
-        collector = check.collector.where(Q.get(User::getRandomNumber).ge(TypedExpressions.of(50)));
+        collector = check.collector.where(get(User::getRandomNumber).ge(TypedExpressions.of(50)));
         result.add(new Checker<>(users, collector));
 
         //
@@ -993,33 +993,33 @@ class QueryBuilderTest {
         users = check.expected.stream().filter(it -> it.getRandomNumber() > 50).collect(Collectors.toList());
         collector = check.collector.where(User::getRandomNumber).gt(50);
         result.add(new Checker<>(users, collector));
-        collector = check.collector.where(Q.get(User::getRandomNumber).gt(50));
+        collector = check.collector.where(get(User::getRandomNumber).gt(50));
         result.add(new Checker<>(users, collector));
         collector = check.collector.where(User::getRandomNumber).gt(TypedExpressions.of(50));
         result.add(new Checker<>(users, collector));
-        collector = check.collector.where(Q.get(User::getRandomNumber).gt(TypedExpressions.of(50)));
+        collector = check.collector.where(get(User::getRandomNumber).gt(TypedExpressions.of(50)));
         result.add(new Checker<>(users, collector));
         //
         //        B le(U value);
         users = check.expected.stream().filter(it -> it.getRandomNumber() <= 50).collect(Collectors.toList());
         collector = check.collector.where(User::getRandomNumber).le(50);
         result.add(new Checker<>(users, collector));
-        collector = check.collector.where(Q.get(User::getRandomNumber).le(50));
+        collector = check.collector.where(get(User::getRandomNumber).le(50));
         result.add(new Checker<>(users, collector));
         collector = check.collector.where(User::getRandomNumber).le(TypedExpressions.of(50));
         result.add(new Checker<>(users, collector));
-        collector = check.collector.where(Q.get(User::getRandomNumber).le(TypedExpressions.of(50)));
+        collector = check.collector.where(get(User::getRandomNumber).le(TypedExpressions.of(50)));
         result.add(new Checker<>(users, collector));
         //
         //        B lt(U value);
         users = check.expected.stream().filter(it -> it.getRandomNumber() < 50).collect(Collectors.toList());
         collector = check.collector.where(User::getRandomNumber).lt(50);
         result.add(new Checker<>(users, collector));
-        collector = check.collector.where(Q.get(User::getRandomNumber).lt(50));
+        collector = check.collector.where(get(User::getRandomNumber).lt(50));
         result.add(new Checker<>(users, collector));
         collector = check.collector.where(User::getRandomNumber).lt(TypedExpressions.of(50));
         result.add(new Checker<>(users, collector));
-        collector = check.collector.where(Q.get(User::getRandomNumber).lt(TypedExpressions.of(50)));
+        collector = check.collector.where(get(User::getRandomNumber).lt(TypedExpressions.of(50)));
         result.add(new Checker<>(users, collector));
         //
         //        B between(U l, U r);
@@ -1031,20 +1031,20 @@ class QueryBuilderTest {
                 .collect(Collectors.toList());
         collector = check.collector.where(User::getRandomNumber).between(25, 73);
         result.add(new Checker<>(users, collector));
-        collector = check.collector.where(Q.get(User::getRandomNumber).between(25, 73));
+        collector = check.collector.where(get(User::getRandomNumber).between(25, 73));
         result.add(new Checker<>(users, collector));
         collector = check.collector.where(User::getRandomNumber).between(25, TypedExpressions.of(73));
         result.add(new Checker<>(users, collector));
-        collector = check.collector.where(Q.get(User::getRandomNumber).between(25, TypedExpressions.of(73)));
+        collector = check.collector.where(get(User::getRandomNumber).between(25, TypedExpressions.of(73)));
         result.add(new Checker<>(users, collector));
         collector = check.collector.where(User::getRandomNumber).between(TypedExpressions.of(25), 73);
         result.add(new Checker<>(users, collector));
-        collector = check.collector.where(Q.get(User::getRandomNumber).between(TypedExpressions.of(25), 73));
+        collector = check.collector.where(get(User::getRandomNumber).between(TypedExpressions.of(25), 73));
         result.add(new Checker<>(users, collector));
         collector = check.collector.where(User::getRandomNumber)
                 .between(TypedExpressions.of(25), TypedExpressions.of(73));
         result.add(new Checker<>(users, collector));
-        collector = check.collector.where(Q.get(User::getRandomNumber)
+        collector = check.collector.where(get(User::getRandomNumber)
                 .between(TypedExpressions.of(25), TypedExpressions.of(73)));
         result.add(new Checker<>(users, collector));
 
@@ -1057,20 +1057,20 @@ class QueryBuilderTest {
                 .collect(Collectors.toList());
         collector = check.collector.where(User::getRandomNumber).notBetween(25, 73);
         result.add(new Checker<>(users, collector));
-        collector = check.collector.where(Q.get(User::getRandomNumber).notBetween(25, 73));
+        collector = check.collector.where(get(User::getRandomNumber).notBetween(25, 73));
         result.add(new Checker<>(users, collector));
         collector = check.collector.where(User::getRandomNumber).notBetween(25, TypedExpressions.of(73));
         result.add(new Checker<>(users, collector));
-        collector = check.collector.where(Q.get(User::getRandomNumber).notBetween(25, TypedExpressions.of(73)));
+        collector = check.collector.where(get(User::getRandomNumber).notBetween(25, TypedExpressions.of(73)));
         result.add(new Checker<>(users, collector));
         collector = check.collector.where(User::getRandomNumber).notBetween(TypedExpressions.of(25), 73);
         result.add(new Checker<>(users, collector));
-        collector = check.collector.where(Q.get(User::getRandomNumber).notBetween(TypedExpressions.of(25), 73));
+        collector = check.collector.where(get(User::getRandomNumber).notBetween(TypedExpressions.of(25), 73));
         result.add(new Checker<>(users, collector));
         collector = check.collector.where(User::getRandomNumber)
                 .notBetween(TypedExpressions.of(25), TypedExpressions.of(73));
         result.add(new Checker<>(users, collector));
-        collector = check.collector.where(Q.get(User::getRandomNumber)
+        collector = check.collector.where(get(User::getRandomNumber)
                 .notBetween(TypedExpressions.of(25), TypedExpressions.of(73)));
         result.add(new Checker<>(users, collector));
 
@@ -1078,11 +1078,11 @@ class QueryBuilderTest {
         users = check.expected.stream().filter(it -> it.getRandomNumber() + 1 == 5).collect(Collectors.toList());
         collector = check.collector.where(User::getRandomNumber).add(1).eq(5);
         result.add(new Checker<>(users, collector));
-        collector = check.collector.where(Q.get(User::getRandomNumber).add(1).eq(5));
+        collector = check.collector.where(get(User::getRandomNumber).add(1).eq(5));
         result.add(new Checker<>(users, collector));
         collector = check.collector.where(User::getRandomNumber).add(TypedExpressions.of(1)).eq(5);
         result.add(new Checker<>(users, collector));
-        collector = check.collector.where(Q.get(User::getRandomNumber).add(TypedExpressions.of(1)).eq(5));
+        collector = check.collector.where(get(User::getRandomNumber).add(TypedExpressions.of(1)).eq(5));
         result.add(new Checker<>(users, collector));
 
         //
@@ -1090,33 +1090,33 @@ class QueryBuilderTest {
         users = check.expected.stream().filter(it -> it.getRandomNumber() - 1 == 5).collect(Collectors.toList());
         collector = check.collector.where(User::getRandomNumber).subtract(1).eq(5);
         result.add(new Checker<>(users, collector));
-        collector = check.collector.where(Q.get(User::getRandomNumber).subtract(1).eq(5));
+        collector = check.collector.where(get(User::getRandomNumber).subtract(1).eq(5));
         result.add(new Checker<>(users, collector));
         collector = check.collector.where(User::getRandomNumber).subtract(TypedExpressions.of(1)).eq(5);
         result.add(new Checker<>(users, collector));
-        collector = check.collector.where(Q.get(User::getRandomNumber).subtract(TypedExpressions.of(1)).eq(5));
+        collector = check.collector.where(get(User::getRandomNumber).subtract(TypedExpressions.of(1)).eq(5));
         result.add(new Checker<>(users, collector));
         //
         //        NumberOperator<T, U, B> multiply(U value);
         users = check.expected.stream().filter(it -> it.getRandomNumber() * 3 == 45).collect(Collectors.toList());
         collector = check.collector.where(User::getRandomNumber).multiply(3).eq(45);
         result.add(new Checker<>(users, collector));
-        collector = check.collector.where(Q.get(User::getRandomNumber).multiply(3).eq(45));
+        collector = check.collector.where(get(User::getRandomNumber).multiply(3).eq(45));
         result.add(new Checker<>(users, collector));
         collector = check.collector.where(User::getRandomNumber).multiply(TypedExpressions.of(3)).eq(45);
         result.add(new Checker<>(users, collector));
-        collector = check.collector.where(Q.get(User::getRandomNumber).multiply(TypedExpressions.of(3)).eq(45));
+        collector = check.collector.where(get(User::getRandomNumber).multiply(TypedExpressions.of(3)).eq(45));
         result.add(new Checker<>(users, collector));
         //
         //        NumberOperator<T, U, B> divide(U value);
         users = check.expected.stream().filter(it -> it.getRandomNumber() / 3. == 12).collect(Collectors.toList());
         collector = check.collector.where(User::getRandomNumber).divide(3).eq(12);
         result.add(new Checker<>(users, collector));
-        collector = check.collector.where(Q.get(User::getRandomNumber).divide(3).eq(12));
+        collector = check.collector.where(get(User::getRandomNumber).divide(3).eq(12));
         result.add(new Checker<>(users, collector));
         collector = check.collector.where(User::getRandomNumber).divide(TypedExpressions.of(3)).eq(12);
         result.add(new Checker<>(users, collector));
-        collector = check.collector.where(Q.get(User::getRandomNumber).divide(TypedExpressions.of(3)).eq(12));
+        collector = check.collector.where(get(User::getRandomNumber).divide(TypedExpressions.of(3)).eq(12));
         result.add(new Checker<>(users, collector));
 
         //
@@ -1125,11 +1125,11 @@ class QueryBuilderTest {
         users = check.expected.stream().filter(it -> it.getRandomNumber() % 8 == 2).collect(Collectors.toList());
         collector = check.collector.where(User::getRandomNumber).mod(8).eq(2);
         result.add(new Checker<>(users, collector));
-        collector = check.collector.where(Q.get(User::getRandomNumber).mod(8).eq(2));
+        collector = check.collector.where(get(User::getRandomNumber).mod(8).eq(2));
         result.add(new Checker<>(users, collector));
         collector = check.collector.where(User::getRandomNumber).mod(TypedExpressions.of(8)).eq(2);
         result.add(new Checker<>(users, collector));
-        collector = check.collector.where(Q.get(User::getRandomNumber).mod(TypedExpressions.of(8)).eq(2));
+        collector = check.collector.where(get(User::getRandomNumber).mod(TypedExpressions.of(8)).eq(2));
         result.add(new Checker<>(users, collector));
 
 
@@ -1138,11 +1138,11 @@ class QueryBuilderTest {
         users = check.expected.stream().filter(it -> it.getUsername().contains("one")).collect(Collectors.toList());
         collector = check.collector.where(User::getUsername).like("%one%");
         result.add(new Checker<>(users, collector));
-        collector = check.collector.where(Q.get(User::getUsername).like("%one%"));
+        collector = check.collector.where(get(User::getUsername).like("%one%"));
         result.add(new Checker<>(users, collector));
         collector = check.collector.where(User::getUsername).contains("one");
         result.add(new Checker<>(users, collector));
-        collector = check.collector.where(Q.get(User::getUsername).contains("one"));
+        collector = check.collector.where(get(User::getUsername).contains("one"));
         result.add(new Checker<>(users, collector));
         //
         //        default B startWith(String value) {
@@ -1151,7 +1151,7 @@ class QueryBuilderTest {
         users = check.expected.stream().filter(it -> it.getUsername().startsWith("Ja")).collect(Collectors.toList());
         collector = check.collector.where(User::getUsername).startWith("Ja");
         result.add(new Checker<>(users, collector));
-        collector = check.collector.where(Q.get(User::getUsername).startWith("Ja"));
+        collector = check.collector.where(get(User::getUsername).startWith("Ja"));
         result.add(new Checker<>(users, collector));
         //
         //        default B endsWith(String value) {
@@ -1160,7 +1160,7 @@ class QueryBuilderTest {
         users = check.expected.stream().filter(it -> it.getUsername().endsWith("win")).collect(Collectors.toList());
         collector = check.collector.where(User::getUsername).endsWith("win");
         result.add(new Checker<>(users, collector));
-        collector = check.collector.where(Q.get(User::getUsername).endsWith("win"));
+        collector = check.collector.where(get(User::getUsername).endsWith("win"));
         result.add(new Checker<>(users, collector));
 
 
@@ -1168,11 +1168,11 @@ class QueryBuilderTest {
         users = check.expected.stream().filter(it -> !it.getUsername().contains("one")).collect(Collectors.toList());
         collector = check.collector.where(User::getUsername).notLike("%one%");
         result.add(new Checker<>(users, collector));
-        collector = check.collector.where(Q.get(User::getUsername).notLike("%one%"));
+        collector = check.collector.where(get(User::getUsername).notLike("%one%"));
         result.add(new Checker<>(users, collector));
         collector = check.collector.where(User::getUsername).notContains("one");
         result.add(new Checker<>(users, collector));
-        collector = check.collector.where(Q.get(User::getUsername).notContains("one"));
+        collector = check.collector.where(get(User::getUsername).notContains("one"));
         result.add(new Checker<>(users, collector));
         //
         //        default B startWith(String value) {
@@ -1181,7 +1181,7 @@ class QueryBuilderTest {
         users = check.expected.stream().filter(it -> !it.getUsername().startsWith("Ja")).collect(Collectors.toList());
         collector = check.collector.where(User::getUsername).notStartWith("Ja");
         result.add(new Checker<>(users, collector));
-        collector = check.collector.where(Q.get(User::getUsername).notStartWith("Ja"));
+        collector = check.collector.where(get(User::getUsername).notStartWith("Ja"));
         result.add(new Checker<>(users, collector));
         //
         //        default B endsWith(String value) {
@@ -1190,7 +1190,7 @@ class QueryBuilderTest {
         users = check.expected.stream().filter(it -> !it.getUsername().endsWith("win")).collect(Collectors.toList());
         collector = check.collector.where(User::getUsername).notEndsWith("win");
         result.add(new Checker<>(users, collector));
-        collector = check.collector.where(Q.get(User::getUsername).notEndsWith("win"));
+        collector = check.collector.where(get(User::getUsername).notEndsWith("win"));
         result.add(new Checker<>(users, collector));
 
         //
@@ -1198,21 +1198,21 @@ class QueryBuilderTest {
         users = check.expected.stream().filter(it -> !it.getUsername().toLowerCase().startsWith("ja")).collect(Collectors.toList());
         collector = check.collector.where(User::getUsername).lower().notStartWith("ja");
         result.add(new Checker<>(users, collector));
-        collector = check.collector.where(Q.get(User::getUsername).lower().notStartWith("ja"));
+        collector = check.collector.where(get(User::getUsername).lower().notStartWith("ja"));
         result.add(new Checker<>(users, collector));
         //
         //        StringOperator<T, B> upper();
         users = check.expected.stream().filter(it -> !it.getUsername().toUpperCase().startsWith("JA")).collect(Collectors.toList());
         collector = check.collector.where(User::getUsername).upper().notStartWith("JA");
         result.add(new Checker<>(users, collector));
-        collector = check.collector.where(Q.get(User::getUsername).upper().notStartWith("JA"));
+        collector = check.collector.where(get(User::getUsername).upper().notStartWith("JA"));
         result.add(new Checker<>(users, collector));
         //
         //        StringOperator<T, B> substring(int a, int b);
         users = check.expected.stream().filter(it -> it.getUsername().startsWith("ar", 1)).collect(Collectors.toList());
         collector = check.collector.where(User::getUsername).substring(2, 2).eq("ar");
         result.add(new Checker<>(users, collector));
-        collector = check.collector.where(Q.get(User::getUsername).substring(2, 2).eq("ar"));
+        collector = check.collector.where(get(User::getUsername).substring(2, 2).eq("ar"));
         result.add(new Checker<>(users, collector));
         //
         //        StringOperator<T, B> substring(int a);
@@ -1223,7 +1223,7 @@ class QueryBuilderTest {
                 .collect(Collectors.toList());
         collector = check.collector.where(User::getUsername).substring(15).eq("ing");
         result.add(new Checker<>(users, collector));
-        collector = check.collector.where(Q.get(User::getUsername).substring(15).eq("ing"));
+        collector = check.collector.where(get(User::getUsername).substring(15).eq("ing"));
         result.add(new Checker<>(users, collector));
 
         users = check.expected.stream().filter(it -> {
@@ -1233,7 +1233,7 @@ class QueryBuilderTest {
                 .collect(Collectors.toList());
         collector = check.collector.where(User::getUsername).length().eq(17);
         result.add(new Checker<>(users, collector));
-        collector = check.collector.where(Q.get(User::getUsername).length().eq(17));
+        collector = check.collector.where(get(User::getUsername).length().eq(17));
         result.add(new Checker<>(users, collector));
 
         users = check.expected.stream().filter(it -> {

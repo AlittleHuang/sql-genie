@@ -22,6 +22,7 @@ import io.github.genie.sql.api.Path.StringPath;
 import io.github.genie.sql.api.Root;
 import io.github.genie.sql.api.TypedExpression;
 import io.github.genie.sql.api.TypedExpression.BasicExpression;
+import io.github.genie.sql.api.TypedExpression.JoinPathExpression;
 import io.github.genie.sql.builder.DefaultExpressionOperator.ComparableOperatorImpl;
 import io.github.genie.sql.builder.DefaultExpressionOperator.NumberOperatorImpl;
 import io.github.genie.sql.builder.DefaultExpressionOperator.PathOperatorImpl;
@@ -35,7 +36,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-class TypedExpressionImpl<T, U> implements BasicExpression<T, U> {
+class TypedExpressionImpl<T, U> implements BasicExpression<T, U>, JoinPathExpression<T, U> {
     protected final Operation operation;
     protected final Expression operand;
 
@@ -44,8 +45,8 @@ class TypedExpressionImpl<T, U> implements BasicExpression<T, U> {
         this.operand = operand;
     }
 
-    public TypedExpressionImpl(TypedExpressionImpl<?, ?> origin, Expression operand) {
-        this(operand == null ? null : origin.operation, operand);
+    public TypedExpressionImpl(TypedExpressionImpl<?, ?> operation, Expression operand) {
+        this(operation == null ? null : operation.operation, operand);
     }
 
     protected Expression operate(Operator operator, Object value) {
@@ -69,6 +70,11 @@ class TypedExpressionImpl<T, U> implements BasicExpression<T, U> {
     }
 
     @Override
+    public BooleanExpression<T> eqIfNotNull(U value) {
+        return value == null ? rollback() : eq(value);
+    }
+
+    @Override
     public BooleanExpression<T> eq(TypedExpression<T, U> value) {
         Expression operate = operate(Operator.EQ, value);
         return new BooleanExpressionImpl<>(this, operate);
@@ -77,6 +83,16 @@ class TypedExpressionImpl<T, U> implements BasicExpression<T, U> {
     @Override
     public BooleanExpression<T> ne(U value) {
         return ne(TypedExpressions.of(value));
+    }
+
+    @Override
+    public BooleanExpression<T> neIfNotNull(U value) {
+        return value == null ? rollback() : ne(value);
+    }
+
+    @NotNull
+    protected BooleanExpressionImpl<T> rollback() {
+        return new BooleanExpressionImpl<>(operation, null);
     }
 
     @Override
@@ -148,16 +164,82 @@ class TypedExpressionImpl<T, U> implements BasicExpression<T, U> {
 
     @Override
     public Expression expression() {
-        if (operation != null) {
+        if (operand == null) {
+            return operation;
+        } else if (operation == null) {
+            return operand;
+        } else {
             Operator operator = operation.operator();
             if (operator == Operator.OR || operator == Operator.AND) {
                 return Expressions.operate(operation, operator, operand);
             } else {
                 throw new IllegalStateException();
             }
-        } else {
-            return operand;
         }
+    }
+
+    private <R> Column getPath(Path<U, R> path) {
+        if (operand instanceof Column) {
+            return Expressions.concat((Column) operand, path);
+        }
+        throw new IllegalStateException();
+    }
+
+    @Override
+    public <R> JoinPathExpression<T, R> get(Path<U, R> path) {
+        return new TypedExpressionImpl<>(this, getPath(path));
+    }
+
+    @Override
+    public StringPathExpression<T> get(StringPath<U> path) {
+        return new StringExpressionImpl<>(this, getPath(path));
+    }
+
+    @Override
+    public <R extends Number & Comparable<R>> NumberPathExpression<T, R> get(NumberPath<U, R> path) {
+        return new NumberExpressionImpl<>(this, getPath(path));
+    }
+
+    @Override
+    public <R extends Comparable<R>> ComparablePathExpression<T, R> get(ComparablePath<U, R> path) {
+        return new ComparableExpressionImpl<>(this, getPath(path));
+    }
+
+    @Override
+    public BooleanPathExpression<T> get(BooleanPath<U> path) {
+        return new BooleanExpressionImpl<>(this, getPath(path));
+    }
+
+    @Override
+    public <R> PathExpression<T, R> get(PathExpression<U, R> path) {
+        Column column = getColumn(path);
+        return TypedExpressions.ofPath(column);
+    }
+
+    private <R> Column getColumn(PathExpression<U, R> path) {
+        Column pre = (Column) expression();
+        Column next = (Column) path.expression();
+        return pre.get(next);
+    }
+
+    @Override
+    public StringPathExpression<T> get(StringPathExpression<U> path) {
+        return TypedExpressions.ofString(getColumn(path));
+    }
+
+    @Override
+    public <R extends Number & Comparable<R>> NumberPathExpression<T, R> get(NumberPathExpression<U, R> path) {
+        return TypedExpressions.ofNumber(getColumn(path));
+    }
+
+    @Override
+    public <R extends Comparable<R>> ComparablePathExpression<T, R> get(ComparablePathExpression<U, R> path) {
+        return TypedExpressions.ofComparable(getColumn(path));
+    }
+
+    @Override
+    public BooleanPathExpression<T> get(BooleanPathExpression<U> path) {
+        return TypedExpressions.ofBoolean(getColumn(path));
     }
 
     protected Operation and() {
@@ -169,6 +251,9 @@ class TypedExpressionImpl<T, U> implements BasicExpression<T, U> {
     }
 
     protected Operation updateOperation(Operator operator) {
+        if (operand == null) {
+            return operation;
+        }
         if (operation == null) {
             return (Operation) Expressions.operate(operand, operator);
         }
@@ -178,54 +263,9 @@ class TypedExpressionImpl<T, U> implements BasicExpression<T, U> {
         return (Operation) Expressions.operate(operation, operator, operand);
     }
 
-    static class PathExpressionImpl<T, U>
-            extends TypedExpressionImpl<T, U>
-            implements PathExpression<T, U> {
-
-        public PathExpressionImpl(TypedExpressionImpl<?, ?> origin, Expression operand) {
-            super(origin, operand);
-        }
-
-        public PathExpressionImpl(Operation operation, Expression operand) {
-            super(operation, operand);
-        }
-
-        private <R> Column getPath(Path<U, R> path) {
-            if (operand instanceof Column) {
-                return Expressions.concat((Column) operand, path);
-            }
-            throw new IllegalStateException();
-        }
-
-        @Override
-        public <R> PathExpression<T, R> get(Path<U, R> path) {
-            return new PathExpressionImpl<>(this, getPath(path));
-        }
-
-        @Override
-        public StringExpression<T> get(StringPath<U> path) {
-            return new StringExpressionImpl<>(this, getPath(path));
-        }
-
-        @Override
-        public <R extends Number & Comparable<R>> NumberExpression<T, R> get(NumberPath<U, R> path) {
-            return new NumberExpressionImpl<>(this, getPath(path));
-        }
-
-        @Override
-        public <R extends Comparable<R>> ComparableExpression<T, R> get(ComparablePath<U, R> path) {
-            return new ComparableExpressionImpl<>(this, getPath(path));
-        }
-
-        @Override
-        public BooleanExpression<T> get(BooleanPath<U> path) {
-            return new BooleanExpressionImpl<>(this, getPath(path));
-        }
-    }
-
     static class ComparableExpressionImpl<T, U extends Comparable<U>>
             extends TypedExpressionImpl<T, U>
-            implements ComparableExpression<T, U> {
+            implements ComparablePathExpression<T, U> {
 
         public ComparableExpressionImpl(TypedExpressionImpl<?, ?> origin, Expression operand) {
             super(origin, operand);
@@ -268,20 +308,14 @@ class TypedExpressionImpl<T, U> implements BasicExpression<T, U> {
         }
 
         @Override
-        public Order<T> asc() {
-            return new OrderImpl<>(operand, SortOrder.ASC);
+        public Order<T> sort(SortOrder order) {
+            return new OrderImpl<>(operand, order);
         }
-
-        @Override
-        public Order<T> desc() {
-            return new OrderImpl<>(operand, SortOrder.DESC);
-        }
-
     }
 
     static class NumberExpressionImpl<T, U extends Number & Comparable<U>>
             extends ComparableExpressionImpl<T, U>
-            implements NumberExpression<T, U> {
+            implements NumberPathExpression<T, U> {
 
         public NumberExpressionImpl(TypedExpressionImpl<?, ?> origin, Expression operand) {
             super(origin, operand);
@@ -335,11 +369,36 @@ class TypedExpressionImpl<T, U> implements BasicExpression<T, U> {
         public NumberExpression<T, U> min() {
             return new NumberExpressionImpl<>(this, operate(Operator.MIN, Lists.of()));
         }
+
+        @Override
+        public NumberExpression<T, U> addIfNotNull(U value) {
+            return value == null ? this : add(value);
+        }
+
+        @Override
+        public NumberExpression<T, U> subtractIfNotNull(U value) {
+            return value == null ? this : subtract(value);
+        }
+
+        @Override
+        public NumberExpression<T, U> multiplyIfNotNull(U value) {
+            return value == null ? this : multiply(value);
+        }
+
+        @Override
+        public NumberExpression<T, U> divideIfNotNull(U value) {
+            return value == null ? this : divide(value);
+        }
+
+        @Override
+        public NumberExpression<T, U> modIfNotNull(U value) {
+            return value == null ? this : mod(value);
+        }
     }
 
     static class StringExpressionImpl<T>
             extends ComparableExpressionImpl<T, String>
-            implements StringExpression<T> {
+            implements StringPathExpression<T> {
 
         public StringExpressionImpl(TypedExpressionImpl<?, ?> origin, Expression operand) {
             super(origin, operand);
@@ -359,6 +418,16 @@ class TypedExpressionImpl<T, U> implements BasicExpression<T, U> {
             Expression operate = operate(Operator.LIKE, value);
             operate = Expressions.operate(operate, Operator.NOT);
             return new BooleanExpressionImpl<>(this, operate);
+        }
+
+        @Override
+        public BooleanExpression<T> likeIfNotNull(String value) {
+            return value == null ? rollback() : like(value);
+        }
+
+        @Override
+        public BooleanExpression<T> notLikeIfNotNull(String value) {
+            return null;
         }
 
         @Override
@@ -396,7 +465,7 @@ class TypedExpressionImpl<T, U> implements BasicExpression<T, U> {
 
     static class BooleanExpressionImpl<T>
             extends ComparableExpressionImpl<T, Boolean>
-            implements BooleanExpression<T> {
+            implements BooleanPathExpression<T> {
 
         public BooleanExpressionImpl(TypedExpressionImpl<?, ?> origin, Expression operand) {
             super(origin, operand);
@@ -406,10 +475,6 @@ class TypedExpressionImpl<T, U> implements BasicExpression<T, U> {
             super(operation, operand);
         }
 
-        public static <T> BooleanExpression<T> of(Expression expression) {
-            return new BooleanExpressionImpl<>((Operation) null, expression);
-        }
-
         @Override
         public BooleanExpression<T> not() {
             return new BooleanExpressionImpl<>(this, Expressions.operate(operand, Operator.NOT));
@@ -417,7 +482,7 @@ class TypedExpressionImpl<T, U> implements BasicExpression<T, U> {
 
         @Override
         public <R> PathOperator<T, R, OrOperator<T>> or(Path<T, R> path) {
-            PathExpression<T, R> expression = new PathExpressionImpl<>(or(), Expressions.of(path));
+            PathExpression<T, R> expression = new TypedExpressionImpl<>(or(), Expressions.of(path));
             return new PathOperatorImpl<>(expression, this::newOrOperator);
         }
 
@@ -483,7 +548,7 @@ class TypedExpressionImpl<T, U> implements BasicExpression<T, U> {
 
         @Override
         public <R> PathOperator<T, R, AndOperator<T>> and(Path<T, R> path) {
-            PathExpression<T, R> expression = new PathExpressionImpl<>(and(), Expressions.of(path));
+            PathExpression<T, R> expression = new TypedExpressionImpl<>(and(), Expressions.of(path));
             return new PathOperatorImpl<>(expression, this::newAndOperator);
         }
 

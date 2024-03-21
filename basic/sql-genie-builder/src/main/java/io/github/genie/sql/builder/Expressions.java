@@ -12,6 +12,7 @@ import io.github.genie.sql.api.TypedExpression.PathExpression;
 import io.github.genie.sql.builder.QueryStructures.ColumnImpl;
 import io.github.genie.sql.builder.QueryStructures.ConstantImpl;
 import io.github.genie.sql.builder.QueryStructures.OperationImpl;
+import io.github.genie.sql.builder.util.Paths;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -86,7 +87,7 @@ public interface Expressions {
 
     static <T> List<PathExpression<T, ?>> toExpressionList(Collection<Path<T, ?>> paths) {
         return paths.stream()
-                .<PathExpression<T, ?>>map(Q::get)
+                .<PathExpression<T, ?>>map(Paths::get)
                 .collect(Collectors.toList());
     }
 
