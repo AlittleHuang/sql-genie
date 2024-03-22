@@ -1584,4 +1584,9 @@ public class GenericApiTest {
         return allUsers.stream().mapToInt(User::getRandomNumber);
     }
 
+    public static void main(String[] args) {
+        Select<User> userQuery = UserQueryProvider.jpa;
+        userQuery.where(get(User::getId).notIn()).getList();
+    }
+
 }

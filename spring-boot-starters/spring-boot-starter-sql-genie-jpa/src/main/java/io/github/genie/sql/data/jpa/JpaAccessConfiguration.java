@@ -12,14 +12,15 @@ import io.github.genie.sql.executor.jdbc.MySqlQuerySqlBuilder;
 import io.github.genie.sql.executor.jpa.JpaQueryExecutor;
 import io.github.genie.sql.executor.jpa.JpaUpdate;
 import io.github.genie.sql.meta.JpaMetamodel;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.orm.jpa.SharedEntityManagerCreator;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 
 @Configuration
 @Import(BaseDbAccessConfiguration.class)

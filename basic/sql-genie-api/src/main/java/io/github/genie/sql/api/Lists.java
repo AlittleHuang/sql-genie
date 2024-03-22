@@ -1,9 +1,8 @@
 package io.github.genie.sql.api;
 
-import java.util.ArrayList;
-
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;

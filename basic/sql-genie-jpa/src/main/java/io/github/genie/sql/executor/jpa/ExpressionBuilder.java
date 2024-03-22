@@ -15,6 +15,7 @@ import javax.persistence.criteria.From;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,32 +47,19 @@ public class ExpressionBuilder {
         if (expression instanceof Operation) {
             Operation ov = (Operation) expression;
             Operator operator = ov.operator();
-            jakarta.persistence.criteria.Expression<?> e0 = toExpression(ov.firstOperand());
+            javax.persistence.criteria.Expression<?> e0 = toExpression(ov.firstOperand());
             Expression e1 = ov.secondOperand();
             Expression e2 = ov.thirdOperand();
-            javax.persistence.criteria.Expression<?> e0 = toExpression(ov.operand());
-            Expression e1 = ov.firstArg();
-            Expression e2 = ov.secondArg();
             switch (operator) {
                 case NOT:
                     return cb.not(cast(e0));
                 case AND: {
                     Predicate[] predicates = getPredicates(ov.operands());
                     return cb.and(predicates);
-                    javax.persistence.criteria.Expression<Boolean> res = cast(e0);
-                    for (Expression arg : args) {
-                        res = cb.and(res, cast(toExpression(arg)));
-                    }
-                    return res;
                 }
                 case OR: {
                     Predicate[] predicates = getPredicates(ov.operands());
                     return cb.or(predicates);
-                    javax.persistence.criteria.Expression<Boolean> res = cast(e0);
-                    for (Expression arg : args) {
-                        res = cb.or(res, cast(toExpression(arg)));
-                    }
-                    return res;
                 }
                 case GT: {
                     if (e1 instanceof Constant) {
@@ -153,7 +141,8 @@ public class ExpressionBuilder {
                 case IN: {
                     List<? extends Expression> operands = ov.operands();
                     if (operands.size() <= 1) {
-                        return cb.literal(false);
+                        javax.persistence.criteria.Expression<?> literal = cb.literal(1);
+                        return cb.notEqual(literal, literal);
                     } else {
                         CriteriaBuilder.In<Object> in = cb.in(e0);
                         for (int i = 1; i < operands.size(); i++) {

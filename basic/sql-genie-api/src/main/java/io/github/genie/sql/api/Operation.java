@@ -2,7 +2,7 @@ package io.github.genie.sql.api;
 
 import java.util.List;
 
-non-sealed public interface Operation extends Expression {
+public interface Operation extends Expression {
     List<? extends Expression> operands();
 
     Operator operator();

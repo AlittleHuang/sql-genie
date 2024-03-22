@@ -3,7 +3,6 @@ package io.github.genie.sql.test;
 import io.github.genie.sql.builder.exception.UncheckedSQLException;
 
 import javax.persistence.EntityTransaction;
-
 import java.sql.SQLException;
 
 public class Transaction {
