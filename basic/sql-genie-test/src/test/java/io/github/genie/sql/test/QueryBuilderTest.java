@@ -462,6 +462,260 @@ class QueryBuilderTest {
                         .collect(Collectors.toList())
         );
 
+
+        assertEquals(
+                userQuery
+                        .select(get(User::getId), get(User::getRandomNumber))
+                        .getList(),
+
+                users().stream()
+                        .map(it -> Tuples.of(it.getId(), it.getRandomNumber()))
+                        .collect(Collectors.toList())
+        );
+
+        assertEquals(
+                userQuery
+                        .select(get(User::getId), get(User::getRandomNumber), get(User::getTime))
+                        .getList(),
+
+                users().stream()
+                        .map(it -> Tuples.of(it.getId(), it.getRandomNumber(), it.getTime()))
+                        .collect(Collectors.toList())
+        );
+
+        assertEquals(
+                userQuery
+                        .select(get(User::getId), get(User::getRandomNumber), get(User::getTime), get(User::getPid))
+                        .getList(),
+
+                users().stream()
+                        .map(it -> Tuples.of(it.getId(), it.getRandomNumber(), it.getTime(), it.getPid()))
+                        .collect(Collectors.toList())
+        );
+
+
+        assertEquals(
+                userQuery
+                        .select(get(User::getId), get(User::getRandomNumber), get(User::getTime), get(User::getPid),
+                                get(User::getTimestamp))
+                        .getList(),
+
+                users().stream()
+                        .map(it -> Tuples.of(it.getId(), it.getRandomNumber(), it.getTime(), it.getPid(),
+                                it.getTimestamp()))
+                        .collect(Collectors.toList())
+        );
+
+        assertEquals(
+                userQuery
+                        .select(get(User::getId), get(User::getRandomNumber), get(User::getTime), get(User::getPid),
+                                get(User::getTimestamp), get(User::isValid))
+                        .getList(),
+
+                users().stream()
+                        .map(it -> Tuples.of(it.getId(), it.getRandomNumber(), it.getTime(), it.getPid(),
+                                it.getTimestamp(), it.isValid()))
+                        .collect(Collectors.toList())
+        );
+
+        assertEquals(
+                userQuery
+                        .select(get(User::getId), get(User::getRandomNumber), get(User::getTime), get(User::getPid),
+                                get(User::getTimestamp), get(User::isValid), get(User::getGender))
+                        .getList(),
+
+                users().stream()
+                        .map(it -> Tuples.of(it.getId(), it.getRandomNumber(), it.getTime(), it.getPid(),
+                                it.getTimestamp(), it.isValid(), it.getGender()))
+                        .collect(Collectors.toList())
+        );
+
+        assertEquals(
+                userQuery
+                        .select(get(User::getId), get(User::getRandomNumber), get(User::getTime), get(User::getPid),
+                                get(User::getTimestamp), get(User::isValid), get(User::getGender), get(User::getInstant))
+                        .getList(),
+
+                users().stream()
+                        .map(it -> Tuples.of(it.getId(), it.getRandomNumber(), it.getTime(), it.getPid(),
+                                it.getTimestamp(), it.isValid(), it.getGender(), it.getInstant()))
+                        .collect(Collectors.toList())
+        );
+
+        assertEquals(
+                userQuery
+                        .select(get(User::getId), get(User::getRandomNumber), get(User::getTime), get(User::getPid),
+                                get(User::getTimestamp), get(User::isValid), get(User::getGender), get(User::getInstant),
+                                get(User::getTestLong))
+                        .getList(),
+
+                users().stream()
+                        .map(it -> Tuples.of(it.getId(), it.getRandomNumber(), it.getTime(), it.getPid(),
+                                it.getTimestamp(), it.isValid(), it.getGender(), it.getInstant(),
+                                it.getTestLong()))
+                        .collect(Collectors.toList())
+        );
+
+        assertEquals(
+                userQuery
+                        .select(get(User::getId), get(User::getRandomNumber), get(User::getTime), get(User::getPid),
+                                get(User::getTimestamp), get(User::isValid), get(User::getGender), get(User::getInstant),
+                                get(User::getTestLong), get(User::getTestInteger))
+                        .getList(),
+
+                users().stream()
+                        .map(user -> Tuples.of(
+                                user.getId(), user.getRandomNumber(), user.getTime(), user.getPid(),
+                                user.getTimestamp(), user.isValid(), user.getGender(), user.getInstant(),
+                                user.getTestLong(), user.getTestInteger()
+                        ))
+                        .collect(Collectors.toList())
+        );
+
+        assertEquals(
+                userQuery
+                        .select(get(User::getId), get(User::getRandomNumber), get(User::getTime), get(User::getPid),
+                                get(User::getTimestamp), get(User::isValid), get(User::getGender), get(User::getInstant),
+                                get(User::getTestLong), get(User::getTestInteger))
+                        .getList(),
+
+                users().stream()
+                        .map(user -> Tuples.of(
+                                user.getId(), user.getRandomNumber(), user.getTime(), user.getPid(),
+                                user.getTimestamp(), user.isValid(), user.getGender(), user.getInstant(),
+                                user.getTestLong(), user.getTestInteger()
+                        ))
+                        .collect(Collectors.toList())
+        );
+
+
+        assertEquals(
+                userQuery
+                        .selectDistinct(get(User::getId), get(User::getRandomNumber))
+                        .getList(),
+
+                users().stream()
+                        .map(it -> Tuples.of(it.getId(), it.getRandomNumber()))
+                        .distinct()
+                        .collect(Collectors.toList())
+        );
+
+        assertEquals(
+                userQuery
+                        .selectDistinct(get(User::getId), get(User::getRandomNumber), get(User::getTime))
+                        .getList(),
+
+                users().stream()
+                        .map(it -> Tuples.of(it.getId(), it.getRandomNumber(), it.getTime()))
+                        .collect(Collectors.toList())
+        );
+
+        assertEquals(
+                userQuery
+                        .selectDistinct(get(User::getId), get(User::getRandomNumber), get(User::getTime), get(User::getPid))
+                        .getList(),
+
+                users().stream()
+                        .map(it -> Tuples.of(it.getId(), it.getRandomNumber(), it.getTime(), it.getPid()))
+                        .collect(Collectors.toList())
+        );
+
+
+        assertEquals(
+                userQuery
+                        .selectDistinct(get(User::getId), get(User::getRandomNumber), get(User::getTime), get(User::getPid),
+                                get(User::getTimestamp))
+                        .getList(),
+
+                users().stream()
+                        .map(it -> Tuples.of(it.getId(), it.getRandomNumber(), it.getTime(), it.getPid(),
+                                it.getTimestamp()))
+                        .collect(Collectors.toList())
+        );
+
+        assertEquals(
+                userQuery
+                        .selectDistinct(get(User::getId), get(User::getRandomNumber), get(User::getTime), get(User::getPid),
+                                get(User::getTimestamp), get(User::isValid))
+                        .getList(),
+
+                users().stream()
+                        .map(it -> Tuples.of(it.getId(), it.getRandomNumber(), it.getTime(), it.getPid(),
+                                it.getTimestamp(), it.isValid()))
+                        .collect(Collectors.toList())
+        );
+
+        assertEquals(
+                userQuery
+                        .selectDistinct(get(User::getId), get(User::getRandomNumber), get(User::getTime), get(User::getPid),
+                                get(User::getTimestamp), get(User::isValid), get(User::getGender))
+                        .getList(),
+
+                users().stream()
+                        .map(it -> Tuples.of(it.getId(), it.getRandomNumber(), it.getTime(), it.getPid(),
+                                it.getTimestamp(), it.isValid(), it.getGender()))
+                        .collect(Collectors.toList())
+        );
+
+        assertEquals(
+                userQuery
+                        .selectDistinct(get(User::getId), get(User::getRandomNumber), get(User::getTime), get(User::getPid),
+                                get(User::getTimestamp), get(User::isValid), get(User::getGender), get(User::getInstant))
+                        .getList(),
+
+                users().stream()
+                        .map(it -> Tuples.of(it.getId(), it.getRandomNumber(), it.getTime(), it.getPid(),
+                                it.getTimestamp(), it.isValid(), it.getGender(), it.getInstant()))
+                        .collect(Collectors.toList())
+        );
+
+        assertEquals(
+                userQuery
+                        .selectDistinct(get(User::getId), get(User::getRandomNumber), get(User::getTime), get(User::getPid),
+                                get(User::getTimestamp), get(User::isValid), get(User::getGender), get(User::getInstant),
+                                get(User::getTestLong))
+                        .getList(),
+
+                users().stream()
+                        .map(it -> Tuples.of(it.getId(), it.getRandomNumber(), it.getTime(), it.getPid(),
+                                it.getTimestamp(), it.isValid(), it.getGender(), it.getInstant(),
+                                it.getTestLong()))
+                        .collect(Collectors.toList())
+        );
+
+        assertEquals(
+                userQuery
+                        .selectDistinct(get(User::getId), get(User::getRandomNumber), get(User::getTime), get(User::getPid),
+                                get(User::getTimestamp), get(User::isValid), get(User::getGender), get(User::getInstant),
+                                get(User::getTestLong), get(User::getTestInteger))
+                        .getList(),
+
+                users().stream()
+                        .map(user -> Tuples.of(
+                                user.getId(), user.getRandomNumber(), user.getTime(), user.getPid(),
+                                user.getTimestamp(), user.isValid(), user.getGender(), user.getInstant(),
+                                user.getTestLong(), user.getTestInteger()
+                        ))
+                        .collect(Collectors.toList())
+        );
+
+        assertEquals(
+                userQuery
+                        .selectDistinct(get(User::getId), get(User::getRandomNumber), get(User::getTime), get(User::getPid),
+                                get(User::getTimestamp), get(User::isValid), get(User::getGender), get(User::getInstant),
+                                get(User::getTestLong), get(User::getTestInteger))
+                        .getList(),
+
+                users().stream()
+                        .map(user -> Tuples.of(
+                                user.getId(), user.getRandomNumber(), user.getTime(), user.getPid(),
+                                user.getTimestamp(), user.isValid(), user.getGender(), user.getInstant(),
+                                user.getTestLong(), user.getTestInteger()
+                        ))
+                        .collect(Collectors.toList())
+        );
+
+
     }
 
     @ParameterizedTest

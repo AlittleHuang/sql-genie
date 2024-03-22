@@ -102,7 +102,7 @@ public class ReflectUtil {
                 .filter(it -> Attribute.getDeclaringType(it.getKey()) != null)
                 .collect(Collectors.groupingBy(e -> Attribute.getDeclaringType(e.getKey())));
         for (Entry<Type, List<Entry<Type, Property>>> entry : attrs.entrySet()) {
-            Property property = map.get(entry.getKey());
+            Property property = map.get(entry.getKey());  
             List<Entry<Type, Property>> v = entry.getValue();
             if (v != null && !v.isEmpty()) {
                 ((ObjectConstructor) property).setProperties(v.stream()
