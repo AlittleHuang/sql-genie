@@ -2,8 +2,10 @@ package io.github.genie.sql.data.example.service;
 
 import io.github.genie.sql.data.access.Access;
 import io.github.genie.sql.data.example.eneity.User;
+import io.github.genie.sql.data.example.projection.IUsernameGender;
 import io.github.genie.sql.data.example.model.Page;
 import io.github.genie.sql.data.example.model.Pageable;
+import io.github.genie.sql.data.example.projection.UsernameGender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -44,4 +46,24 @@ public class UserService {
                 .slice(pageable);
     }
 
+    /**
+     * 投影查询示例
+     */
+    public Page<UsernameGender> usernameGenderPage(String username, Pageable<UsernameGender> pageable) {
+        return userAccess
+                .select(UsernameGender.class)
+                .where(User::getUsername).eqIfNotNull(username)
+                .slice(pageable);
+    }
+
+
+    /**
+     * 接口投影查询示例
+     */
+    public Page<IUsernameGender> iUsernameGenderPage(String username, Pageable<IUsernameGender> pageable) {
+        return userAccess
+                .select(IUsernameGender.class)
+                .where(User::getUsername).eqIfNotNull(username)
+                .slice(pageable);
+    }
 }

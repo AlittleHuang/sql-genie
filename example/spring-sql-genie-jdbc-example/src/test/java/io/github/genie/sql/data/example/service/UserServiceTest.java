@@ -4,6 +4,8 @@ import io.github.genie.sql.data.access.Access;
 import io.github.genie.sql.data.example.eneity.User;
 import io.github.genie.sql.data.example.model.Page;
 import io.github.genie.sql.data.example.model.Pageable;
+import io.github.genie.sql.data.example.projection.IUsernameGender;
+import io.github.genie.sql.data.example.projection.UsernameGender;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,5 +50,32 @@ class UserServiceTest {
         System.out.println(page);
         page = userService.page("Marjorie Minnie", Pageable.of(1, 12));
         System.out.println(page);
+    }
+
+
+    @Test
+    void usernameGenderPage() {
+        Page<UsernameGender> page = userService.usernameGenderPage(null, Pageable.of(1, 12));
+        System.out.println(page);
+        page = userService.usernameGenderPage("Marjorie Minnie", Pageable.of(1, 12));
+        System.out.println(page);
+
+    }
+
+    @Test
+    void iUsernameGenderPage() {
+        IUsernameGender first = userAccess.select(IUsernameGender.class).getFirst();
+        IUsernameGender first2 = userAccess.select(IUsernameGender.class).getFirst();
+        System.out.println(first2.equals(first));
+
+
+        Page<IUsernameGender> page = userService.iUsernameGenderPage(null, Pageable.of(1, 12));
+        System.out.println(toString(page));
+        page = userService.iUsernameGenderPage("Marjorie Minnie", Pageable.of(1, 12));
+        System.out.println(toString(page));
+    }
+
+    private String toString(Object page) {
+        return String.valueOf(page);
     }
 }
