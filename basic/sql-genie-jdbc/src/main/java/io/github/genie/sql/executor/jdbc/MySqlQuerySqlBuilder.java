@@ -41,20 +41,22 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class MySqlQuerySqlBuilder implements QuerySqlBuilder {
 
-    public static final String NONE_DELIMITER = "";
-    public static final String DELIMITER = ",";
-    public static final String FOR_SHARE = " for share";
-    public static final String FOR_UPDATE = " for update";
-    public static final String FOR_UPDATE_NOWAIT = " for update nowait";
-    public static final String SELECT = "select ";
-    public static final String DISTINCT = "distinct ";
-    public static final String FROM = "from ";
-    public static final String WHERE = " where ";
-    public static final String HAVING = " having ";
-    public static final String ORDER_BY = " order by ";
-    public static final String DESC = "desc";
-    public static final String ASC = "asc";
-    public static final String ON = " on ";
+    protected static final String NONE_DELIMITER = "";
+    protected static final String DELIMITER = ",";
+    protected static final String FOR_SHARE = " for share";
+    protected static final String FOR_UPDATE = " for update";
+    protected static final String FOR_UPDATE_NOWAIT = " for update nowait";
+    protected static final String SELECT = "select ";
+    protected static final String DISTINCT = "distinct ";
+    protected static final String FROM = "from ";
+    protected static final String WHERE = " where ";
+    protected static final String HAVING = " having ";
+    protected static final String ORDER_BY = " order by ";
+    protected static final String DESC = "desc";
+    protected static final String ASC = "asc";
+    protected static final String ON = " on ";
+    public static final char lw = '`';
+    public static final char rw = '`';
 
     @Override
     public PreparedSql build(QueryStructure structure, Metamodel metamodel) {
@@ -247,9 +249,10 @@ public class MySqlQuerySqlBuilder implements QuerySqlBuilder {
         }
 
         private void appendFromTable() {
-            sql.append("`")
+            sql.append(lw)
                     .append(entity.tableName())
-                    .append("` ");
+                    .append(rw)
+                    .append(" ");
         }
 
         protected StringBuilder appendFromAlias() {
@@ -485,10 +488,10 @@ public class MySqlQuerySqlBuilder implements QuerySqlBuilder {
                 if (i++ == iMax) {
                     if (attribute instanceof AnyToOneAttribute) {
                         AnyToOneAttribute joinColumnMapper = (AnyToOneAttribute) attribute;
-                        sb.append(joinColumnMapper.joinColumnName());
+                        sb.append(lw).append(joinColumnMapper.joinColumnName()).append(rw);
                     } else if (attribute instanceof BasicAttribute) {
                         BasicAttribute basicColumnMapper = (BasicAttribute) attribute;
-                        sb.append(basicColumnMapper.columnName());
+                        sb.append(lw).append(basicColumnMapper.columnName()).append(rw);
                     } else {
                         throw new IllegalStateException();
                     }
@@ -511,7 +514,7 @@ public class MySqlQuerySqlBuilder implements QuerySqlBuilder {
             joins.forEach((k, v) -> {
                 Attribute attribute = getAttribute(k);
                 EntityType entityTypeInfo = mappers.getEntity(attribute.javaType());
-                sql.append(" left join `").append(entityTypeInfo.tableName()).append("`");
+                sql.append(" left join ").append(lw).append(entityTypeInfo.tableName()).append(rw);
 
                 appendTableAttribute(sql, attribute, v);
                 sql.append(ON);
