@@ -1,7 +1,8 @@
 package io.github.genie.sql.test;
 
 import io.github.genie.sql.builder.exception.UncheckedSQLException;
-import jakarta.persistence.EntityTransaction;
+
+import javax.persistence.EntityTransaction;
 
 import java.sql.SQLException;
 
