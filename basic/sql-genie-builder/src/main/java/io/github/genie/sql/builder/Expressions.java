@@ -25,6 +25,10 @@ public interface Expressions {
 
     Expression TRUE = of(true);
 
+    static boolean isNullOrTrue(Expression expression) {
+        return expression == null || Expressions.isTrue(expression);
+    }
+
     static boolean isTrue(Expression expression) {
         return expression instanceof Constant
                && Boolean.TRUE.equals(((Constant) expression).value());

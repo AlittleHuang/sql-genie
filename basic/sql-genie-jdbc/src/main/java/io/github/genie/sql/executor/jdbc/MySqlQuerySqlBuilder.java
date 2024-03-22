@@ -284,7 +284,7 @@ public class MySqlQuerySqlBuilder implements QuerySqlBuilder {
 
         protected void appendWhere() {
             Expression where = queryStructure.where();
-            if (where == null || Expressions.isTrue(where)) {
+            if (Expressions.isNullOrTrue(where)) {
                 return;
             }
             sql.append(WHERE);
@@ -293,7 +293,7 @@ public class MySqlQuerySqlBuilder implements QuerySqlBuilder {
 
         protected void appendHaving() {
             Expression having = queryStructure.having();
-            if (having == null || Expressions.isTrue(having)) {
+            if (Expressions.isNullOrTrue(having)) {
                 return;
             }
             sql.append(HAVING);

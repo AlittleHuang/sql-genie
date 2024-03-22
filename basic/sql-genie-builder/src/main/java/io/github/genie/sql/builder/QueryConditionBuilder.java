@@ -74,13 +74,17 @@ public class QueryConditionBuilder<T, U> implements Where0<T, U>, Having<T, U>, 
 
     @Override
     public Where0<T, U> where(TypedExpression<T, Boolean> predicate) {
+        Expression expression = predicate.expression();
+        if (Expressions.isNullOrTrue(expression)) {
+            return this;
+        }
         QueryStructureImpl structure = queryStructure.copy();
-        whereAnd(structure, predicate.expression());
+        whereAnd(structure, expression);
         return update(structure);
     }
 
     static void whereAnd(QueryStructureImpl structure, Expression expression) {
-        if (structure.where == null || Expressions.isTrue(structure.where)) {
+        if (Expressions.isNullOrTrue(structure.where)) {
             structure.where = expression;
         } else {
             structure.where = Expressions.operate(structure.where, Operator.AND, expression);

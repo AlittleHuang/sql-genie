@@ -20,15 +20,11 @@ import io.github.genie.sql.api.Selection.SingleSelected;
 import io.github.genie.sql.api.Slice;
 import io.github.genie.sql.builder.util.Exceptions;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 final class QueryStructures {
 
@@ -123,25 +119,6 @@ final class QueryStructures {
             return fetch;
         }
 
-        @Override
-        public String toString() {
-
-            return "select " + select
-                   + (isEmpty(fetch) ? "" : " fetch " + QueryStructures.toString(fetch))
-                   + " from " + from.type().getName()
-                   + (where == null || Expressions.isTrue(where) ? "" : " where " + where)
-                   + (isEmpty(groupBy) ? "" : " group by " + QueryStructures.toString(groupBy))
-                   + (having == null || Expressions.isTrue(having) ? "" : " having " + having)
-                   + (isEmpty(orderBy) ? "" : " orderBy " + QueryStructures.toString(orderBy))
-                   + (offset == null ? "" : " offset " + offset)
-                   + (limit == null ? "" : " limit " + limit)
-                   + (lockType == null || lockType == LockModeType.NONE ? "" : " lock(" + lockType + ")");
-        }
-
-        private static boolean isEmpty(Collection<?> objects) {
-            return objects == null || objects.isEmpty();
-        }
-
     }
 
     @lombok.Data
@@ -161,11 +138,6 @@ final class QueryStructures {
     static final class OrderImpl<T> implements Order<T> {
         private final Expression expression;
         private final SortOrder order;
-
-        @Override
-        public String toString() {
-            return expression + " " + order;
-        }
     }
 
     @lombok.Data
@@ -173,11 +145,6 @@ final class QueryStructures {
     static final class EntitySelectedImpl implements EntitySelected {
         private final Class<?> resultType;
         private final boolean distinct;
-
-        @Override
-        public String toString() {
-            return resultType.getName();
-        }
     }
 
     @lombok.Data
@@ -185,11 +152,6 @@ final class QueryStructures {
     static final class ProjectionSelectedImpl implements ProjectionSelected {
         private final Class<?> resultType;
         private final boolean distinct;
-
-        @Override
-        public String toString() {
-            return resultType.getName();
-        }
     }
 
     @lombok.Data
@@ -197,12 +159,6 @@ final class QueryStructures {
     static final class MultiSelectedImpl implements MultiSelected {
         private final List<? extends Expression> expressions;
         private final boolean distinct;
-
-        @Override
-        public String toString() {
-            return String.valueOf(expressions);
-        }
-
     }
 
     @lombok.Data
@@ -211,11 +167,6 @@ final class QueryStructures {
         private final Class<?> resultType;
         private final Expression expression;
         private final boolean distinct;
-
-        @Override
-        public String toString() {
-            return String.valueOf(expression);
-        }
     }
 
     @lombok.Data
@@ -231,11 +182,6 @@ final class QueryStructures {
     @Accessors(fluent = true)
     static final class ConstantImpl implements Constant {
         private final Object value;
-
-        @Override
-        public String toString() {
-            return String.valueOf(value);
-        }
     }
 
     @lombok.Data
@@ -249,13 +195,6 @@ final class QueryStructures {
     @Accessors(fluent = true)
     static final class ColumnImpl implements Column {
         private final String[] paths;
-        @Getter(lazy = true)
-        private final String identity = String.join(".", paths);
-
-        @Override
-        public String toString() {
-            return identity();
-        }
 
         @Override
         public int size() {
@@ -292,17 +231,6 @@ final class QueryStructures {
         }
 
         @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-            return Arrays.equals(paths, ((ColumnImpl) o).paths);
-        }
-
-        @Override
         public Column get(Column column) {
             String[] paths = new String[size() + column.size()];
             int i = 0;
@@ -314,18 +242,6 @@ final class QueryStructures {
             }
             return new ColumnImpl(paths);
         }
-
-        @Override
-        public int hashCode() {
-            return Arrays.hashCode(paths);
-        }
-    }
-
-    @NotNull
-    private static String toString(List<?> list) {
-        return list.stream()
-                .map(String::valueOf)
-                .collect(Collectors.joining(", "));
     }
 
     private QueryStructures() {

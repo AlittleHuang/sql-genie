@@ -185,7 +185,7 @@ public class JpaQueryExecutor implements AbstractQueryExecutor {
         }
 
         protected void setWhere(Expression where) {
-            if (where != null && !Expressions.isTrue(where)) {
+            if (!Expressions.isNullOrTrue(where)) {
                 query.where(toPredicate(where));
             }
         }
@@ -198,7 +198,7 @@ public class JpaQueryExecutor implements AbstractQueryExecutor {
         }
 
         protected void setHaving(Expression having) {
-            if (having != null && !Expressions.isTrue(having)) {
+            if (!Expressions.isNullOrTrue(having)) {
                 query.having(toPredicate(having));
             }
         }
