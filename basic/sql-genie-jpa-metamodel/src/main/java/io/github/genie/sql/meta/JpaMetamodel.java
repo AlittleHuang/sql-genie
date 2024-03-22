@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.List;
 
@@ -110,7 +111,11 @@ public class JpaMetamodel extends AbstractMetamodel {
 
     @Override
     protected boolean isTransient(Attribute attribute) {
-        return attribute == null || getAnnotation(attribute, Transient.class) != null;
+        return attribute == null
+               || attribute.field() == null
+               || Modifier.isTransient(attribute.field().getModifiers())
+               || Modifier.isStatic(attribute.field().getModifiers())
+               || getAnnotation(attribute, Transient.class) != null;
     }
 
     @Override
