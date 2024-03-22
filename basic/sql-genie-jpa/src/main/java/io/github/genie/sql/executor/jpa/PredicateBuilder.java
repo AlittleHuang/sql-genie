@@ -16,7 +16,7 @@ public class PredicateBuilder extends ExpressionBuilder {
         if (result instanceof Predicate) {
             return (Predicate) result;
         }
-        return cb.isTrue(cast(toExpression(expression)));
+        return cb.isTrue(cast(result));
     }
 
 }

@@ -83,6 +83,7 @@ public interface Expressions {
             return new OperationImpl(operands, o);
         }
         List<Expression> operands = new ArrayList<>(r.size() + 1);
+        operands.add(l);
         operands.addAll(r);
         return new OperationImpl(operands, o);
     }
