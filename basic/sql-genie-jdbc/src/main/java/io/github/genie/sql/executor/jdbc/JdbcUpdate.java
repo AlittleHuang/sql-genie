@@ -5,7 +5,7 @@ import io.github.genie.sql.api.Update;
 import io.github.genie.sql.api.Updater;
 import io.github.genie.sql.builder.UpdaterImpl;
 import io.github.genie.sql.builder.exception.OptimisticLockException;
-import io.github.genie.sql.builder.exception.SqlExecuteException;
+import io.github.genie.sql.builder.exception.UncheckedSQLException;
 import io.github.genie.sql.builder.exception.TransactionRequiredException;
 import io.github.genie.sql.builder.meta.Attribute;
 import io.github.genie.sql.builder.meta.BasicAttribute;
@@ -224,7 +224,7 @@ public class JdbcUpdate implements Update {
                 return action.doInConnection(connection);
             });
         } catch (SQLException e) {
-            throw new SqlExecuteException(e);
+            throw new UncheckedSQLException(e);
         }
     }
 

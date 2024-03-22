@@ -1,7 +1,7 @@
 package io.github.genie.sql.executor.jdbc;
 
 import io.github.genie.sql.builder.TypeCastUtil;
-import lombok.Lombok;
+import io.github.genie.sql.builder.util.Exceptions;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
@@ -110,7 +110,7 @@ public abstract class JdbcUtil {
                 Method method = cls.getMethod("values");
                 return method.invoke(null);
             } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                throw Lombok.sneakyThrow(e);
+                throw Exceptions.sneakyThrow(e);
             }
         });
         return Array.get(array, index);

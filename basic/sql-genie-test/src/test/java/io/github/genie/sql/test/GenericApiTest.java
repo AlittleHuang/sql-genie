@@ -17,7 +17,9 @@ import io.github.genie.sql.api.tuple.Tuple;
 import io.github.genie.sql.api.tuple.Tuple2;
 import io.github.genie.sql.api.tuple.Tuple3;
 import io.github.genie.sql.builder.Tuples;
+import io.github.genie.sql.builder.exception.UncheckedSQLException;
 import io.github.genie.sql.builder.meta.Metamodel;
+import io.github.genie.sql.builder.util.Exceptions;
 import io.github.genie.sql.builder.util.Paths;
 import io.github.genie.sql.executor.jdbc.ConnectionProvider;
 import io.github.genie.sql.executor.jdbc.JdbcQueryExecutor;
@@ -29,7 +31,6 @@ import io.github.genie.sql.meta.JpaMetamodel;
 import io.github.genie.sql.test.entity.User;
 import io.github.genie.sql.test.projection.UserInterface;
 import io.github.genie.sql.test.projection.UserModel;
-import lombok.Lombok;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -89,8 +90,8 @@ public class GenericApiTest {
                         metamodel);
                 resetData(connection, jdbcUpdate, query);
                 allUsers = queryAllUsers(query);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+            } catch (SQLException e) {
+                throw new UncheckedSQLException(e);
             }
         });
     }
@@ -134,9 +135,9 @@ public class GenericApiTest {
                 }
                 result = action.apply(connection);
                 connection.commit();
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 connection.rollback();
-                throw Lombok.sneakyThrow(e);
+                throw Exceptions.sneakyThrow(e);
             } finally {
                 if (autoCommit) {
                     connection.setAutoCommit(true);

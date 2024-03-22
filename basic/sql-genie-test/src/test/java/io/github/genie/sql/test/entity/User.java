@@ -1,5 +1,6 @@
 package io.github.genie.sql.test.entity;
 
+import io.github.genie.sql.builder.util.Exceptions;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.Id;
@@ -105,7 +106,7 @@ public class User extends EnableOptimisticLock implements Cloneable {
         try {
             return (User) super.clone();
         } catch (CloneNotSupportedException e) {
-            throw new AssertionError();
+            throw Exceptions.sneakyThrow(e);
         }
     }
 }

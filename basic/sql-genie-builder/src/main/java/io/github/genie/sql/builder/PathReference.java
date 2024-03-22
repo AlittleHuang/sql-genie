@@ -1,6 +1,8 @@
 package io.github.genie.sql.builder;
 
 import io.github.genie.sql.api.Path;
+import io.github.genie.sql.builder.exception.BeanReflectiveException;
+import io.github.genie.sql.builder.util.Exceptions;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -61,7 +63,7 @@ public class PathReference {
             }
             return new PathReference(serializedLambda);
         } catch (ReflectiveOperationException e) {
-            throw new IllegalArgumentException(e);
+            throw new BeanReflectiveException(e);
         }
     }
 
@@ -95,7 +97,7 @@ public class PathReference {
         try {
             return Class.forName(className);
         } catch (ClassNotFoundException e) {
-            throw new IllegalStateException(e);
+            throw Exceptions.sneakyThrow(e);
         }
     }
 
@@ -114,7 +116,7 @@ public class PathReference {
                     try {
                         return Class.forName(s);
                     } catch (ClassNotFoundException e) {
-                        throw new IllegalStateException(e);
+                        throw Exceptions.sneakyThrow(e);
                     }
                 })
                 .findFirst()

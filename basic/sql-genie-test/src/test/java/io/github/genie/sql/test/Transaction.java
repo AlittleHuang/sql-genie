@@ -1,5 +1,6 @@
 package io.github.genie.sql.test;
 
+import io.github.genie.sql.builder.exception.UncheckedSQLException;
 import jakarta.persistence.EntityTransaction;
 
 import java.sql.SQLException;
@@ -9,8 +10,8 @@ public class Transaction {
     public static void doInTransaction(Runnable action) {
         try {
             executeAction(action);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (SQLException e) {
+            throw new UncheckedSQLException(e);
         }
     }
 

@@ -3,7 +3,7 @@ package io.github.genie.sql.executor.jdbc;
 import io.github.genie.sql.api.LockModeType;
 import io.github.genie.sql.api.QueryStructure;
 import io.github.genie.sql.builder.AbstractQueryExecutor;
-import io.github.genie.sql.builder.exception.SqlExecuteException;
+import io.github.genie.sql.builder.exception.UncheckedSQLException;
 import io.github.genie.sql.builder.exception.TransactionRequiredException;
 import io.github.genie.sql.builder.meta.Attribute;
 import io.github.genie.sql.builder.meta.EntityType;
@@ -56,7 +56,7 @@ public class JdbcQueryExecutor implements AbstractQueryExecutor {
                 }
             });
         } catch (SQLException e) {
-            throw new SqlExecuteException(e);
+            throw new UncheckedSQLException(e);
         }
     }
 

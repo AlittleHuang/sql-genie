@@ -18,6 +18,7 @@ import io.github.genie.sql.api.Selection.MultiSelected;
 import io.github.genie.sql.api.Selection.ProjectionSelected;
 import io.github.genie.sql.api.Selection.SingleSelected;
 import io.github.genie.sql.api.Slice;
+import io.github.genie.sql.builder.util.Exceptions;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.experimental.Accessors;
@@ -68,7 +69,7 @@ final class QueryStructures {
             try {
                 return (QueryStructureImpl) super.clone();
             } catch (CloneNotSupportedException e) {
-                throw new RuntimeException(e);
+                throw Exceptions.sneakyThrow(e);
             }
         }
 
