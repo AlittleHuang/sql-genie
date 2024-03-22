@@ -43,14 +43,18 @@ class BaseAccessImpl<T, ID> extends AccessFacade<T> implements BaseAccess<T> {
     }
 
     @Autowired
-    protected void setEntityType(Query query, Update update, Metamodel metamodel) {
-        this.query = query;
-        this.update = update;
-        this.metamodel = metamodel;
+    protected void secComponents(Query query, Update update, Metamodel metamodel) {
+        this.query = nonNullOrElse(this.query, query);
+        this.update = nonNullOrElse(this.update, update);
+        this.metamodel = nonNullOrElse(this.metamodel, metamodel);
         this.entityType = resolveEntityType();
         this.select = query.from(entityType);
         this.updater = update.getUpdater(entityType);
         this.idColumn = Expressions.column(metamodel.getEntity(entityType).id().name());
+    }
+
+    private <X> X nonNullOrElse(X a, X b) {
+        return a == null ? b : a;
     }
 
     protected Class<T> resolveEntityType() {
