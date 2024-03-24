@@ -98,10 +98,6 @@ public interface Expressions {
                 .collect(Collectors.toList());
     }
 
-    static Column concat(Column join, String path) {
-        return join.get(path);
-    }
-
     static Column concat(Column join, Path<?, ?> path) {
         return join.get(columnName(path));
     }

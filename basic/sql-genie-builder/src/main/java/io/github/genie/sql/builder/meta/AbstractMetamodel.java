@@ -9,6 +9,7 @@ import io.github.genie.sql.builder.meta.Metamodels.BasicAttributeImpl;
 import io.github.genie.sql.builder.meta.Metamodels.ProjectionAttributeImpl;
 import io.github.genie.sql.builder.meta.Metamodels.RootEntity;
 import io.github.genie.sql.builder.meta.Metamodels.RootProjection;
+import io.github.genie.sql.builder.meta.Metamodels.SubSelectEntity;
 import io.github.genie.sql.builder.reflect.ReflectUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -163,9 +164,14 @@ public abstract class AbstractMetamodel implements Metamodel {
 
     protected abstract Field[] getSuperClassField(Class<?> baseClass, Class<?> superClass);
 
-    protected RootEntity createEntityType(Class<?> entityType) {
+    protected EntityType createEntityType(Class<?> entityType) {
         RootEntity result = new RootEntity();
-        return createEntityType(entityType, result, result);
+        createEntityType(entityType, result, result);
+        SubSelect[] type = entityType.getAnnotationsByType(SubSelect.class);
+        if (type.length == 1) {
+            return new SubSelectEntity(result, type[0].value());
+        }
+        return result;
     }
 
     protected RootEntity createEntityType(Class<?> entityType, RootEntity result, Type owner) {

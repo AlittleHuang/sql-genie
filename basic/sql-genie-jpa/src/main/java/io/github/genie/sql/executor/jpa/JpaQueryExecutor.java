@@ -2,6 +2,7 @@ package io.github.genie.sql.executor.jpa;
 
 import io.github.genie.sql.api.Column;
 import io.github.genie.sql.api.Expression;
+import io.github.genie.sql.api.From;
 import io.github.genie.sql.api.From.SubQuery;
 import io.github.genie.sql.api.Lists;
 import io.github.genie.sql.api.Order;
@@ -20,9 +21,9 @@ import io.github.genie.sql.builder.meta.Attribute;
 import io.github.genie.sql.builder.meta.Metamodel;
 import io.github.genie.sql.builder.meta.Projection;
 import io.github.genie.sql.builder.meta.ProjectionAttribute;
+import io.github.genie.sql.builder.meta.SubSelectType;
 import io.github.genie.sql.builder.reflect.InstanceConstructor;
 import io.github.genie.sql.builder.reflect.ReflectUtil;
-import io.github.genie.sql.executor.jdbc.JdbcQueryExecutor.PreparedSql;
 import io.github.genie.sql.executor.jdbc.JdbcQueryExecutor.QuerySqlBuilder;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.LockModeType;
@@ -43,18 +44,18 @@ public class JpaQueryExecutor implements AbstractQueryExecutor {
 
     private final EntityManager entityManager;
     private final Metamodel metamodel;
-    private final QuerySqlBuilder querySqlBuilder;
+    private final JpaNativeQueryExecutor nativeQueryExecutor;
 
     public JpaQueryExecutor(EntityManager entityManager, Metamodel metamodel, QuerySqlBuilder querySqlBuilder) {
         this.entityManager = entityManager;
         this.metamodel = metamodel;
-        this.querySqlBuilder = querySqlBuilder;
+        nativeQueryExecutor = new JpaNativeQueryExecutor(querySqlBuilder, entityManager, metamodel);
     }
 
     @Override
     public <T> List<T> getList(@NotNull QueryStructure queryStructure) {
-        if (queryStructure.from() instanceof SubQuery) {
-            return queryByNativeSql(queryStructure);
+        if (requiredNativeQuery(queryStructure)) {
+            return nativeQueryExecutor.getList(queryStructure);
         }
         Selection selected = queryStructure.select();
         if (selected instanceof SingleSelected) {
@@ -89,15 +90,12 @@ public class JpaQueryExecutor implements AbstractQueryExecutor {
         }
     }
 
-    private <T> List<T> queryByNativeSql(@NotNull QueryStructure queryStructure) {
-        PreparedSql preparedSql = querySqlBuilder.build(queryStructure, metamodel);
-        jakarta.persistence.Query query = entityManager.createNativeQuery(preparedSql.sql());
-        int position = 0;
-        for (Object arg : preparedSql.args()) {
-            query.setParameter(++position, arg);
-        }
-        return TypeCastUtil.cast(query.getResultList());
+    private boolean requiredNativeQuery(@NotNull QueryStructure queryStructure) {
+        From from = queryStructure.from();
+        return from instanceof SubQuery
+               || metamodel.getEntity(from.type()) instanceof SubSelectType;
     }
+
 
     private List<?> getEntityResultList(@NotNull QueryStructure structure) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();

@@ -26,6 +26,7 @@ import io.github.genie.sql.builder.meta.EntityType;
 import io.github.genie.sql.builder.meta.Metamodel;
 import io.github.genie.sql.builder.meta.Projection;
 import io.github.genie.sql.builder.meta.ProjectionAttribute;
+import io.github.genie.sql.builder.meta.SubSelectType;
 import io.github.genie.sql.builder.meta.Type;
 import io.github.genie.sql.executor.jdbc.JdbcQueryExecutor.PreparedSql;
 import io.github.genie.sql.executor.jdbc.JdbcQueryExecutor.QuerySqlBuilder;
@@ -212,7 +213,7 @@ public class MySqlQuerySqlBuilder implements QuerySqlBuilder {
                         if (!(attr instanceof BasicAttribute)) {
                             continue;
                         }
-                        Column column = Expressions.concat(fetch, attr.name());
+                        Column column = fetch.get(attr.name());
                         selectedExpressions.add(column);
                         selectedAttributes.add(attr);
                     }
@@ -249,10 +250,8 @@ public class MySqlQuerySqlBuilder implements QuerySqlBuilder {
         }
 
         private void appendFromTable() {
-            sql.append(lw)
-                    .append(entity.tableName())
-                    .append(rw)
-                    .append(" ");
+            appendTable(sql, entity);
+            sql.append(" ");
         }
 
         protected StringBuilder appendFromAlias() {
@@ -504,7 +503,7 @@ public class MySqlQuerySqlBuilder implements QuerySqlBuilder {
                     }
                 }
                 type = attribute.javaType();
-                join = Expressions.concat(join, path);
+                join = join.get(path);
             }
         }
 
@@ -514,7 +513,8 @@ public class MySqlQuerySqlBuilder implements QuerySqlBuilder {
             joins.forEach((k, v) -> {
                 Attribute attribute = getAttribute(k);
                 EntityType entityTypeInfo = mappers.getEntity(attribute.javaType());
-                sql.append(" left join ").append(lw).append(entityTypeInfo.tableName()).append(rw);
+                StringBuilder append = sql.append(" left join ");
+                appendTable(append, entityTypeInfo);
 
                 appendTableAttribute(sql, attribute, v);
                 sql.append(ON);
@@ -541,6 +541,14 @@ public class MySqlQuerySqlBuilder implements QuerySqlBuilder {
             });
             this.sql.insert(sqlIndex, sql);
 
+        }
+
+        private static void appendTable(StringBuilder append, EntityType entityTypeInfo) {
+            if (entityTypeInfo instanceof SubSelectType) {
+                append.append('(').append(((SubSelectType) entityTypeInfo).subSelectSql()).append(')');
+            } else {
+                append.append(lw).append(entityTypeInfo.tableName()).append(rw);
+            }
         }
 
         private static Column getParent(Column k) {

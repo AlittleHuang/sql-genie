@@ -11,6 +11,7 @@ import io.github.genie.sql.builder.TypedExpressions;
 import io.github.genie.sql.builder.UpdaterImpl;
 import io.github.genie.sql.builder.reflect.ReflectUtil;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceUnitUtil;
 import jakarta.persistence.metamodel.EntityType;
 import jakarta.persistence.metamodel.SingularAttribute;
 import lombok.extern.slf4j.Slf4j;
@@ -26,10 +27,12 @@ public class JpaUpdate implements Update {
 
     private final EntityManager entityManager;
     private final Query query;
+    private final PersistenceUnitUtil util;
 
     public JpaUpdate(EntityManager entityManager, JpaQueryExecutor jpaQueryExecutor) {
         this.entityManager = entityManager;
         this.query = jpaQueryExecutor.createQuery();
+        this.util = entityManager.getEntityManagerFactory().getPersistenceUnitUtil();
     }
 
     @Override
@@ -47,7 +50,9 @@ public class JpaUpdate implements Update {
         for (T entity : entities) {
             Object id = requireId(entity);
             if (uniqueValues.add(id)) {
-                ids.add(Expressions.of(id));
+                if (!util.isLoaded(entity)) {
+                    ids.add(Expressions.of(id));
+                }
             } else {
                 throw new IllegalArgumentException("duplicate id");
             }
@@ -97,9 +102,7 @@ public class JpaUpdate implements Update {
     }
 
     private <T> Object requireId(T entity) {
-        Object id = entityManager.getEntityManagerFactory()
-                .getPersistenceUnitUtil()
-                .getIdentifier(entity);
+        Object id = util.getIdentifier(entity);
         return Objects.requireNonNull(id);
     }
 

@@ -67,6 +67,16 @@ public class Metamodels {
     }
 
     @Getter
+    @Setter
+    @RequiredArgsConstructor
+    @Accessors(fluent = true)
+    public static class SubSelectEntity implements SubSelectType {
+        @Delegate
+        private final RootEntity entity;
+        private final String subSelectSql;
+    }
+
+    @Getter
     @RequiredArgsConstructor
     @Accessors(fluent = true)
     public static class BasicAttributeImpl implements BasicAttribute {

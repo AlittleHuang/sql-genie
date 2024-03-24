@@ -67,22 +67,30 @@ public class UserQueryProvider implements ArgumentsProvider {
     }
 
     private static Select<User> jpa() {
-        EntityManager manager = EntityManagers.getEntityManager();
-        Query query = new JpaQueryExecutor(manager, JpaMetamodel.of(), new MySqlQuerySqlBuilder())
-                .createQuery(new TestPostProcessor());
+        Query query = jpaQuery();
         log.debug("create jpa query: " + query);
         return query.from(User.class);
     }
 
+    public static Query jpaQuery() {
+        EntityManager manager = EntityManagers.getEntityManager();
+        return new JpaQueryExecutor(manager, JpaMetamodel.of(), new MySqlQuerySqlBuilder())
+                .createQuery(new TestPostProcessor());
+    }
+
     @SneakyThrows
     private static Select<User> jdbc() {
+        Query query = jdbcQuery();
+        log.debug("create jdbc query: " + query);
+        return query.from(User.class);
+    }
+
+    public static Query jdbcQuery() {
         ConnectionProvider sqlExecutor = SingleConnectionProvider.CONNECTION_PROVIDER;
-        Query query = new JdbcQueryExecutor(JpaMetamodel.of(),
+        return new JdbcQueryExecutor(JpaMetamodel.of(),
                 new MySqlQuerySqlBuilder(),
                 sqlExecutor,
                 new JdbcResultCollector()
         ).createQuery(new TestPostProcessor());
-        log.debug("create jdbc query: " + query);
-        return query.from(User.class);
     }
 }
