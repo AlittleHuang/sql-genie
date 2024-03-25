@@ -15,6 +15,7 @@ import io.github.genie.sql.api.Query.ExpressionsBuilder;
 import io.github.genie.sql.api.Query.OrderOperator;
 import io.github.genie.sql.api.Query.QueryStructureBuilder;
 import io.github.genie.sql.api.Query.Select;
+import io.github.genie.sql.api.Query.SubQueryBuilder;
 import io.github.genie.sql.api.Query.Where;
 import io.github.genie.sql.api.Query.Where0;
 import io.github.genie.sql.api.Root;
@@ -533,6 +534,11 @@ public abstract class AccessFacade<T> implements BaseAccess<T> {
     @Override
     public Slice<T> slice(int offset, int limit) {
         return select().slice(offset, limit);
+    }
+
+    @Override
+    public <X> SubQueryBuilder<X, T> asSubQuery() {
+        return select().asSubQuery();
     }
 
     @Override

@@ -430,6 +430,7 @@ public interface Query {
 
         QueryStructureBuilder buildMetadata();
 
+        <X> SubQueryBuilder<X, T> asSubQuery();
     }
 
     interface QueryStructureBuilder {
@@ -443,6 +444,25 @@ public interface Query {
         SliceQueryStructure slice(int offset, int limit);
 
     }
+
+    interface SubQueryBuilder<T, U> extends TypedExpression<T, List<U>> {
+        TypedExpression<T, Long> count();
+
+        TypedExpression<T, List<U>> slice(int offset, int maxResult);
+
+        default TypedExpression<T, U> getSingle() {
+            return getSingle(-1);
+        }
+
+        TypedExpression<T, U> getSingle(int offset);
+
+        default TypedExpression<T, U> getFirst() {
+            return getFirst(-1);
+        }
+
+        TypedExpression<T, U> getFirst(int offset);
+    }
+
 
     @Data
     @Accessors(fluent = true)

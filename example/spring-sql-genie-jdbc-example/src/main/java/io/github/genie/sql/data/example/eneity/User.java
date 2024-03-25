@@ -32,7 +32,7 @@ public class User {
     public static StringPathExpression<User> Username = get(User::getUsername);
     public static EntityPathExpression<User, User> ParentUser = get(User::getParentUser);
     public static ComparablePathExpression<User, Gender> Gender = get(User::getGender);
-    public static NumberPathExpression<User, Integer> Pid = get(User::getPid);
+    public static NumberPathExpression<User, Long> Pid = get(User::getPid);
 
     @Id
     private Long id;
@@ -43,7 +43,7 @@ public class User {
 
     private Date time;
 
-    private Integer pid;
+    private Long pid;
 
     private Double timestamp;
 

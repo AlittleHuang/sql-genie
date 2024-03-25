@@ -50,8 +50,10 @@ public interface Attribute extends Type {
         try {
             Method setter = setter();
             if (setter != null && ReflectUtil.isAccessible(setter, entity)) {
+                ReflectUtil.typeCheck(value, setter.getParameterTypes()[0]);
                 setter.invoke(entity, value);
             } else {
+                ReflectUtil.typeCheck(value, field().getType());
                 ReflectUtil.setFieldValue(field(), entity, value);
             }
         } catch (IllegalAccessException | InvocationTargetException e) {

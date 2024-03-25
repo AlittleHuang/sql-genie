@@ -10,7 +10,7 @@ public interface From extends Serializable {
 
     }
 
-    interface SubQuery extends From {
+    interface FromSubQuery extends From, SubQuery {
         QueryStructure queryStructure();
 
         @Override

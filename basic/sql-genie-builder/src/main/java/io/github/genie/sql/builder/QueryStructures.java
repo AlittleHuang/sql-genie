@@ -5,7 +5,6 @@ import io.github.genie.sql.api.Constant;
 import io.github.genie.sql.api.Expression;
 import io.github.genie.sql.api.From;
 import io.github.genie.sql.api.From.Entity;
-import io.github.genie.sql.api.From.SubQuery;
 import io.github.genie.sql.api.Lists;
 import io.github.genie.sql.api.LockModeType;
 import io.github.genie.sql.api.Operation;
@@ -18,6 +17,7 @@ import io.github.genie.sql.api.Selection.MultiSelected;
 import io.github.genie.sql.api.Selection.ProjectionSelected;
 import io.github.genie.sql.api.Selection.SingleSelected;
 import io.github.genie.sql.api.Slice;
+import io.github.genie.sql.api.SubQuery;
 import io.github.genie.sql.builder.util.Exceptions;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -129,7 +129,7 @@ final class QueryStructures {
 
     @lombok.Data
     @Accessors(fluent = true)
-    static final class FromSubQuery implements SubQuery {
+    static final class FromSubQuery implements From.FromSubQuery {
         private final QueryStructure queryStructure;
     }
 
@@ -242,6 +242,12 @@ final class QueryStructures {
             }
             return new ColumnImpl(paths);
         }
+    }
+
+    @lombok.Data
+    @Accessors(fluent = true)
+    static class SubQueryExpr implements SubQuery {
+        private final QueryStructure queryStructure;
     }
 
     private QueryStructures() {

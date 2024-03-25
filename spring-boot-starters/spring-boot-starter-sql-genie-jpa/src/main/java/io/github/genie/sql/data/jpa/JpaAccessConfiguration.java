@@ -4,6 +4,7 @@ import io.github.genie.sql.api.Query;
 import io.github.genie.sql.api.Update;
 import io.github.genie.sql.builder.AbstractQueryExecutor;
 import io.github.genie.sql.builder.QueryStructurePostProcessor;
+import io.github.genie.sql.builder.converter.TypeConverter;
 import io.github.genie.sql.builder.meta.Metamodel;
 import io.github.genie.sql.data.access.BaseDbAccessConfiguration;
 import io.github.genie.sql.data.access.TransactionalUpdate;
@@ -20,6 +21,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.orm.jpa.SharedEntityManagerCreator;
+
+import java.util.List;
 
 @Configuration
 @Import(BaseDbAccessConfiguration.class)
@@ -39,8 +42,12 @@ public class JpaAccessConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    protected JpaQueryExecutor queryExecutor(EntityManager entityManager, Metamodel metamodel, QuerySqlBuilder querySqlBuilder) {
-        return new JpaQueryExecutor(entityManager, metamodel, querySqlBuilder);
+    protected JpaQueryExecutor queryExecutor(EntityManager entityManager,
+                                             Metamodel metamodel,
+                                             QuerySqlBuilder querySqlBuilder,
+                                             List<TypeConverter> typeConverters) {
+        TypeConverter converter = TypeConverter.of(typeConverters.toArray(new TypeConverter[0]));
+        return new JpaQueryExecutor(entityManager, metamodel, querySqlBuilder, converter);
     }
 
     @Bean
@@ -63,6 +70,11 @@ public class JpaAccessConfiguration {
     @ConditionalOnMissingBean
     protected EntityManager entityManager(EntityManagerFactory entityManagerFactory) {
         return SharedEntityManagerCreator.createSharedEntityManager(entityManagerFactory);
+    }
+
+    @Bean
+    protected TypeConverter typeConverter() {
+        return TypeConverter.ofDefault();
     }
 
 }

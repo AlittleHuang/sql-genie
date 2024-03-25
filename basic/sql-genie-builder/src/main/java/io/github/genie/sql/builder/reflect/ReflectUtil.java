@@ -4,6 +4,7 @@ import io.github.genie.sql.builder.exception.BeanReflectiveException;
 import io.github.genie.sql.builder.meta.Attribute;
 import io.github.genie.sql.builder.meta.ObjectType;
 import io.github.genie.sql.builder.meta.Type;
+import io.github.genie.sql.builder.util.Exceptions;
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -12,8 +13,10 @@ import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Collection;
@@ -25,6 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public class ReflectUtil {
+    private static final Map<Class<?>, Object> SINGLE_ENUM_MAP = new ConcurrentHashMap<>();
 
     static final Map<Collection<? extends Attribute>, ObjectConstructor> CONSTRUCTORS = new ConcurrentHashMap<>();
 
@@ -99,7 +103,7 @@ public class ReflectUtil {
                 .filter(it -> Attribute.getDeclaringType(it.getKey()) != null)
                 .collect(Collectors.groupingBy(e -> Attribute.getDeclaringType(e.getKey())));
         for (Entry<Type, List<Entry<Type, Property>>> entry : attrs.entrySet()) {
-            Property property = map.get(entry.getKey());  
+            Property property = map.get(entry.getKey());
             List<Entry<Type, Property>> v = entry.getValue();
             if (v != null && !v.isEmpty()) {
                 ((ObjectConstructor) property).setProperties(v.stream()
@@ -164,6 +168,33 @@ public class ReflectUtil {
         ClassLoader classLoader = resultType.getClassLoader();
         Class<?>[] interfaces = {resultType};
         return Proxy.newProxyInstance(classLoader, interfaces, new InstanceInvocationHandler(fields, resultType, map));
+    }
+
+    public static void typeCheck(Object value, Class<?> type) {
+        if (value == null) {
+            if (type.isPrimitive()) {
+                throw new BeanReflectiveException("primitive type value can not be null");
+            }
+        } else if (!type.isInstance(value)) {
+            if (type.isPrimitive()) {
+                type = PrimitiveTypes.getWrapper(type);
+            }
+            if (!type.isInstance(value)) {
+                throw new BeanReflectiveException(value.getClass() + "[" + value + "] can not cast to " + type);
+            }
+        }
+    }
+
+    public static Object getEnum(Class<?> cls, int index) {
+        Object array = SINGLE_ENUM_MAP.computeIfAbsent(cls, k -> {
+            try {
+                Method method = cls.getMethod("values");
+                return method.invoke(null);
+            } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                throw Exceptions.sneakyThrow(e);
+            }
+        });
+        return Array.get(array, index);
     }
 
 }

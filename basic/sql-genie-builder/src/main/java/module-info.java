@@ -5,10 +5,12 @@ module io.github.genie.sql.builder {
     requires io.github.genie.sql.api;
     requires java.desktop;
     requires org.slf4j;
+    requires java.sql;
 
     exports io.github.genie.sql.builder;
     exports io.github.genie.sql.builder.exception;
     exports io.github.genie.sql.builder.meta;
     exports io.github.genie.sql.builder.reflect;
     exports io.github.genie.sql.builder.util;
+    exports io.github.genie.sql.builder.converter;
 }

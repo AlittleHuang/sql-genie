@@ -30,6 +30,8 @@ public interface ExpressionOperator<T, U, B> {
 
     B in(@NotNull List<? extends TypedExpression<T, U>> expressions);
 
+    B in(@NotNull TypedExpression<T, List<U>> expressions);
+
     B in(@NotNull Collection<? extends U> values);
 
     @SuppressWarnings({"unchecked"})

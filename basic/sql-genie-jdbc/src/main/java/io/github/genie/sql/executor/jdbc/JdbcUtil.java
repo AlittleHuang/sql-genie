@@ -1,11 +1,8 @@
 package io.github.genie.sql.executor.jdbc;
 
 import io.github.genie.sql.builder.TypeCastUtil;
-import io.github.genie.sql.builder.util.Exceptions;
+import io.github.genie.sql.builder.reflect.ReflectUtil;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.sql.Blob;
 import java.sql.Clob;
@@ -22,11 +19,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class JdbcUtil {
 
-    private static final Map<Class<?>, Object> SINGLE_ENUM_MAP = new ConcurrentHashMap<>();
     private static final Map<Class<?>, ResultSetGetter<?>> GETTER_MAPS = new HashMap<>();
 
     static {
@@ -85,7 +80,7 @@ public abstract class JdbcUtil {
             ResultSetGetter<?> getter = GETTER_MAPS.get(targetType);
             if (getter == null) {
                 if (Enum.class.isAssignableFrom(targetType)) {
-                    result = getEnum(targetType, resultSet.getInt(column));
+                    result = ReflectUtil.getEnum(targetType, resultSet.getInt(column));
                 }
             } else {
                 result = getter.getValue(resultSet, column);
@@ -102,18 +97,6 @@ public abstract class JdbcUtil {
             }
             pst.setObject(++i, arg);
         }
-    }
-
-    private static Object getEnum(Class<?> cls, int index) {
-        Object array = SINGLE_ENUM_MAP.computeIfAbsent(cls, k -> {
-            try {
-                Method method = cls.getMethod("values");
-                return method.invoke(null);
-            } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                throw Exceptions.sneakyThrow(e);
-            }
-        });
-        return Array.get(array, index);
     }
 
     private static <T> void put(Class<T> type, ResultSetGetter<T> getter) {

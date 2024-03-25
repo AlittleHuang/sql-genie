@@ -45,6 +45,11 @@ public interface Lists {
         return List.of(e1, e2, e3, e4, e5, e6, e7, e8, e9, e10);
     }
 
+    @SafeVarargs
+    static <E> List<E> of(E... es) {
+        return List.of(es);
+    }
+
     static <E> List<E> of(E e) {
         return List.of(e);
     }

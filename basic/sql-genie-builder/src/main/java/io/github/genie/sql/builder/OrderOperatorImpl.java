@@ -8,6 +8,7 @@ import io.github.genie.sql.api.Query.Collector;
 import io.github.genie.sql.api.Query.OrderBy;
 import io.github.genie.sql.api.Query.OrderOperator;
 import io.github.genie.sql.api.Query.QueryStructureBuilder;
+import io.github.genie.sql.api.Query.SubQueryBuilder;
 import io.github.genie.sql.api.Root;
 import io.github.genie.sql.api.Slice;
 import io.github.genie.sql.api.Sliceable;
@@ -89,6 +90,11 @@ public class OrderOperatorImpl<T, U> implements OrderOperator<T, U> {
     @Override
     public QueryStructureBuilder buildMetadata() {
         return asc().buildMetadata();
+    }
+
+    @Override
+    public <X> SubQueryBuilder<X, U> asSubQuery() {
+        return asc().asSubQuery();
     }
 
     @Override

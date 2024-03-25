@@ -1578,6 +1578,18 @@ public class GenericApiTest {
         System.out.println(users);
     }
 
+    @ParameterizedTest
+    @ArgumentsSource(UserQueryProvider.class)
+    public void subQueryTest(Select<User> userQuery) {
+        TypedExpression<User, List<Integer>> ids = userQuery
+                .select(User::getId).where(User::getId)
+                .in(1, 2, 3)
+                .asSubQuery();
+
+        List<User> result = userQuery.where(User::getId).in(ids).getList();
+        System.out.println(result);
+    }
+
     private IntStream getUserIdStream() {
         return allUsers.stream().mapToInt(User::getRandomNumber);
     }

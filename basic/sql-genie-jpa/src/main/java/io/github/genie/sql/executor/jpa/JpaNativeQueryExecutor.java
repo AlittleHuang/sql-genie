@@ -1,5 +1,6 @@
 package io.github.genie.sql.executor.jpa;
 
+import io.github.genie.sql.api.Column;
 import io.github.genie.sql.api.QueryStructure;
 import io.github.genie.sql.api.Selection;
 import io.github.genie.sql.api.Selection.EntitySelected;
@@ -9,8 +10,11 @@ import io.github.genie.sql.api.Selection.SingleSelected;
 import io.github.genie.sql.builder.AbstractQueryExecutor;
 import io.github.genie.sql.builder.Tuples;
 import io.github.genie.sql.builder.TypeCastUtil;
+import io.github.genie.sql.builder.converter.TypeConverter;
 import io.github.genie.sql.builder.meta.Attribute;
+import io.github.genie.sql.builder.meta.EntityType;
 import io.github.genie.sql.builder.meta.Metamodel;
+import io.github.genie.sql.builder.meta.Type;
 import io.github.genie.sql.builder.reflect.InstanceConstructor;
 import io.github.genie.sql.builder.reflect.ReflectUtil;
 import io.github.genie.sql.executor.jdbc.JdbcQueryExecutor.PreparedSql;
@@ -20,16 +24,19 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class JpaNativeQueryExecutor implements AbstractQueryExecutor {
     private final QuerySqlBuilder sqlBuilder;
     private final EntityManager entityManager;
     private final Metamodel metamodel;
+    private final TypeConverter typeConverter;
 
-    public JpaNativeQueryExecutor(QuerySqlBuilder sqlBuilder, EntityManager entityManager, Metamodel metamodel) {
+    public JpaNativeQueryExecutor(QuerySqlBuilder sqlBuilder, EntityManager entityManager, Metamodel metamodel, TypeConverter typeConverter) {
         this.sqlBuilder = sqlBuilder;
         this.entityManager = entityManager;
         this.metamodel = metamodel;
+        this.typeConverter = typeConverter;
     }
 
     @Override
@@ -54,20 +61,37 @@ public class JpaNativeQueryExecutor implements AbstractQueryExecutor {
             List<? extends Attribute> selected,
             QueryStructure structure) {
         List<T> result = new ArrayList<>(resultSet.size());
-        Selection select = structure.select();
         if (resultSet.isEmpty()) {
-            return new ArrayList<>();
+            return result;
         }
+        Selection select = structure.select();
         int columnsCount = asArray(resultSet.get(0)).length;
 
         if (select instanceof MultiSelected multiSelected) {
             if (multiSelected.expressions().size() != columnsCount) {
                 throw new IllegalStateException();
             }
+            List<Class<?>> types = multiSelected.expressions().stream()
+                    .map(expression -> {
+                        if (expression instanceof Column) {
+                            Type t = metamodel.getEntity(structure.from().type());
+                            //noinspection PatternVariableCanBeUsed
+                            Column column = (Column) expression;
+                            for (String s : column) {
+                                t = ((EntityType) t).getAttribute(s);
+                            }
+                            return t.javaType();
+                        }
+                        return Object.class;
+                    })
+                    .collect(Collectors.toList());
             for (Object r : resultSet) {
                 Object[] row = asArray(r);
-                if (multiSelected.expressions().size() != columnsCount) {
-                    throw new IllegalStateException();
+                if (typeConverter != null) {
+                    for (int i = 0; i < selected.size(); i++) {
+                        Class<?> attribute = types.get(i);
+                        row[i] = typeConverter.convert(row[i], attribute);
+                    }
                 }
                 result.add(TypeCastUtil.unsafeCast(Tuples.of(row)));
             }
@@ -86,7 +110,14 @@ public class JpaNativeQueryExecutor implements AbstractQueryExecutor {
             Class<?> resultType = getResultType(structure);
             InstanceConstructor extractor = ReflectUtil.getRowInstanceConstructor(selected, resultType);
             for (Object r : resultSet) {
-                T row = TypeCastUtil.unsafeCast(extractor.newInstance(asArray(r)));
+                Object[] array = asArray(r);
+                if (typeConverter != null) {
+                    for (int i = 0; i < selected.size(); i++) {
+                        Attribute attribute = selected.get(i);
+                        array[i] = typeConverter.convert(array[i], attribute.javaType());
+                    }
+                }
+                T row = TypeCastUtil.unsafeCast(extractor.newInstance(array));
                 result.add(row);
             }
         }

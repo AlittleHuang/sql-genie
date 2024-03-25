@@ -1,6 +1,7 @@
 package io.github.genie.sql.test;
 
 import io.github.genie.sql.api.Updater;
+import io.github.genie.sql.builder.converter.TypeConverter;
 import io.github.genie.sql.executor.jdbc.JdbcUpdate;
 import io.github.genie.sql.executor.jdbc.MySqlQuerySqlBuilder;
 import io.github.genie.sql.executor.jdbc.MysqlUpdateSqlBuilder;
@@ -40,7 +41,7 @@ public class UserUpdaterProvider implements ArgumentsProvider {
     private static Updater<User> jpa() {
         EntityManager em = EntityManagers.getEntityManager();
         MySqlQuerySqlBuilder sqlBuilder = new MySqlQuerySqlBuilder();
-        JpaQueryExecutor jpaQueryExecutor = new JpaQueryExecutor(em, JpaMetamodel.of(), sqlBuilder);
+        JpaQueryExecutor jpaQueryExecutor = new JpaQueryExecutor(em, JpaMetamodel.of(), sqlBuilder, TypeConverter.ofDefault());
         return new JpaUpdate(em, jpaQueryExecutor).getUpdater(User.class);
     }
 }

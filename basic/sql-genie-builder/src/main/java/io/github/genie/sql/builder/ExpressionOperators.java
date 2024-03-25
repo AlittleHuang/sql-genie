@@ -6,6 +6,7 @@ import io.github.genie.sql.api.ExpressionOperator.ComparableOperator;
 import io.github.genie.sql.api.ExpressionOperator.NumberOperator;
 import io.github.genie.sql.api.ExpressionOperator.PathOperator;
 import io.github.genie.sql.api.ExpressionOperator.StringOperator;
+import io.github.genie.sql.api.Lists;
 import io.github.genie.sql.api.Path;
 import io.github.genie.sql.api.Path.ComparablePath;
 import io.github.genie.sql.api.Path.NumberPath;
@@ -94,6 +95,12 @@ public class ExpressionOperators {
         @Override
         public B in(@NotNull List<? extends TypedExpression<T, U>> expressions) {
             return resultBuilder.apply(base.in(expressions));
+        }
+
+        @Override
+        public B in(@NotNull TypedExpression<T, List<U>> expressions) {
+            List<TypedExpression<T, U>> in = TypeCastUtil.unsafeCast(Lists.of(expressions));
+            return resultBuilder.apply(base.in(in));
         }
 
         @Override

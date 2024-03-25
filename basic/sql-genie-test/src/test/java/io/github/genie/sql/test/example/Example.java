@@ -2,6 +2,7 @@ package io.github.genie.sql.test.example;
 
 import io.github.genie.sql.api.Query;
 import io.github.genie.sql.api.Query.Select;
+import io.github.genie.sql.builder.converter.TypeConverter;
 import io.github.genie.sql.builder.util.Paths;
 import io.github.genie.sql.executor.jdbc.MySqlQuerySqlBuilder;
 import io.github.genie.sql.executor.jpa.JpaQueryExecutor;
@@ -25,7 +26,7 @@ public class Example {
         properties.put("javax.persistence.jdbc.password", config.getPassword());
         try (EntityManagerFactory factory = Persistence.createEntityManagerFactory("org.hibernate.jpa", properties)) {
             EntityManager em = factory.createEntityManager();
-            Query builder = new JpaQueryExecutor(em, JpaMetamodel.of(), new MySqlQuerySqlBuilder()).createQuery();
+            Query builder = new JpaQueryExecutor(em, JpaMetamodel.of(), new MySqlQuerySqlBuilder(), TypeConverter.ofDefault()).createQuery();
             Select<Employee> select0 = builder.from(Employee.class);
             runExample(select0);
         }

@@ -2,6 +2,7 @@ package io.github.genie.sql.test;
 
 import io.github.genie.sql.api.Query;
 import io.github.genie.sql.api.Query.Select;
+import io.github.genie.sql.builder.converter.TypeConverter;
 import io.github.genie.sql.executor.jdbc.ConnectionProvider;
 import io.github.genie.sql.executor.jdbc.JdbcQueryExecutor;
 import io.github.genie.sql.executor.jdbc.JdbcResultCollector;
@@ -74,7 +75,7 @@ public class UserQueryProvider implements ArgumentsProvider {
 
     public static Query jpaQuery() {
         EntityManager manager = EntityManagers.getEntityManager();
-        return new JpaQueryExecutor(manager, JpaMetamodel.of(), new MySqlQuerySqlBuilder())
+        return new JpaQueryExecutor(manager, JpaMetamodel.of(), new MySqlQuerySqlBuilder(), TypeConverter.ofDefault())
                 .createQuery(new TestPostProcessor());
     }
 

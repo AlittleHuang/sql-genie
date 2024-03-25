@@ -3,8 +3,9 @@ package io.github.genie.sql.executor.jpa;
 import io.github.genie.sql.api.Column;
 import io.github.genie.sql.api.Expression;
 import io.github.genie.sql.api.From;
-import io.github.genie.sql.api.From.SubQuery;
+import io.github.genie.sql.api.From.FromSubQuery;
 import io.github.genie.sql.api.Lists;
+import io.github.genie.sql.api.Operation;
 import io.github.genie.sql.api.Order;
 import io.github.genie.sql.api.Order.SortOrder;
 import io.github.genie.sql.api.QueryStructure;
@@ -13,10 +14,12 @@ import io.github.genie.sql.api.Selection.EntitySelected;
 import io.github.genie.sql.api.Selection.MultiSelected;
 import io.github.genie.sql.api.Selection.ProjectionSelected;
 import io.github.genie.sql.api.Selection.SingleSelected;
+import io.github.genie.sql.api.SubQuery;
 import io.github.genie.sql.builder.AbstractQueryExecutor;
 import io.github.genie.sql.builder.Expressions;
 import io.github.genie.sql.builder.Tuples;
 import io.github.genie.sql.builder.TypeCastUtil;
+import io.github.genie.sql.builder.converter.TypeConverter;
 import io.github.genie.sql.builder.meta.Attribute;
 import io.github.genie.sql.builder.meta.Metamodel;
 import io.github.genie.sql.builder.meta.Projection;
@@ -47,9 +50,13 @@ public class JpaQueryExecutor implements AbstractQueryExecutor {
     private final JpaNativeQueryExecutor nativeQueryExecutor;
 
     public JpaQueryExecutor(EntityManager entityManager, Metamodel metamodel, QuerySqlBuilder querySqlBuilder) {
+        this(entityManager, metamodel, querySqlBuilder, TypeConverter.ofDefault());
+    }
+
+    public JpaQueryExecutor(EntityManager entityManager, Metamodel metamodel, QuerySqlBuilder querySqlBuilder, TypeConverter converter) {
         this.entityManager = entityManager;
         this.metamodel = metamodel;
-        nativeQueryExecutor = new JpaNativeQueryExecutor(querySqlBuilder, entityManager, metamodel);
+        this.nativeQueryExecutor = new JpaNativeQueryExecutor(querySqlBuilder, entityManager, metamodel, converter);
     }
 
     @Override
@@ -92,8 +99,45 @@ public class JpaQueryExecutor implements AbstractQueryExecutor {
 
     private boolean requiredNativeQuery(@NotNull QueryStructure queryStructure) {
         From from = queryStructure.from();
-        return from instanceof SubQuery
-               || metamodel.getEntity(from.type()) instanceof SubSelectType;
+        return from instanceof FromSubQuery
+               || metamodel.getEntity(from.type()) instanceof SubSelectType
+               || hasSubQuery(queryStructure);
+    }
+
+    private boolean hasSubQuery(QueryStructure queryStructure) {
+        return hasSubQuery(queryStructure.where())
+               || hasSubQuery(queryStructure.groupBy())
+               || hasSubQuery(queryStructure.orderBy())
+               || hasSubQuery(queryStructure.having());
+    }
+
+    private boolean hasSubQuery(List<? extends Order<?>> orders) {
+        for (Order<?> order : orders) {
+            if (hasSubQuery(order.expression())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean hasSubQuery(Collection<? extends Expression> expressions) {
+        for (Expression operand : expressions) {
+            if (hasSubQuery(operand)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean hasSubQuery(Expression expression) {
+        if (expression instanceof SubQuery) {
+            return true;
+        }
+        if (expression instanceof Operation) {
+            List<? extends Expression> expressions = ((Operation) expression).operands();
+            return hasSubQuery(expressions);
+        }
+        return false;
     }
 
 

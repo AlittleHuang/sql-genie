@@ -22,6 +22,7 @@ import io.github.genie.sql.api.Query.OrderBy;
 import io.github.genie.sql.api.Query.OrderOperator;
 import io.github.genie.sql.api.Query.QueryStructureBuilder;
 import io.github.genie.sql.api.Query.SliceQueryStructure;
+import io.github.genie.sql.api.Query.SubQueryBuilder;
 import io.github.genie.sql.api.Query.Where0;
 import io.github.genie.sql.api.QueryExecutor;
 import io.github.genie.sql.api.QueryStructure;
@@ -33,6 +34,7 @@ import io.github.genie.sql.api.TypedExpression.BasicExpression;
 import io.github.genie.sql.builder.QueryStructures.FromSubQuery;
 import io.github.genie.sql.builder.QueryStructures.QueryStructureImpl;
 import io.github.genie.sql.builder.QueryStructures.SingleSelectedImpl;
+import io.github.genie.sql.builder.QueryStructures.SubQueryExpr;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -249,6 +251,11 @@ public class QueryConditionBuilder<T, U> implements Where0<T, U>, Having<T, U>, 
     }
 
     @Override
+    public <X> SubQueryBuilder<X, U> asSubQuery() {
+        return new SubQuery<>();
+    }
+
+    @Override
     public Having<T, U> groupBy(List<? extends TypedExpression<T, ?>> expressions) {
         QueryStructureImpl structure = queryStructure.copy();
         structure.groupBy = expressions.stream()
@@ -313,6 +320,46 @@ public class QueryConditionBuilder<T, U> implements Where0<T, U>, Having<T, U>, 
     @Override
     public <N> PathOperator<T, N, Where0<T, U>> where(Path<T, N> path) {
         return ExpressionOperators.ofPath(root().get(path), this::whereAnd);
+    }
+
+
+    class SubQuery<X> implements SubQueryBuilder<X, U> {
+
+        @Override
+        public TypedExpression<X, Long> count() {
+            QueryStructure structure = buildCountData();
+            structure = structurePostProcessor.preCountQuery(QueryConditionBuilder.this, structure);
+            return TypedExpressions.of(new SubQueryExpr(structure));
+        }
+
+        @Override
+        public TypedExpression<X, List<U>> slice(int offset, int maxResult) {
+            QueryStructure structure = buildListData(offset, maxResult, null);
+            structure = structurePostProcessor.preListQuery(QueryConditionBuilder.this, structure);
+            return TypedExpressions.of(new SubQueryExpr(structure));
+        }
+
+        @Override
+        public TypedExpression<X, U> getSingle(int offset) {
+            QueryStructure structure = buildListData(offset, 2, null);
+            structure = structurePostProcessor.preListQuery(QueryConditionBuilder.this, structure);
+            return TypedExpressions.of(new SubQueryExpr(structure));
+        }
+
+        @Override
+        public TypedExpression<X, U> getFirst(int offset) {
+            QueryStructure structure = buildListData(offset, 1, null);
+            structure = structurePostProcessor.preListQuery(QueryConditionBuilder.this, structure);
+            return TypedExpressions.of(new SubQueryExpr(structure));
+        }
+
+        @Override
+        public Expression expression() {
+            QueryStructure structure = buildListData(-1, -1, null);
+            structure = structurePostProcessor.preListQuery(QueryConditionBuilder.this, structure);
+            return new SubQueryExpr(structure);
+        }
+
     }
 
 }

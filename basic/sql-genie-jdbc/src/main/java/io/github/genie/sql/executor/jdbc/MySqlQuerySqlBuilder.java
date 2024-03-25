@@ -5,7 +5,7 @@ import io.github.genie.sql.api.Constant;
 import io.github.genie.sql.api.Expression;
 import io.github.genie.sql.api.From;
 import io.github.genie.sql.api.From.Entity;
-import io.github.genie.sql.api.From.SubQuery;
+import io.github.genie.sql.api.From.FromSubQuery;
 import io.github.genie.sql.api.Lists;
 import io.github.genie.sql.api.LockModeType;
 import io.github.genie.sql.api.Operation;
@@ -18,6 +18,7 @@ import io.github.genie.sql.api.Selection.EntitySelected;
 import io.github.genie.sql.api.Selection.MultiSelected;
 import io.github.genie.sql.api.Selection.ProjectionSelected;
 import io.github.genie.sql.api.Selection.SingleSelected;
+import io.github.genie.sql.api.SubQuery;
 import io.github.genie.sql.builder.Expressions;
 import io.github.genie.sql.builder.meta.AnyToOneAttribute;
 import io.github.genie.sql.builder.meta.Attribute;
@@ -236,9 +237,9 @@ public class MySqlQuerySqlBuilder implements QuerySqlBuilder {
             From from = queryStructure.from();
             if (from instanceof Entity) {
                 appendFromTable();
-            } else if (from instanceof SubQuery) {
-                SubQuery subQuery = (SubQuery) from;
-                appendSubQuery(subQuery.queryStructure());
+            } else if (from instanceof FromSubQuery) {
+                FromSubQuery subQuery = (FromSubQuery) from;
+                appendExpression(subQuery);
             }
             appendFromAlias();
         }
@@ -246,7 +247,7 @@ public class MySqlQuerySqlBuilder implements QuerySqlBuilder {
         private void appendSubQuery(QueryStructure queryStructure) {
             sql.append('(');
             new Builder(sql, args, queryStructure, mappers, selectIndex, subIndex + 1).doBuilder();
-            sql.append(") ");
+            sql.append(')');
         }
 
         private void appendFromTable() {
@@ -316,6 +317,8 @@ public class MySqlQuerySqlBuilder implements QuerySqlBuilder {
             } else if (expression instanceof Operation) {
                 Operation operation = (Operation) expression;
                 appendOperation(args, operation);
+            } else if (expression instanceof SubQuery) {
+                appendSubQuery(((SubQuery) expression).queryStructure());
             } else {
                 throw new UnsupportedOperationException("unknown type " + expression.getClass());
             }
