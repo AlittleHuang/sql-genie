@@ -30,10 +30,6 @@ import io.github.genie.sql.api.Selection;
 import io.github.genie.sql.api.Selection.MultiSelected;
 import io.github.genie.sql.api.TypedExpression;
 import io.github.genie.sql.api.TypedExpression.BasicExpression;
-import io.github.genie.sql.builder.DefaultExpressionOperator.ComparableOperatorImpl;
-import io.github.genie.sql.builder.DefaultExpressionOperator.NumberOperatorImpl;
-import io.github.genie.sql.builder.DefaultExpressionOperator.PathOperatorImpl;
-import io.github.genie.sql.builder.DefaultExpressionOperator.StringOperatorImpl;
 import io.github.genie.sql.builder.QueryStructures.FromSubQuery;
 import io.github.genie.sql.builder.QueryStructures.QueryStructureImpl;
 import io.github.genie.sql.builder.QueryStructures.SingleSelectedImpl;
@@ -287,12 +283,12 @@ public class QueryConditionBuilder<T, U> implements Where0<T, U>, Having<T, U>, 
 
     @Override
     public <N extends Number & Comparable<N>> NumberOperator<T, N, Where0<T, U>> where(NumberPath<T, N> path) {
-        return new NumberOperatorImpl<>(root().get(path), this::whereAnd);
+        return ExpressionOperators.ofNumber(root().get(path), this::whereAnd);
     }
 
     @Override
     public <N extends Comparable<N>> ComparableOperator<T, N, Where0<T, U>> where(ComparablePath<T, N> path) {
-        return new ComparableOperatorImpl<>(root().get(path), this::whereAnd);
+        return ExpressionOperators.ofComparable(root().get(path), this::whereAnd);
     }
 
     @NotNull
@@ -307,7 +303,7 @@ public class QueryConditionBuilder<T, U> implements Where0<T, U>, Having<T, U>, 
 
     @Override
     public StringOperator<T, Where0<T, U>> where(StringPath<T> path) {
-        return new StringOperatorImpl<>(root().get(path), this::whereAnd);
+        return ExpressionOperators.ofString(root().get(path), this::whereAnd);
     }
 
     public Root<T> root() {
@@ -316,7 +312,7 @@ public class QueryConditionBuilder<T, U> implements Where0<T, U>, Having<T, U>, 
 
     @Override
     public <N> PathOperator<T, N, Where0<T, U>> where(Path<T, N> path) {
-        return new PathOperatorImpl<>(root().get(path), this::whereAnd);
+        return ExpressionOperators.ofPath(root().get(path), this::whereAnd);
     }
 
 }

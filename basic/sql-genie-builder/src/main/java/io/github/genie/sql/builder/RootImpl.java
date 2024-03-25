@@ -1,6 +1,5 @@
 package io.github.genie.sql.builder;
 
-import io.github.genie.sql.api.Operation;
 import io.github.genie.sql.api.Path;
 import io.github.genie.sql.api.Path.BooleanPath;
 import io.github.genie.sql.api.Path.ComparablePath;
@@ -13,10 +12,6 @@ import io.github.genie.sql.api.TypedExpression.ComparablePathExpression;
 import io.github.genie.sql.api.TypedExpression.EntityPathExpression;
 import io.github.genie.sql.api.TypedExpression.NumberPathExpression;
 import io.github.genie.sql.api.TypedExpression.StringPathExpression;
-import io.github.genie.sql.builder.TypedExpressionImpl.BooleanExpressionImpl;
-import io.github.genie.sql.builder.TypedExpressionImpl.ComparableExpressionImpl;
-import io.github.genie.sql.builder.TypedExpressionImpl.NumberExpressionImpl;
-import io.github.genie.sql.builder.TypedExpressionImpl.StringExpressionImpl;
 
 public class RootImpl<T> implements Root<T> {
 
@@ -36,12 +31,12 @@ public class RootImpl<T> implements Root<T> {
 
     @Override
     public <U> EntityPathExpression<T, U> entity(Path<T, U> path) {
-        return new TypedExpressionImpl<>((Operation) null, Expressions.of(path));
+        return TypedExpressions.ofEntity(Expressions.of(path));
     }
 
     @Override
     public <U> EntityPathExpression<T, U> get(Path<T, U> path) {
-        return new TypedExpressionImpl<>((Operation) null, Expressions.of(path));
+        return TypedExpressions.ofEntity(Expressions.of(path));
     }
 
     @Override
@@ -66,22 +61,22 @@ public class RootImpl<T> implements Root<T> {
 
     @Override
     public StringPathExpression<T> string(Path<T, String> path) {
-        return new StringExpressionImpl<>((Operation) null, Expressions.of(path));
+        return TypedExpressions.ofString(Expressions.of(path));
     }
 
     @Override
     public <U extends Number & Comparable<U>> NumberPathExpression<T, U> number(Path<T, U> path) {
-        return new NumberExpressionImpl<>((Operation) null, Expressions.of(path));
+        return TypedExpressions.ofNumber(Expressions.of(path));
     }
 
     @Override
     public <U extends Comparable<U>> ComparablePathExpression<T, U> comparable(Path<T, U> path) {
-        return new ComparableExpressionImpl<>((Operation) null, Expressions.of(path));
+        return TypedExpressions.ofComparable(Expressions.of(path));
     }
 
     @Override
     public BooleanPathExpression<T> bool(Path<T, Boolean> path) {
-        return new BooleanExpressionImpl<>((Operation) null, Expressions.of(path));
+        return TypedExpressions.ofBoolean(Expressions.of(path));
     }
 
 }
