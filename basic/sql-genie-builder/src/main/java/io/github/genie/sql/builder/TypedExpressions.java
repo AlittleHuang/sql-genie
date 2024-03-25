@@ -93,24 +93,24 @@ public class TypedExpressions {
         return new _Comparable<>((Operation) null, column);
     }
 
-    public static <T, R> BasicExpression<T, R> ofPath(Expression column) {
-        return new _Basic<>((Operation) null, column);
+    public static <T, R> BasicExpression<T, R> ofBasic(Expression expression) {
+        return new _Basic<>((Operation) null, expression);
     }
 
-    public static <T> StringExpression<T> ofString(Expression column) {
-        return new _String<>((Operation) null, column);
+    public static <T> StringExpression<T> ofString(Expression expression) {
+        return new _String<>((Operation) null, expression);
     }
 
-    public static <T> BooleanExpression<T> ofBoolean(Expression column) {
-        return new _Boolean<>((Operation) null, column);
+    public static <T> BooleanExpression<T> ofBoolean(Expression expression) {
+        return new _Boolean<>((Operation) null, expression);
     }
 
-    public static <T, U extends Number & Comparable<U>> NumberExpression<T, U> ofNumber(Expression column) {
-        return new _Number<>((Operation) null, column);
+    public static <T, U extends Number & Comparable<U>> NumberExpression<T, U> ofNumber(Expression expression) {
+        return new _Number<>((Operation) null, expression);
     }
 
-    public static <T, U extends Comparable<U>> ComparableExpression<T, U> ofComparable(Expression column) {
-        return new _Comparable<>((Operation) null, column);
+    public static <T, U extends Comparable<U>> ComparableExpression<T, U> ofComparable(Expression expression) {
+        return new _Comparable<>((Operation) null, expression);
     }
 
     static class _Basic<T, U> implements BasicExpression<T, U>, EntityPathExpression<T, U> {
