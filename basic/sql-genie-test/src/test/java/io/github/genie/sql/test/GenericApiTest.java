@@ -29,10 +29,12 @@ import io.github.genie.sql.executor.jdbc.MySqlQuerySqlBuilder;
 import io.github.genie.sql.executor.jdbc.MysqlUpdateSqlBuilder;
 import io.github.genie.sql.meta.JpaMetamodel;
 import io.github.genie.sql.test.entity.User;
+import io.github.genie.sql.test.entity.UserSummary;
 import io.github.genie.sql.test.projection.UserInterface;
 import io.github.genie.sql.test.projection.UserModel;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 
@@ -1594,4 +1596,15 @@ public class GenericApiTest {
         return allUsers.stream().mapToInt(User::getRandomNumber);
     }
 
+    @Test
+    void test() {
+        test(UserQueryProvider.jpaQuery());
+        test(UserQueryProvider.jdbcQuery());
+    }
+
+    private static void test(Query query) {
+        Select<UserSummary> from = query.from(UserSummary.class);
+        List<UserSummary> list = from.where(UserSummary::getMaxRandomNumber).eq(33).getList();
+        System.out.println(list);
+    }
 }
