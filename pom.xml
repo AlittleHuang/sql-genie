@@ -6,21 +6,43 @@
 
   <groupId>io.github.genie-cloud</groupId>
   <artifactId>sql-genie</artifactId>
-  <version>1.1.0-jdk8</version>
+  <version>1.1.1-SNAPSHOT</version><!-- project version -->
 
   <packaging>pom</packaging>
 
   <modules>
-    <module>sql-genie-test</module>
-    <module>sql-genie-api</module>
-    <module>sql-genie-builder</module>
-    <module>sql-genie-jdbc</module>
-    <module>sql-genie-jpa</module>
-    <module>sql-genie-jpa-metamodel</module>
+    <module>basic/sql-genie-test</module>
+    <module>basic/sql-genie-api</module>
+    <module>basic/sql-genie-builder</module>
+    <module>basic/sql-genie-jdbc</module>
+    <module>basic/sql-genie-jpa</module>
+    <module>basic/sql-genie-jpa-metamodel</module>
+    <module>spring-boot-starters/spring-boot-starter-sql-genie-common</module>
+    <module>spring-boot-starters/spring-boot-starter-sql-genie-jdbc</module>
+    <module>spring-boot-starters/spring-boot-starter-sql-genie-jpa</module>
+    <module>example/spring-sql-genie-jdbc-example</module>
+    <module>example/spring-sql-genie-jpa-example</module>
   </modules>
+
+  <properties>
+    <maven.compiler.source>8</maven.compiler.source>
+    <maven.compiler.target>8</maven.compiler.target>
+    <maven.compiler.release>8</maven.compiler.release>
+    <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <lombok.version>1.18.30</lombok.version>
+    <spring.boot.version>3.2.3</spring.boot.version>
+  </properties>
 
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-dependencies</artifactId>
+        <version>${spring.boot.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
 
       <dependency>
         <groupId>org.junit</groupId>
@@ -74,15 +96,6 @@
     </dependencies>
   </dependencyManagement>
 
-  <properties>
-    <maven.compiler.source>8</maven.compiler.source>
-    <maven.compiler.target>8</maven.compiler.target>
-    <maven.compiler.release>8</maven.compiler.release>
-    <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <lombok.version>1.18.30</lombok.version>
-  </properties>
-
   <licenses>
     <license>
       <name>The Apache Software License, Version 2.0</name>
@@ -129,6 +142,11 @@
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-deploy-plugin</artifactId>
+          <version>3.1.1</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-source-plugin</artifactId>
           <version>3.3.0</version>
         </plugin>
@@ -164,10 +182,6 @@
           <source>${maven.compiler.source}</source>
           <target>${maven.compiler.target}</target>
           <release>${maven.compiler.release}</release>
-          <compilerArgs>
-            <arg>--module-path</arg>
-            <arg>${java.home}/jmods</arg>
-          </compilerArgs>
           <annotationProcessorPaths>
             <annotationProcessorPath>
               <groupId>org.projectlombok</groupId>
