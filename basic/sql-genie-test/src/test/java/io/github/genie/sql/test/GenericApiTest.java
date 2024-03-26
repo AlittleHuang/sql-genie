@@ -1606,7 +1606,6 @@ public class GenericApiTest {
     private static void test(Query query) {
         Select<UserSummary> from = query.from(UserSummary.class);
         List<UserSummary> list = from.where(UserSummary::getMaxRandomNumber).le(33).getList();
-        System.out.println(list);
         Map<String, List<User>> map = allUsers.stream().collect(Collectors.groupingBy(User::getUsername));
         Map<String, UserSummary> summaryMap = new HashMap<>();
         map.forEach((k, v) -> {
@@ -1623,6 +1622,7 @@ public class GenericApiTest {
         for (UserSummary summary : list) {
             UserSummary s = summaryMap.get(summary.getUsername());
             assertEquals(s, summary);
+            assertTrue(summary.getMaxRandomNumber() <= 33);
         }
     }
 }
