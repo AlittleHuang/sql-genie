@@ -10,5 +10,5 @@ public class UserSummary {
     @Id
     private String username;
     private Integer maxRandomNumber;
-    private Integer count;
+    private Long count;
 }
