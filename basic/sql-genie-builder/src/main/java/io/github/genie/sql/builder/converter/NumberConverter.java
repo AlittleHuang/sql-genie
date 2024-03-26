@@ -1,6 +1,7 @@
 package io.github.genie.sql.builder.converter;
 
 import io.github.genie.sql.api.Lists;
+import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -12,6 +13,7 @@ import java.util.function.Function;
  * @author HuangChengwei
  * @since 2024-03-25 11:57
  */
+@Slf4j
 public class NumberConverter implements TypeConverter {
 
     private static final List<Class<? extends Number>> BASIC_NUMBER_TYPES = Lists.of(
@@ -24,7 +26,8 @@ public class NumberConverter implements TypeConverter {
             Number::doubleValue, Number::byteValue, Number::shortValue,
             Number::intValue, Number::longValue, Number::floatValue,
             Number::doubleValue, Number::byteValue, Number::shortValue,
-            n -> new BigInteger(String.valueOf(n)), n -> new BigDecimal(String.valueOf(n))
+            n -> new BigDecimal(String.valueOf(n)).toBigInteger(),
+            n -> new BigDecimal(String.valueOf(n))
     );
 
     private static final NumberConverter INSTANCE = new NumberConverter();
@@ -41,7 +44,12 @@ public class NumberConverter implements TypeConverter {
         if (value == null || targetType.isInstance(value)) {
             return value;
         }
-        return doConvert(value, targetType);
+        try {
+            return doConvert(value, targetType);
+        } catch (Exception e) {
+            log.warn(value.getClass() + "[" + value + "] cast to " + targetType + " failed", e);
+            return value;
+        }
     }
 
     private static Object doConvert(Object value, Class<?> targetType) {
