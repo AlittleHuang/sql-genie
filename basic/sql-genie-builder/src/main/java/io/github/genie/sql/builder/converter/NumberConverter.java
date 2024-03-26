@@ -2,6 +2,8 @@ package io.github.genie.sql.builder.converter;
 
 import io.github.genie.sql.api.Lists;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
@@ -14,13 +16,15 @@ public class NumberConverter implements TypeConverter {
 
     private static final List<Class<? extends Number>> BASIC_NUMBER_TYPES = Lists.of(
             int.class, long.class, float.class, double.class, byte.class, short.class,
-            Integer.class, Long.class, Float.class, Double.class, Byte.class, Short.class
+            Integer.class, Long.class, Float.class, Double.class, Byte.class, Short.class,
+            BigInteger.class, BigDecimal.class
     );
     private static final List<Function<Number, Number>> VALUE_FUNCTIONS = Lists.of(
             Number::intValue, Number::longValue, Number::floatValue,
             Number::doubleValue, Number::byteValue, Number::shortValue,
             Number::intValue, Number::longValue, Number::floatValue,
-            Number::doubleValue, Number::byteValue, Number::shortValue
+            Number::doubleValue, Number::byteValue, Number::shortValue,
+            n -> new BigInteger(String.valueOf(n)), n -> new BigDecimal(String.valueOf(n))
     );
 
     private static final NumberConverter INSTANCE = new NumberConverter();
