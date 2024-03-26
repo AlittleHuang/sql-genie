@@ -45,6 +45,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -1604,7 +1605,24 @@ public class GenericApiTest {
 
     private static void test(Query query) {
         Select<UserSummary> from = query.from(UserSummary.class);
-        List<UserSummary> list = from.where(UserSummary::getMaxRandomNumber).eq(33).getList();
+        List<UserSummary> list = from.where(UserSummary::getMaxRandomNumber).le(33).getList();
         System.out.println(list);
+        Map<String, List<User>> map = allUsers.stream().collect(Collectors.groupingBy(User::getUsername));
+        Map<String, UserSummary> summaryMap = new HashMap<>();
+        map.forEach((k, v) -> {
+            UserSummary summary = new UserSummary();
+            summary.setCount((long) v.size());
+            summary.setUsername(k);
+            int maxRandomNumber = Integer.MIN_VALUE;
+            for (User user : v) {
+                maxRandomNumber = Math.max(maxRandomNumber, user.getRandomNumber());
+            }
+            summary.setMaxRandomNumber(maxRandomNumber);
+            summaryMap.put(k, summary);
+        });
+        for (UserSummary summary : list) {
+            UserSummary s = summaryMap.get(summary.getUsername());
+            assertEquals(s, summary);
+        }
     }
 }
