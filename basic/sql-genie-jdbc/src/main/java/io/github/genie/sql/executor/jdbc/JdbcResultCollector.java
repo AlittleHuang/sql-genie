@@ -1,6 +1,5 @@
 package io.github.genie.sql.executor.jdbc;
 
-import io.github.genie.sql.api.Column;
 import io.github.genie.sql.api.QueryStructure;
 import io.github.genie.sql.api.Selection;
 import io.github.genie.sql.api.Selection.EntitySelected;
@@ -9,9 +8,9 @@ import io.github.genie.sql.api.Selection.ProjectionSelected;
 import io.github.genie.sql.api.Selection.SingleSelected;
 import io.github.genie.sql.builder.Tuples;
 import io.github.genie.sql.builder.TypeCastUtil;
+import io.github.genie.sql.builder.ExpressionTypeResolver;
 import io.github.genie.sql.builder.meta.Attribute;
-import io.github.genie.sql.builder.meta.EntityType;
-import io.github.genie.sql.builder.meta.Type;
+import io.github.genie.sql.builder.meta.Metamodel;
 import io.github.genie.sql.builder.reflect.InstanceConstructor;
 import io.github.genie.sql.builder.reflect.ReflectUtil;
 import io.github.genie.sql.executor.jdbc.JdbcQueryExecutor.ResultCollector;
@@ -27,7 +26,7 @@ import java.util.stream.Collectors;
 public class JdbcResultCollector implements ResultCollector {
     @Override
     public <T> List<T> resolve(ResultSet resultSet,
-                               EntityType entityType,
+                               Metamodel metamodel,
                                List<? extends Attribute> selected,
                                QueryStructure structure) throws SQLException {
         int type = resultSet.getType();
@@ -47,19 +46,9 @@ public class JdbcResultCollector implements ResultCollector {
             if (multiSelected.expressions().size() != columnsCount) {
                 throw new IllegalStateException();
             }
+            ExpressionTypeResolver typeResolver = new ExpressionTypeResolver(metamodel);
             List<Class<?>> types = multiSelected.expressions().stream()
-                    .map(expression -> {
-                        if (expression instanceof Column) {
-                            Type t = entityType;
-                            //noinspection PatternVariableCanBeUsed
-                            Column column = (Column) expression;
-                            for (String s : column) {
-                                t = ((EntityType) t).getAttribute(s);
-                            }
-                            return t.javaType();
-                        }
-                        return Object.class;
-                    })
+                    .map(expr -> typeResolver.getExpressionType(expr, structure.from().type()))
                     .collect(Collectors.toList());
             while (resultSet.next()) {
                 Object[] row = getObjects(resultSet, columnsCount, types);
