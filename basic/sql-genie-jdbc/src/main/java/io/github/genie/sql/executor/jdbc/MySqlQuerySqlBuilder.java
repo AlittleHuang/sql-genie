@@ -402,15 +402,20 @@ public class MySqlQuerySqlBuilder implements QuerySqlBuilder {
                 case AVG:
                 case SUM: {
                     appendOperator(operator);
-                    sql.append('(');
-                    appendExpression(args, leftOperand);
                     List<? extends Expression> operands = operation.operands();
+                    boolean notSingleSubQuery = !(leftOperand instanceof SubQuery) || operands.size() != 1;
+                    if (notSingleSubQuery) {
+                        sql.append('(');
+                    }
+                    appendExpression(args, leftOperand);
                     for (int i = 1; i < operands.size(); i++) {
                         Expression expression = operands.get(i);
                         sql.append(',');
                         appendExpression(args, expression);
                     }
-                    sql.append(")");
+                    if (notSingleSubQuery) {
+                        sql.append(")");
+                    }
                     break;
                 }
                 case IN: {
@@ -420,15 +425,18 @@ public class MySqlQuerySqlBuilder implements QuerySqlBuilder {
                         appendBlank();
                         appendExpression(leftOperand);
                         appendOperator(operator);
-                        char join = '(';
                         List<? extends Expression> operands = operation.operands();
+                        boolean notSingleSubQuery = operands.size() != 2 || !(operands.get(1) instanceof SubQuery);
+                        char join = notSingleSubQuery ? '(' : ' ';
                         for (int i = 1; i < operands.size(); i++) {
                             Expression expression = operands.get(i);
                             sql.append(join);
                             appendExpression(args, expression);
                             join = ',';
                         }
-                        sql.append(")");
+                        if (notSingleSubQuery) {
+                            sql.append(")");
+                        }
                     }
                     break;
                 }
