@@ -154,7 +154,7 @@ public interface TypedExpression<T, U> {
 
         NumberExpression<T, U> sum();
 
-        <R extends Number & Comparable<R>> NumberExpression<T, R> avg();
+        NumberExpression<T, Double> avg();
 
         NumberExpression<T, U> max();
 

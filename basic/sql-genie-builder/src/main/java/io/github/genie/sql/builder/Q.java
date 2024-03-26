@@ -75,7 +75,7 @@ public final class Q {
         return Q.<T>of().get(path).sum();
     }
 
-    public static <T, E extends Number & Comparable<E>> NumberExpression<T, E> avg(NumberPath<T, E> path) {
+    public static <T> NumberExpression<T, Double> avg(NumberPath<T, ?> path) {
         return Q.<T>of().get(path).avg();
     }
 

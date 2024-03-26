@@ -574,7 +574,7 @@ public class TypedExpressions {
         }
 
         @Override
-        public <R extends Number & Comparable<R>> NumberExpression<T, R> avg() {
+        public NumberExpression<T, Double> avg() {
             return new _Number<>(this, operate(Operator.AVG, Lists.of()));
         }
 
