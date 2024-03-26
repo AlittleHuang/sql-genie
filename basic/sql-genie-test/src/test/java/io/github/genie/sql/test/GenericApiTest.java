@@ -29,10 +29,12 @@ import io.github.genie.sql.executor.jdbc.MySqlQuerySqlBuilder;
 import io.github.genie.sql.executor.jdbc.MysqlUpdateSqlBuilder;
 import io.github.genie.sql.meta.JpaMetamodel;
 import io.github.genie.sql.test.entity.User;
+import io.github.genie.sql.test.entity.UserSummary;
 import io.github.genie.sql.test.projection.UserInterface;
 import io.github.genie.sql.test.projection.UserModel;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 
@@ -43,6 +45,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -1596,4 +1599,32 @@ public class GenericApiTest {
         return allUsers.stream().mapToInt(User::getRandomNumber);
     }
 
+    @Test
+    void test() {
+        test(UserQueryProvider.jpaQuery());
+        test(UserQueryProvider.jdbcQuery());
+    }
+
+    private static void test(Query query) {
+        Select<UserSummary> from = query.from(UserSummary.class);
+        List<UserSummary> list = from.where(UserSummary::getMaxRandomNumber).le(33).getList();
+        Map<String, List<User>> map = allUsers.stream().collect(Collectors.groupingBy(User::getUsername));
+        Map<String, UserSummary> summaryMap = new HashMap<>();
+        map.forEach((k, v) -> {
+            UserSummary summary = new UserSummary();
+            summary.setCount((long) v.size());
+            summary.setUsername(k);
+            int maxRandomNumber = Integer.MIN_VALUE;
+            for (User user : v) {
+                maxRandomNumber = Math.max(maxRandomNumber, user.getRandomNumber());
+            }
+            summary.setMaxRandomNumber(maxRandomNumber);
+            summaryMap.put(k, summary);
+        });
+        for (UserSummary summary : list) {
+            UserSummary s = summaryMap.get(summary.getUsername());
+            assertEquals(s, summary);
+            assertTrue(summary.getMaxRandomNumber() <= 33);
+        }
+    }
 }
