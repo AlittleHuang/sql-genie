@@ -1,9 +1,15 @@
 package io.github.genie.sql.data.access;
 
+import io.github.genie.sql.api.Query;
+import io.github.genie.sql.builder.AbstractQueryExecutor;
+import io.github.genie.sql.builder.QueryStructurePostProcessor;
 import io.github.genie.sql.builder.meta.Metamodel;
+import io.github.genie.sql.meta.JpaMetamodel;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.beans.factory.config.DependencyDescriptor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -26,6 +32,22 @@ public class BaseDbAccessConfiguration {
             checkIdType(descriptor, metamodel, entityType);
         }
         return BaseAccessImpl.access(entityType);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    Query genieQuery(AbstractQueryExecutor executor,
+                     @Autowired(required = false)
+                     QueryStructurePostProcessor structurePostProcessor) {
+        return structurePostProcessor != null
+                ? executor.createQuery(structurePostProcessor)
+                : executor.createQuery();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    protected Metamodel genieMetamodel() {
+        return JpaMetamodel.of();
     }
 
     private <T, ID extends Serializable> void checkIdType(DependencyDescriptor descriptor,
