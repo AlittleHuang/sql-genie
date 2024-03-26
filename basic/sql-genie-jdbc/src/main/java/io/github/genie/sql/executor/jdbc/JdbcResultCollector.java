@@ -6,9 +6,9 @@ import io.github.genie.sql.api.Selection.EntitySelected;
 import io.github.genie.sql.api.Selection.MultiSelected;
 import io.github.genie.sql.api.Selection.ProjectionSelected;
 import io.github.genie.sql.api.Selection.SingleSelected;
+import io.github.genie.sql.builder.ExpressionTypeResolver;
 import io.github.genie.sql.builder.Tuples;
 import io.github.genie.sql.builder.TypeCastUtil;
-import io.github.genie.sql.builder.ExpressionTypeResolver;
 import io.github.genie.sql.builder.meta.Attribute;
 import io.github.genie.sql.builder.meta.Metamodel;
 import io.github.genie.sql.builder.reflect.InstanceConstructor;
@@ -42,7 +42,8 @@ public class JdbcResultCollector implements ResultCollector {
         Selection select = structure.select();
         int columnsCount = resultSet.getMetaData().getColumnCount();
 
-        if (select instanceof MultiSelected multiSelected) {
+        if (select instanceof MultiSelected) {
+            MultiSelected multiSelected = (MultiSelected) select;
             if (multiSelected.expressions().size() != columnsCount) {
                 throw new IllegalStateException();
             }
@@ -58,7 +59,6 @@ public class JdbcResultCollector implements ResultCollector {
             if (1 != columnsCount) {
                 throw new IllegalStateException();
             }
-            //noinspection PatternVariableCanBeUsed
             SingleSelected sc = (SingleSelected) select;
             while (resultSet.next()) {
                 T row = getSingleObj(resultSet, sc);

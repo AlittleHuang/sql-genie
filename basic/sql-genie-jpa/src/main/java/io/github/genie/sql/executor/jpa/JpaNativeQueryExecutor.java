@@ -7,9 +7,9 @@ import io.github.genie.sql.api.Selection.MultiSelected;
 import io.github.genie.sql.api.Selection.ProjectionSelected;
 import io.github.genie.sql.api.Selection.SingleSelected;
 import io.github.genie.sql.builder.AbstractQueryExecutor;
+import io.github.genie.sql.builder.ExpressionTypeResolver;
 import io.github.genie.sql.builder.Tuples;
 import io.github.genie.sql.builder.TypeCastUtil;
-import io.github.genie.sql.builder.ExpressionTypeResolver;
 import io.github.genie.sql.builder.converter.TypeConverter;
 import io.github.genie.sql.builder.meta.Attribute;
 import io.github.genie.sql.builder.meta.Metamodel;
@@ -17,9 +17,9 @@ import io.github.genie.sql.builder.reflect.InstanceConstructor;
 import io.github.genie.sql.builder.reflect.ReflectUtil;
 import io.github.genie.sql.executor.jdbc.JdbcQueryExecutor.PreparedSql;
 import io.github.genie.sql.executor.jdbc.JdbcQueryExecutor.QuerySqlBuilder;
-import jakarta.persistence.EntityManager;
 import org.jetbrains.annotations.NotNull;
 
+import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -44,7 +44,7 @@ public class JpaNativeQueryExecutor implements AbstractQueryExecutor {
 
     private <T> List<T> queryByNativeSql(@NotNull QueryStructure queryStructure) {
         PreparedSql preparedSql = sqlBuilder.build(queryStructure, metamodel);
-        jakarta.persistence.Query query = entityManager.createNativeQuery(preparedSql.sql());
+        javax.persistence.Query query = entityManager.createNativeQuery(preparedSql.sql());
         int position = 0;
         for (Object arg : preparedSql.args()) {
             query.setParameter(++position, arg);
@@ -65,7 +65,8 @@ public class JpaNativeQueryExecutor implements AbstractQueryExecutor {
         Selection select = structure.select();
         int columnsCount = asArray(resultSet.get(0)).length;
 
-        if (select instanceof MultiSelected multiSelected) {
+        if (select instanceof MultiSelected) {
+            MultiSelected multiSelected = (MultiSelected) select;
             if (multiSelected.expressions().size() != columnsCount) {
                 throw new IllegalStateException();
             }

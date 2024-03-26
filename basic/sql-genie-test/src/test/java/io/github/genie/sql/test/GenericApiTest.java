@@ -90,9 +90,9 @@ public class GenericApiTest {
                         new MysqlUpdateSqlBuilder(),
                         connectionProvider,
                         metamodel);
-                resetData(connection, jdbcUpdate, query);
+                // resetData(connection, jdbcUpdate, query);
                 allUsers = queryAllUsers(query);
-            } catch (SQLException e) {
+            } catch (Exception e) {
                 throw new UncheckedSQLException(e);
             }
         });

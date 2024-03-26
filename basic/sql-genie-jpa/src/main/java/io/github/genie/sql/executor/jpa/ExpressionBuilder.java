@@ -7,22 +7,21 @@ import io.github.genie.sql.api.Operation;
 import io.github.genie.sql.api.Operator;
 import io.github.genie.sql.builder.Expressions;
 import io.github.genie.sql.builder.TypeCastUtil;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.FetchParent;
-import jakarta.persistence.criteria.From;
-import jakarta.persistence.criteria.Join;
-import jakarta.persistence.criteria.JoinType;
-import jakarta.persistence.criteria.Path;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
 import org.jetbrains.annotations.NotNull;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.FetchParent;
+import javax.persistence.criteria.From;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.JoinType;
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@SuppressWarnings("PatternVariableCanBeUsed")
 public class ExpressionBuilder {
 
     protected final Root<?> root;
@@ -36,7 +35,7 @@ public class ExpressionBuilder {
         this.cb = cb;
     }
 
-    public jakarta.persistence.criteria.Expression<?> toExpression(Expression expression) {
+    public javax.persistence.criteria.Expression<?> toExpression(Expression expression) {
         if (expression instanceof Constant) {
             Constant cv = (Constant) expression;
             return cb.literal(cv.value());
@@ -48,7 +47,7 @@ public class ExpressionBuilder {
         if (expression instanceof Operation) {
             Operation ov = (Operation) expression;
             Operator operator = ov.operator();
-            jakarta.persistence.criteria.Expression<?> e0 = toExpression(ov.firstOperand());
+            javax.persistence.criteria.Expression<?> e0 = toExpression(ov.firstOperand());
             Expression e1 = ov.secondOperand();
             Expression e2 = ov.thirdOperand();
             switch (operator) {
@@ -77,7 +76,9 @@ public class ExpressionBuilder {
                 case EQ: {
                     if (e1 instanceof Constant) {
                         Constant cv = (Constant) e1;
-                        return cb.equal(cast(e0), cv.value());
+                        if (cv.value() != null && e0.getJavaType() == cv.value().getClass()) {
+                            return cb.equal(cast(e0), cb.literal(cv.value()));
+                        }
                     }
                     return cb.equal(e0, toExpression(e1));
                 }
@@ -140,7 +141,8 @@ public class ExpressionBuilder {
                 case IN: {
                     List<? extends Expression> operands = ov.operands();
                     if (operands.size() <= 1) {
-                        return cb.literal(false);
+                        javax.persistence.criteria.Expression<Boolean> expr = cb.literal(true);
+                        return cb.notEqual(expr, expr);
                     } else {
                         CriteriaBuilder.In<Object> in = cb.in(e0);
                         for (int i = 1; i < operands.size(); i++) {
@@ -289,7 +291,7 @@ public class ExpressionBuilder {
                 .toArray(Predicate[]::new);
     }
 
-    public static <T> jakarta.persistence.criteria.Expression<T> cast(jakarta.persistence.criteria.Expression<?> expression) {
+    public static <T> javax.persistence.criteria.Expression<T> cast(javax.persistence.criteria.Expression<?> expression) {
         return unsafeCast(expression);
     }
 
