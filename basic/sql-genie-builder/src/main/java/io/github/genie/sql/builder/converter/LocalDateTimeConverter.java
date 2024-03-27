@@ -24,6 +24,9 @@ public class LocalDateTimeConverter implements TypeConverter {
 
     @Override
     public Object convert(Object value, Class<?> targetType) {
+        if (value == null || targetType.isInstance(value)) {
+            return value;
+        }
         if (value instanceof Date && targetType == LocalDate.class) {
             return ((Date) value).toLocalDate();
         }
