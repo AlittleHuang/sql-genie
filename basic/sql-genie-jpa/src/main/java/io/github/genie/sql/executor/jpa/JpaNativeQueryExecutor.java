@@ -1,5 +1,6 @@
 package io.github.genie.sql.executor.jpa;
 
+import io.github.genie.sql.api.Expression;
 import io.github.genie.sql.api.QueryStructure;
 import io.github.genie.sql.api.Selection;
 import io.github.genie.sql.api.Selection.EntitySelected;
@@ -77,7 +78,7 @@ public class JpaNativeQueryExecutor implements AbstractQueryExecutor {
             for (Object r : resultSet) {
                 Object[] row = asArray(r);
                 if (typeConverter != null) {
-                    for (int i = 0; i < selected.size(); i++) {
+                    for (int i = 0; i < types.size(); i++) {
                         Class<?> attribute = types.get(i);
                         row[i] = typeConverter.convert(row[i], attribute);
                     }
@@ -88,9 +89,13 @@ public class JpaNativeQueryExecutor implements AbstractQueryExecutor {
             if (1 != columnsCount) {
                 throw new IllegalStateException();
             }
+            Expression expression = ((SingleSelected) select).expression();
+            ExpressionTypeResolver typeResolver = new ExpressionTypeResolver(metamodel);
+            Class<?> type = typeResolver.getExpressionType(expression, structure.from().type());
             for (Object r : resultSet) {
-                Object[] row = asArray(r);
-                result.add(TypeCastUtil.unsafeCast(row[0]));
+                Object val = asArray(r)[0];
+                val = typeConverter.convert(val, type);
+                result.add(TypeCastUtil.unsafeCast(val));
             }
         } else {
             if (selected.size() != columnsCount) {

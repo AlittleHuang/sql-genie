@@ -7,6 +7,7 @@ import io.github.genie.sql.executor.jdbc.ConnectionProvider;
 import io.github.genie.sql.executor.jdbc.JdbcQueryExecutor;
 import io.github.genie.sql.executor.jdbc.JdbcResultCollector;
 import io.github.genie.sql.executor.jdbc.MySqlQuerySqlBuilder;
+import io.github.genie.sql.executor.jpa.JpaNativeQueryExecutor;
 import io.github.genie.sql.executor.jpa.JpaQueryExecutor;
 import io.github.genie.sql.meta.JpaMetamodel;
 import io.github.genie.sql.test.entity.User;
@@ -32,6 +33,7 @@ import java.util.stream.Stream;
 public class UserQueryProvider implements ArgumentsProvider {
     public static final Select<User> jdbc = jdbc();
     public static final Select<User> jpa = jpa();
+    public static final Select<User> jpaNative = jpaNative();
 
     @Getter(lazy = true)
     @Accessors(fluent = true)
@@ -63,7 +65,8 @@ public class UserQueryProvider implements ArgumentsProvider {
         EntityManagers.getEntityManager().clear();
         return Stream.of(
                 Arguments.of(jdbc),
-                Arguments.of(jpa)
+                Arguments.of(jpa),
+                Arguments.of(jpaNative)
         );
     }
 
@@ -73,9 +76,21 @@ public class UserQueryProvider implements ArgumentsProvider {
         return query.from(User.class);
     }
 
+    private static Select<User> jpaNative() {
+        Query query = jpaNaviveQuery();
+        log.debug("create jpa query: " + query);
+        return query.from(User.class);
+    }
+
     public static Query jpaQuery() {
         EntityManager manager = EntityManagers.getEntityManager();
         return new JpaQueryExecutor(manager, JpaMetamodel.of(), new MySqlQuerySqlBuilder(), TypeConverter.ofDefault())
+                .createQuery(new TestPostProcessor());
+    }
+
+    public static Query jpaNaviveQuery() {
+        EntityManager manager = EntityManagers.getEntityManager();
+        return new JpaNativeQueryExecutor(new MySqlQuerySqlBuilder(), manager, JpaMetamodel.of(), TypeConverter.ofDefault())
                 .createQuery(new TestPostProcessor());
     }
 

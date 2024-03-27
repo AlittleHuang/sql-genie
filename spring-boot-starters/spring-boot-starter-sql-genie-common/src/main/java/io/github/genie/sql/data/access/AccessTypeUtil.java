@@ -3,6 +3,7 @@ package io.github.genie.sql.data.access;
 import io.github.genie.sql.api.Query.Select;
 import io.github.genie.sql.api.Updater;
 import io.github.genie.sql.builder.TypeCastUtil;
+import io.github.genie.sql.builder.meta.Metamodel;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.config.DependencyDescriptor;
 
@@ -37,8 +38,20 @@ public class AccessTypeUtil {
 
 
     public static <ID extends Serializable> Class<ID> getIdType(DependencyDescriptor descriptor) {
-        Class<?> type = descriptor.getResolvableType().as(Access.class).resolveGeneric(1);
+        Class<?> type = descriptor.getResolvableType().as(ReadableAccess.class).resolveGeneric(1);
         return TypeCastUtil.cast(type);
+    }
+
+    public static <T, ID extends Serializable> void checkIdType(DependencyDescriptor descriptor,
+                                                                Metamodel metamodel,
+                                                                Class<T> entityType) {
+        Class<ID> idType = AccessTypeUtil.getIdType(descriptor);
+        Class<?> expected = metamodel.getEntity(entityType).id().javaType();
+        if (expected != idType) {
+            String msg = descriptor.getResolvableType() + " " + descriptor
+                         + " id type mismatch, expected: " + expected + ", actual: " + idType;
+            throw new EntityIdTypeMismatchException(msg);
+        }
     }
 
 

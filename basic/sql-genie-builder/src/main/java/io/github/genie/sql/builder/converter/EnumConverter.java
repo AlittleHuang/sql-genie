@@ -16,7 +16,7 @@ public class EnumConverter implements TypeConverter {
 
     @Override
     public Object convert(Object input, Class<?> targetType) {
-        if (!targetType.isEnum()) {
+        if (!targetType.isEnum() || input == null || targetType.isInstance(input)) {
             return input;
         }
         if (input instanceof String) {

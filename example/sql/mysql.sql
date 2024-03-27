@@ -133,4 +133,20 @@ INSERT INTO `user` VALUES (100, 10, 5, '2024-03-19 06:02:01.847000', 17107993218
 
 SET FOREIGN_KEY_CHECKS = 1;
 
-# @formatter:on
+CREATE TABLE `company` (
+  `id` int NOT NULL,
+  `addr` varchar(255) DEFAULT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `employee` (
+  `id` int NOT NULL,
+  `age` int DEFAULT NULL,
+  `company_id` int DEFAULT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK5v50ed2bjh60n1gc7ifuxmgf4` (`company_id`),
+  CONSTRAINT `FK5v50ed2bjh60n1gc7ifuxmgf4` FOREIGN KEY (`company_id`) REFERENCES `company` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
