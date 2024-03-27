@@ -191,9 +191,7 @@ public class MySqlQuerySqlBuilder implements QuerySqlBuilder {
         }
 
         private void appendSelectAlias() {
-            if (subIndex > 0) {
-                sql.append(" as _").append(selectIndex.getAndIncrement());
-            }
+            sql.append(" as _").append(selectIndex.getAndIncrement());
         }
 
         protected void appendFetchExpressions() {
