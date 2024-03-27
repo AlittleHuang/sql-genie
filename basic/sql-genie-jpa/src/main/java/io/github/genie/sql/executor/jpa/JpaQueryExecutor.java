@@ -8,6 +8,7 @@ import io.github.genie.sql.api.Lists;
 import io.github.genie.sql.api.Operation;
 import io.github.genie.sql.api.Order;
 import io.github.genie.sql.api.Order.SortOrder;
+import io.github.genie.sql.api.QueryExecutor;
 import io.github.genie.sql.api.QueryStructure;
 import io.github.genie.sql.api.Selection;
 import io.github.genie.sql.api.Selection.EntitySelected;
@@ -47,10 +48,12 @@ public class JpaQueryExecutor implements AbstractQueryExecutor {
 
     private final EntityManager entityManager;
     private final Metamodel metamodel;
-    private final JpaNativeQueryExecutor nativeQueryExecutor;
+    private final QueryExecutor nativeQueryExecutor;
 
-    public JpaQueryExecutor(EntityManager entityManager, Metamodel metamodel, QuerySqlBuilder querySqlBuilder) {
-        this(entityManager, metamodel, querySqlBuilder, TypeConverter.ofDefault());
+    public JpaQueryExecutor(EntityManager entityManager, Metamodel metamodel, QueryExecutor nativeQueryExecutor) {
+        this.entityManager = entityManager;
+        this.metamodel = metamodel;
+        this.nativeQueryExecutor = nativeQueryExecutor;
     }
 
     public JpaQueryExecutor(EntityManager entityManager, Metamodel metamodel, QuerySqlBuilder querySqlBuilder, TypeConverter converter) {

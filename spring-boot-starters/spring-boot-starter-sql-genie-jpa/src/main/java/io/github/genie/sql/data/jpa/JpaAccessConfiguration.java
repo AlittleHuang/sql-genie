@@ -1,66 +1,70 @@
 package io.github.genie.sql.data.jpa;
 
+import io.github.genie.sql.api.Query;
 import io.github.genie.sql.api.Update;
-import io.github.genie.sql.builder.converter.TypeConverter;
+import io.github.genie.sql.builder.QueryStructurePostProcessor;
 import io.github.genie.sql.builder.meta.Metamodel;
-import io.github.genie.sql.data.access.BaseDbAccessConfiguration;
+import io.github.genie.sql.data.access.Access;
+import io.github.genie.sql.data.access.Accesses;
 import io.github.genie.sql.data.access.TransactionalUpdate;
-import io.github.genie.sql.executor.jdbc.JdbcQueryExecutor.QuerySqlBuilder;
-import io.github.genie.sql.executor.jdbc.MySqlQuerySqlBuilder;
+import io.github.genie.sql.executor.jdbc.JdbcQueryExecutor;
 import io.github.genie.sql.executor.jpa.JpaQueryExecutor;
 import io.github.genie.sql.executor.jpa.JpaUpdate;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.beans.factory.config.DependencyDescriptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
+import org.springframework.context.annotation.Scope;
 import org.springframework.orm.jpa.SharedEntityManagerCreator;
 
-import java.util.List;
+import java.io.Serializable;
 
 @Configuration
-@Import(BaseDbAccessConfiguration.class)
 public class JpaAccessConfiguration {
-
     @Bean
-    @ConditionalOnMissingBean
-    protected QuerySqlBuilder querySqlBuilder() {
-        return new MySqlQuerySqlBuilder();
+    @Primary
+    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+    protected <T, ID extends Serializable> Access<T, ID> jpaAccess(DependencyDescriptor descriptor,
+                                                                   @Qualifier("jpaQuery") Query query,
+                                                                   @Qualifier("jpaUpdate") Update update,
+                                                                   Metamodel metamodel) {
+        return Accesses.of(descriptor, query, update, metamodel);
     }
+
 
     @Bean
     @Primary
-    @ConditionalOnMissingBean
-    protected JpaQueryExecutor queryExecutor(EntityManager entityManager,
-                                             Metamodel metamodel,
-                                             QuerySqlBuilder querySqlBuilder,
-                                             List<TypeConverter> typeConverters) {
-        TypeConverter converter = TypeConverter.of(typeConverters.toArray(new TypeConverter[0]));
-        return new JpaQueryExecutor(entityManager, metamodel, querySqlBuilder, converter);
+    protected JpaQueryExecutor jpaQueryExecutor(EntityManager entityManager,
+                                                Metamodel metamodel,
+                                                JdbcQueryExecutor executor) {
+        return new JpaQueryExecutor(entityManager, metamodel, executor);
     }
 
-    @Bean
+    @Bean("jpaUpdate")
     @Primary
-    @ConditionalOnMissingBean
-    protected Update genieUpdate(EntityManager entityManager, JpaQueryExecutor jpaQueryExecutor) {
+    protected Update jpaUpdate(EntityManager entityManager, JpaQueryExecutor jpaQueryExecutor) {
         JpaUpdate jpaUpdate = new JpaUpdate(entityManager, jpaQueryExecutor);
         return new TransactionalUpdate(jpaUpdate);
     }
 
     @Bean
-    @ConditionalOnMissingBean
     protected EntityManager entityManager(EntityManagerFactory entityManagerFactory) {
         return SharedEntityManagerCreator.createSharedEntityManager(entityManagerFactory);
     }
 
     @Bean
-    @Order(Ordered.LOWEST_PRECEDENCE >> 2)
-    protected TypeConverter typeConverter() {
-        return TypeConverter.ofDefault();
+    @Primary
+    protected Query jpaQuery(JpaQueryExecutor executor,
+                             @Autowired(required = false)
+                             QueryStructurePostProcessor structurePostProcessor) {
+        return structurePostProcessor != null
+                ? executor.createQuery(structurePostProcessor)
+                : executor.createQuery();
     }
 
 }
