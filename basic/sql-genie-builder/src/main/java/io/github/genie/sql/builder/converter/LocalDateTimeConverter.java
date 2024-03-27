@@ -1,6 +1,5 @@
 package io.github.genie.sql.builder.converter;
 
-import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -27,14 +26,26 @@ public class LocalDateTimeConverter implements TypeConverter {
         if (value == null || targetType.isInstance(value)) {
             return value;
         }
-        if (value instanceof Date && targetType == LocalDate.class) {
-            return ((Date) value).toLocalDate();
+        if (value instanceof java.sql.Date && targetType == LocalDate.class) {
+            return ((java.sql.Date) value).toLocalDate();
         }
         if (value instanceof Timestamp && targetType == LocalDateTime.class) {
             return ((Timestamp) value).toLocalDateTime();
         }
         if (value instanceof Time && targetType == LocalTime.class) {
             return ((Time) value).toLocalTime();
+        }
+        if (value instanceof java.util.Date) {
+            long time = ((java.util.Date) value).getTime();
+            if (targetType == LocalDate.class) {
+                return new java.sql.Date(time).toLocalDate();
+            }
+            if (targetType == LocalDateTime.class) {
+                return (new Timestamp(time)).toLocalDateTime();
+            }
+            if (targetType == LocalTime.class) {
+                return (new Time(time)).toLocalTime();
+            }
         }
         return value;
     }
