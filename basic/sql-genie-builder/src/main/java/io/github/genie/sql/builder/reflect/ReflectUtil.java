@@ -177,9 +177,9 @@ public class ReflectUtil {
         field.set(instance, value);
     }
 
-    private static void checkAccessible(Field field, Object instance) {
-        if (!isAccessible(field, instance)) {
-            field.setAccessible(true);
+    private static void checkAccessible(AccessibleObject accessible, Object instance) {
+        if (!isAccessible(accessible, instance)) {
+            accessible.setAccessible(true);
         }
     }
 
@@ -209,16 +209,33 @@ public class ReflectUtil {
         }
     }
 
-    public static Object getEnum(Class<?> cls, int index) {
+    public static Object getEnum(Class<?> cls, int ordinal) {
+        if (!cls.isEnum()) {
+            throw new IllegalArgumentException();
+        }
         Object array = SINGLE_ENUM_MAP.computeIfAbsent(cls, k -> {
             try {
                 Method method = cls.getMethod("values");
+                checkAccessible(method, null);
                 return method.invoke(null);
             } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
                 throw Exceptions.sneakyThrow(e);
             }
         });
-        return Array.get(array, index);
+        return Array.get(array, ordinal);
+    }
+
+    public static Object getEnum(Class<?> cls, String name) {
+        if (!cls.isEnum()) {
+            throw new IllegalArgumentException();
+        }
+        try {
+            Method method = cls.getMethod("valueOf");
+            checkAccessible(method, null);
+            return method.invoke(name);
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            throw Exceptions.sneakyThrow(e);
+        }
     }
 
 }

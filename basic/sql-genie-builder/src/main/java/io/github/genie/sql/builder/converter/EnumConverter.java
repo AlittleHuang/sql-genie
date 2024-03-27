@@ -15,16 +15,27 @@ public class EnumConverter implements TypeConverter {
     }
 
     @Override
-    public Object convert(Object value, Class<?> targetType) {
-        if (value instanceof Number && targetType.isEnum()) {
-            Object v = NumberConverter.of().convert(value, Integer.class);
-            if (v instanceof Integer) {
-                return ReflectUtil.getEnum(targetType, (Integer) v);
+    public Object convert(Object input, Class<?> targetType) {
+        if (!targetType.isEnum()) {
+            return input;
+        }
+        if (input instanceof String) {
+            try {
+                return ReflectUtil.getEnum(targetType, (String) input);
+            } catch (Exception ignore) {
             }
         }
-        return value;
+        Object num = NumberConverter.of().convert(input, Integer.class);
+        if (num instanceof Integer) {
+            try {
+                return ReflectUtil.getEnum(targetType, (Integer) num);
+            } catch (Exception ignore) {
+            }
+        }
+        return input;
     }
 
     protected EnumConverter() {
     }
+
 }
