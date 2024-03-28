@@ -5,9 +5,9 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>io.github.genie-cloud</groupId>
-    <artifactId>sql-genie</artifactId>
+    <artifactId>sql-genie-spring-boot-starters</artifactId>
     <version>1.1.2</version><!-- project version -->
-    <relativePath>../../pom.xml</relativePath>
+    <relativePath>../pom.xml</relativePath>
   </parent>
 
   <artifactId>spring-boot-starter-sql-genie-jpa</artifactId>
